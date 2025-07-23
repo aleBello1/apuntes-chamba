@@ -1,0 +1,2 @@
+Descargar o cambiar el  jdk: En la parte sup der -> click en el engrane -> Project structure
+	-> Project settings -> Project -> SDK -> download jdk.

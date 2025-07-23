@@ -1,0 +1,13 @@
+
+
+
+RAMAS
+
+Rama feature ------------------------
+
+Nos posicionamos en la rama develop.
+Crear la rama feature.
+En la rama feature hacer todo las tareas que se nos encarga.
+Al finalizar las tareas, nos posicionamos en la rama develop y la unimos con la rama feature.
+
+Después, estando en la rama develop se crea una rama realese.

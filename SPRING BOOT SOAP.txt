@@ -1,0 +1,131 @@
+////////////////////////////////////////////////////SOAP///////////////////////////////////////////////////////
+
+Simple Object Access Protocol (SOAP): protocolo de mensajería basado en XML usado para intercambiar datos estructurados entre aplicaciones.
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <!-- Aquí van los metadatos del mensaje -->
+  </soap:Header>
+  <soap:Body>
+    <!-- Aquí va la solicitud o la respuesta (el contenido principal) -->
+  </soap:Body>
+</soap:Envelope> -> Estructura de un mensaje SOAP
+	El Header es opcional, y se usa para incluir información Autenticación (como tokens), Time-to-live (TTL)
+	(Fecha de expiración del mensaje), Encriptación (Para proteger los datos del mensaje).
+	El Body es obligatorio y contiene: En una solicitud: los datos que el cliente envía al servidor y En una 	respuesta: los datos que el servidor devuelve al cliente.
+	Si ocurre un error, el Body puede contener una etiqueta <soap:Fault> con información del error.
+
+<soap:Body>
+  <soap:Fault>
+    <faultcode>soap:Client</faultcode>
+    <faultstring>El ID enviado no es válido</faultstring>
+    <detail>
+      <codigoError>400</codigoError>
+    </detail>
+  </soap:Fault>
+</soap:Body> -> Ejemplo de error (SOAP Fault).
+	Dentro de la etiqueta detail podemos inventar nuestras propias etiquetas. ******
+	- Valores permitidos en <faultcode>:
+		- soap:Client -> El error es del cliente (por ejemplo, datos inválidos).
+		- soap:Server -> El error ocurrió en el servidor.
+		- soap:VersionMismatch -> El cliente usó una versión de SOAP no compatible.
+		- soap:MustUnderstand -> El cliente ignoró un header marcado como obligatorio.
+
+
+Dependencias -----------------------------------------
+
+Agregar las siguientes dependencias:
+
+spring-boot-starter-web-services -> Habilita soporte para servicios web (SOAP) en Spring Boot.
+
+jaxb-api -> JAXB (Java Architecture for XML Binding) es una tecnología que permite convertir objetos Java a XML 	(marshal) y convertir XML a objetos Java (unmarshal).
+	A partir de Java 11, JAXB ya no viene incluido por defecto, así que debes agregarlo manualmente.
+
+jaxb2-maven-plugin -> Plugin de Maven que te permite generar automáticamente clases Java a partir de: Archivos 	WSDL (Web Services Description Language) y Archivos XSD (XML Schema).
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web-services</artifactId>
+</dependency>
+
+<dependency>
+  <groupId>jakarta.xml.bind</groupId>
+  <artifactId>jakarta.xml.bind-api</artifactId>
+  <version>4.0.0</version>
+</dependency>
+<dependency>
+  <groupId>org.glassfish.jaxb</groupId>
+  <artifactId>jaxb-runtime</artifactId>
+  <version>4.0.3</version>
+</dependency>
+
+
+Crear clase que representa a un XML -----------------------------------
+
+@XmlRootElement(name = "objetoX")
+public class NombreClaseX {} -> Indica que esta clase representa el elemento raíz del XML, es decir, sirve para
+	poder mapear esta clase y atributos con cierto documento XML.
+	Sin esta anotación, no puedes usar JAXBContext.newInstance(NombreClaseX.class) directamente para 	marshalling o unmarshalling.
+
+@XmlElement
+public tipoDato getNombreAtributoX() {
+    return nombreAtributo;
+} -> Indica que este atributo es mapeado a un atributo XML.
+	Siempre se coloca sobre los getters, si se quisiera colocar encima de los atributos y no encima de los
+	getters se tendría que agregar esta anotación a la clase: @XmlAccessorType(XmlAccessType.FIELD) (si no
+	se coloca el valor por defecto es: @XmlAccessorType(XmlAccessType.PROPERTY)).
+
+
+°°°°°° Convertir un objeto java a XML °°°°°°
+
+JAXBContext context = JAXBContext.newInstance(NombreEntidadX.class);
+Marshaller marshaller = context.createMarshaller();
+marshaller.marshal(objetoX, System.out); -> Convierte un objeto java a un XML.
+	El XML se imprime por consola (es decir, en la salida estándar del sistema: System.out).
+
+File archivo = new File("objetoX.xml");
+JAXBContext context = JAXBContext.newInstance(NombreEntidadX.class);
+Marshaller marshaller = context.createMarshaller();
+marshaller.marshal(objetoX, archivo); -> Convierte un objeto java a un XML.
+	El XML se guarda en un archivo XML.
+
+Ejemplo de salida:
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persona>
+  <nombre>Juan</nombre>
+  <edad>30</edad>
+</persona>
+
+
+°°°°°° Convertir un XML a un objeto java °°°°°°
+
+JAXBContext context = JAXBContext.newInstance(NombreClaseX.class);
+Unmarshaller unmarshaller = context.createUnmarshaller();
+File xmlFile = new File("objetoX.xml");
+NombreClaseX objetoX = (NombreClaseX) unmarshaller.unmarshal(xmlFile); -> Cuando viene de un XML.
+
+String xml = """
+<objetoX>
+  <nombre>Juan</nombre>
+  <edad>30</edad>
+</objetoX>
+""";
+JAXBContext context = JAXBContext.newInstance(NombreClaseX.class);
+Unmarshaller unmarshaller = context.createUnmarshaller();
+StringReader reader = new StringReader(xml);
+NombreClaseX objetoX = (NombreClaseX) unmarshaller.unmarshal(reader); -> Cuando viene de un string el cual 
+	contiene al XML.
+
+
+Consumir API soap con restTemplate ------------------------
+
+mediatype
+
+action() -> 
+
+
+////////////////////////////////////////////////////WSDL///////////////////////////////////////////////////////
+
+Web Services Description Language (WSDL): documento XML que describe un servicio web. Funciona como un contrato 	entre un cliente y un servidor.
+	Analogo a swagger solo que este es para soap.

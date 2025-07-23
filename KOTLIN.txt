@@ -1,0 +1,226 @@
+///////////////////////////////////////////////BASICO////////////////////////////////////////////////////
+
+Lenguaje de programación moderno que corre sobre la máquina virtual de Java (JVM). 
+
+Kotlin no usa ;.
+
+val nombreVariable = valor -> Define una variable inmutable (como final en Java).
+
+var nombreVariable = valor -> Define una variable mutable (se puede cambiar su valor).
+	Kotlin infiere el tipo de dato automáticamente de acuerdo a lo que almacene pero también se puede
+	indicar.
+	- var nombreVariable: tipoDato = valor -> Define una variable mutable (se puede cambiar su valor)
+		indicando el tipo de dato.
+	- var nombreVariable: tipoDatoX? -> Para definir una variable que puede almacenar un valor null 
+		ó un valor de cierto tipo de dato.
+		De esta manera, se evitan los nullPointerException que ocurren en java.
+
+const val NOMBRE_VARIABLE = valor -> Define una constante. Como static final en Java.
+	No se declaran dentro de una función o método. *****
+
+
+TIPOS DE DATO
+
+Solo hay un tipo de dato primito diferente en kotlin en comparación con java.
+
+Kotlin	Descripción	Equivalente Java
+Int	Entero (32 bits)	Integer
+
+
+CASTEO AUTOMATICO
+
+No necesitas hacer cast explícito después de una verificación de tipo de dato.
+
+if (obj is tipoDatoX) {
+    // No se necesita convertir a obj al tipo de dato equis)
+    // Ya se puede usar obj como si fuera el tipo de dato equis
+}
+
+
+MODOS DE ACCESO
+
+Los modos de acceso son y funcionan igual que en java, salvo por tres excepciones.
+
+En Kotlin no existe el modificador de acceso defaul
+En Kotlin, si no pones ningún modificador, es public por defecto.
+Existe un modificador de acceso mas, llamado internal el cual sirve para ser Visible solo dentro del mismo módulo (por ejemplo, en el mismo proyecto).
+
+
+CICLOS
+
+for (i in valorInicial..valorFinal) {
+    // N instrucciones
+} -> Crea un ciclo que va del valor inicial al valor final de uno en uno.
+
+for (i in valorInicial until valorFinal) {
+    // N instrucciones
+} -> Crea un ciclo que va del valor inicial el valor (final-1) de uno en uno.
+
+for (i in valorFinal downTo valorInicial) {
+    // N instrucciones
+} -> Crea un ciclo que va del valor final al valor inicial de uno en uno.
+
+for (i in valorInicial..valorFinal step valorStep) {
+    // N instrucciones
+} -> Crea un ciclo que va del valor final al valor inicial de step en step.
+
+
+FUNCIONES
+
+Existe el tipo de dato para retorno llamado Unit, este indica que no devuelve nada (Unit es como void en Java, aunque también se puede omitirlo).
+
+fun nombreFuncionX(par1: tipoDato1, par2: tipoDato2, parN: tipoDatoN): tipoDatoRetorno {
+    // N instrucciones
+}
+
+fun saludar(nombre: String = "amigo") {
+    println("Hola, $nombre")
+} -> Ejemeplo de función con valor por defecto para un parámetro.
+
+
+COLECCIONES
+
+List ----------------------------------
+
+Son listas inmutables.
+
+listOf() -> Crea una lista no mutable, equivalente en Java a List.of(...).
+
+setOf() -> Crea una lista no mutable, equivalente en Java a Set.of(...).
+
+
+
+MutableList ----------------------------------
+
+Son listas mutables, es decir, que se puede modificar su contenido.
+
+mutableListOf() -> Crea una lista mutable vacía, equivalente en Java a new ArrayList<>().
+
+mutableSetOf() -> Crea una lista mutable vacía, equivalente en Java a new HashSet<>() (no guarda un orden).
+
+
+Mapas ---------------
+
+val errors = mutableMapOf<String, String>() -> Crea un mapa mutable vacio.
+	
+errors["nombreLlave"] = valor -> Agrega determinada llave y valor.
+	Equivalente al método put.
+
+ val errors = mapOf(
+        "nombreLlave1" to valor1,
+        "nombreLlave2" to valor2,
+	"nombreLlaveN" to valorN
+    ) -> Crea e inicializa un mapa inmutable.
+
+
+EXCEPCIONES
+
+Kotlin no tiene checked exceptions, por lo tanto no estás forzado a usar try-catch o throws para muchas operaciones. Sin embargo, Lo mejor será usar trycatch par
+
+Ejemplo
+
+fun leerArchivo() {
+    val contenido = File("archivo.txt").readText() // sin throws
+}
+
+
+OPERADORES
+
+expresión ?: valor -> Operador Elvis. Sirve para proporcionar un valor por defecto cuando una expresión 
+	es null.
+	Siempre a la varialbes a las que se les aplica la expresión se definen de tal manera que permita
+	nulos ********
+	
+Ejemplo 1:
+
+val nombre: String? = null
+val mostrar = nombre ?: "Desconocido"
+
+Ejemplo 2:
+
+val lista: List<Int>? = null
+val total = lista?.sum() ?: 0
+
+val nombreVariable: String? = null
+nombreVariable?.nombrePropiedad -> Operador de llamada segura. Evita verificar si un objeto es nulo. Si 
+	el objeto es null, retorna null (sin lanzar NullPointerException).
+	El operador ?. necesita estar antes de una llamada o acceso a una propiedad o función, 	como .length, .toUpperCase(), etc. *****
+	Siempre a la varialbes a las que se les aplica la expresión se definen de tal manera que permita
+	nulos ********
+	Otra manera de verlo es que si de la expresión 'nombreVariable?.nombrePropiedad' la variable
+	tiene valor, si podrá usar cierta propiedad. ******
+
+val nombreVariable: String? = null
+nombreVariable!!.nombrePropiedad -> Operador de aserción no nula. Se aplica a variables que estamos 
+	completamente seguros que NO serán null, pero si lo son se lanzara un NullPointerException.
+	El operador necesita estar antes de una llamada o acceso a una propiedad o función, 	como .length, .toUpperCase(), etc. *****
+	Siempre a la varialbes a las que se les aplica la expresión se definen de tal manera que permita
+	nulos ********
+	
+a == b -> Compara contenido (como equals en Java). *****
+
+a === b -> Compara referencia (como == en Java). ******
+
+
+
+
+PARA PREGUNTAR DESPUES
+
+Operadores let, run, apply, also, with (scoping functions).
+
+fatory methods
+
+singleton
+
+
+/////////////////////////////////////////////PATRONES DE DISEÑO////////////////////////////////////////////
+
+FACTORY METHOD
+
+Es un patron de diseño creacional en el cual se definen un conjunto de funciones las cuales ofrecen diferentes formas de crear instancias de una misma clase.
+Cada una de estas funciones encapsulan lógica en el momento de crear de objetos y permite construir instancias de una clase evitando el uso directo de constructores.
+Sirve para Ocultar lógica compleja de creación y Validar o transformar datos antes de crear el objeto.
+
+class NombreClase private constructor(var atributo1: tipoDato, 
+	var atributo2: tipoDato2, var atributoN: tipoDatoN) {} -> Se debe obligar a que la clase no 
+		instancie los objetos, esto solo debe ser posible con los métodos de
+		fabricas asi que se hace algo asi.
+		Al ser un constructor privado es posible usarlo dentro de la misma clase.
+
+companion object {
+
+        fun crearAtributo(pars: tipoDato): NombreClaseX {
+	    // lógica para validar o transformar antes de crear
+            return NombreClaseX(...) // Siempre la ultima linea llama al constructor privado
+        }
+} -> Manera de definir multiples métodos de fabrica.
+	La instrucción companion object { ... } se usa para declarar métodos de clase y no de instancia.
+
+Cada método de fabrica debe tener nombres semánticos que explican qué se esta creando (pe crear con base a un atributo o crear con base a un posible catalogo de valores que puede tener un atributo (pe si se tiene el atributo rol donde los posibles valores son admin, user, invitado, los métodos se podrían lamar: crearAdmin, crearUser, crearInvitado))*******
+
+
+
+
+//////////////////////////////////////////////////POO///////////////////////////////////////////////////
+
+
+
+CONSTRUCTORES
+
+Se tienen dos tipos de constructores: primario y secundario.
+El primario se define en la definición de clase.
+
+class NombreClase(var nombreAtributo1: tipoDato, var nombreAtributo2: tipoDato2, 
+	var nombreAtributoN: tipoDatoN) -> Constructor en la definición de clase.
+
+class NombreClase(var nombreAtributo1: tipoDato = valor1, var nombreAtributo2: tipoDato2 = valo2, 
+	var nombreAtributoN: tipoDatoN) -> Constructor en la definición de clase indicando que hay valor 		por defecto.
+
+constructor(var nombreAtributo1: tipoDato, var nombreAtributo2: tipoDato2, var nombreAtributoN: tipoDatoN) {
+    this.nombreAtributo1 = nombreAtributo1
+    this.nombreAtributo2 = nombreAtributo2
+    this.nombreAtributoN = nombreAtributoN
+} -> Para definir un constructor secundario.
+
+
+	

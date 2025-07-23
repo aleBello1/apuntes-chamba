@@ -1,0 +1,103 @@
+
+
+///////////////////////////////////////////////CRUD////////////////////////////////////////////////////////
+
+
+DEFINICION DE CLASES ENTITY
+
+Aquí todas las anotaciones como @Entity, @Id, @GeneratedValue(strategy = GenerationType.IDENTITY), entre
+otras, se usan igual.
+
+Las clases entity y dto deben ser data class. Una data class es una clase diseñada para almacenar o representar datos y no comportamiento. Kotlin genera automáticamente para ella: equals() (comparación por contenido), hashCode(), toString(), copy(), componentN() (usado para desestructuración como en js 
+(val (a, b) = obj)). Esto lo puede hacer java con la anotación Loombok
+
+Las anotaciones para validaciones o restricciones de atributos en Kotlin con Spring Boot funcionan igual
+que en Java, pero la sintaxis cambia:
+@field:NombreAnotacionRestriccion
+
+@Entity
+data class NombreClaseX(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
+    var nombreAtributo1: tipoDato,
+    var nombreAtributo2: tipoDato,
+    var nombreAtributoN: tipoDato,
+)
+
+En Kotlin, no se necesita escribir manualmente los getters y setters como en Java. Kotlin los genera automáticamente cuando se define una propiedad.
+
+
+CAPA DE REPOSITORY
+
+La sintaxis para las interface es:
+
+import com.alejandro.crudKotlin.entities.NombreEntidadX
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface NombreEntidadXRepository : JpaRepository<NombreEntidadX, Long> {
+    
+}
+
+
+CAPA DE SERVICE
+
+La sintaxis para las interface es:
+
+interface ActorService {
+
+    fun nombreMetoHttpNombreOperacion1(par1: tipoDato1, par2: tipoDato2, parN: tipoDatoN): tipoDatoReturn
+
+    fun nombreMetoHttpNombreOperacion1(par1: tipoDato1, par2: tipoDato2, parN: tipoDatoN): tipoDatoReturn
+
+    fun nombreMetoHttpNombreOperacion1(par1: tipoDato1, par2: tipoDato2, parN: tipoDatoN): tipoDatoReturn
+
+}
+
+Para las clases implementadoras:
+
+@Service
+class NombreClaseXServiceImpl(
+    private val objetoXRepository: NombreClaseXRepository
+) : NombreClaseXService {
+    // contenido
+} -> Define una clase implementadora llamada NombreEntidadXServiceImpl, implementará los métodos definidos 	en la interfaz NombreEntidadXService.
+	Kotlin permite definir el constructor en la misma línea que la clase asi que, esta es la manera de
+	inyectar una instancia del repositorio (gracias a @Service).
+
+Los métodos mas o menos quedan: 
+
+@Transactional
+override fun nombreMetoHttpNombreOperacion1(par1: tipoDato1, par2: tipoDato2, 
+	parN: tipoDatoN): tipoDatoReturn
+{
+        // contenido
+}
+
+
+CAPA DE CONTROLLER
+
+@RestController
+@RequestMapping("/api/arrayX")
+class NombeEntidadXController(
+    private val service: NombeEntidadX
+) {}
+
+El tipo de dato: ResponseEntity<?> es reemplazado por: ResponseEntity<*>.
+
+
+///////////////////////////////////////////////OTROS//////////////////////////////////////////////////////
+
+
+DEPURACION
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+private val log = LoggerFactory.getLogger(this::class.java) -> -> Para registrar mensajes de log en 
+	la clase en la que está definido.
+
+
+
+
