@@ -1,0 +1,1 @@
+En todos los endpoint de cualquier proyecto donde este {business} se escribe ahorra y es el único posible valor que puede tomar.

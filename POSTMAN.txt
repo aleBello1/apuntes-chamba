@@ -1,0 +1,16 @@
+
+ENVIROMENTS
+
+Se crea un ambiente por cada proyecto. Cada ambiente tiene multiples variables. Estas variables sirven para que cuando probemos endpoints, podamos cambiar de servidor (pasar de local, develop, etc).
+
+Crear un nuevo enviroment: En el apartado izq click en enviroments -> agregar un nuevo enviroments -> 	asignarle el nombre del proyecto.
+	En la tabla: 
+		variable: nombre del servidor (local, develop, etc)
+		initial value: la url correspondiente.
+
+Para cambiar de enviroment: En la parte sup der de postman -> Seleccionar determinado enviroment.
+
+Para usar una variable de un enviroment en los endpoint se coloca:
+	{{nombreVariable}}
+
+

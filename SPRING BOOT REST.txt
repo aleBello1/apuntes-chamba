@@ -1,0 +1,19 @@
+
+Crear una ruta de primer nivel, ruta raiz ó ruta base -------------
+
+
+°°°°°° ruta base con path variable °°°°°°°
+
+
+Se define un path variable en la ruta base.
+
+@RestController
+@RequestMapping("/api/vehiculos-{nombreParametroY}")
+public class NombreEntidadController {}
+
+Pero es hasta cierto método del controlador que se capture ese valor.
+
+@GetMapping("/nombreRutaX/{nombreParametroY}")
+public ResponseEntity<?> nombreMetodoX(@PathVariable tipoDato nombreParametroY) {
+    // N instrucciones
+} 
