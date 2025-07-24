@@ -100,4 +100,96 @@ private val log = LoggerFactory.getLogger(this::class.java) -> -> Para registrar
 
 
 
+///////////////////////////////////////////////CLIENTES//////////////////////////////////////////////////
+
+
+REST TEMPLATE
+	
+Crear el paquete llamado config/ y dentro de este una clase de configuración, ahí crear el bean para
+restTemplate.
+
+@Configuration
+class AppConfig {
+
+    @Bean
+    fun restTemplate(): RestTemplate {
+        return RestTemplate()
+    }
+
+} -> declararlo como un @Bean a restTemplate.
+
+
+En una clase service ---------------------------------------------
+
+Inyectar el componenete por medio de autowired o constructor primario.
+
+@Service
+class NombreClaseXServicio(private val restTemplate: RestTemplate) {}
+
+val headers = HttpHeaders() -> Permite la definición del header.
+
+headers.accept = listOf(MediaType.APPLICATION_JSON) -> Para indicar que esperamos el cuerpo de la respuesta 	que da el servidor en formato json.
+
+headers.setBearerAuth("token") -> Para agregar el token de autorización de tipo Bearer que necesita la
+	petición.
+
+val entity = HttpEntity<String>("", headers) -> Crea un objeto HttpEntity que encapsula dos cosas:
+	El cuerpo (body) de la solicitud y los encabezados.
+
+val response = restTemplate.exchange(
+    url,
+    HttpMethod.NOMBRE_METODO_HTTP,
+    entity,
+    NombreTipoDato
+) -> Realiza cierta petición a un servidor.
+
+JSONObject(response.body) -> Convierte un json string a un objeto json.
+
+objetoJson.getJSONArray("nombreClave") -> Accede a determinado atributo o clave del objeto json.
+
+val lista: MutableList<JSONObject> = mutableListOf() -> Crea una lista mutable vacía que almacenará 
+	objetos de tipo json.
+
+arregloJson.getJSONObject(i) -> Del arreglo de objetos json devuelve el objeto JSON que está en la 
+	posición i.
+
+val objetoJson = JSONObject() -> Crea un objeto json.
+
+objetoJson.put("Id", Id) -> Crea una clave y le asigna un valor dentro de un objeto json.
+
+objetoJson.getTipoDatoY("nombreClaveX") -> Extrae del objeto json el valor asociado a cierta clave
+	y la convierte al tipo de dato ye.
+
+JSONArray(lista) -> Convierte una lista de JSONObject en un JSONArray.
+
+
+°°°°° Extraer determinados valores de una arreglo obtener un nuevo arreglo °°°°°°°
+
+val response = restTemplate.exchange(
+    url,
+    HttpMethod.NOMBRE_METODO_HTTP,
+    entity,
+    String::class.java // obligatorio
+)
+
+val JSONArray = JSONObject(resp.body)
+
+val objectJsonList: MutableList<JSONObject> = mutableListOf()
+
+for (i in 0 until JSONArray.length()) {
+    val currentJsonObject = JSONArray.getJSONObject(i)
+
+    val newJsonObject = JSONObject().apply {
+	jsonObject.put("nombreClave1", currentJsonObject.getTipoDato("nombreClave1"))
+        jsonObject.put("nombreClave2", currentJsonObject.getTipoDato("nombreClave2"))
+        jsonObject.put("nombreClaveN", currentJsonObject.getTipoDato("nombreClaveN"))    
+
+    }
+             
+
+    objectJsonList.add(newJsonObject)
+}
+
+
+ 
 

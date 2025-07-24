@@ -1,4 +1,4 @@
-
+Al bajar un nuevo proyecto cambiarse a la rama develop.
 
 
 RAMAS
@@ -6,8 +6,20 @@ RAMAS
 Rama feature ------------------------
 
 Nos posicionamos en la rama develop.
-Crear la rama feature.
+	git switch devlop
+
+Crear la rama feature. Para nombrar a la rama se usa la nomeclatura kebab-case (guiones medios) y se asigna
+un nombre descriptivo de acuerdo a la funcionalidad que se agregara. Pe: feature/agregar-login, feature/mejorar-busqueda-productos, etc.
+	git switch -c feature/nombre-descriptivo-x
+
 En la rama feature hacer todo las tareas que se nos encarga.
 Al finalizar las tareas, nos posicionamos en la rama develop y la unimos con la rama feature.
+	git switch develop
+	git merge feature/nombre-descriptivo-x
 
-Después, estando en la rama develop se crea una rama realese.
+Cuando nos aseguremos de que todo esta bien se elmina la rama feature.
+	git branch -d feature/nombre-descriptivo-x
+	git push origin --delete feature/nombre-descriptivo-x
+
+
+

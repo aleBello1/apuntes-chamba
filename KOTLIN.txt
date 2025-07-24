@@ -223,4 +223,3 @@ constructor(var nombreAtributo1: tipoDato, var nombreAtributo2: tipoDato2, var n
 } -> Para definir un constructor secundario.
 
 
-	
