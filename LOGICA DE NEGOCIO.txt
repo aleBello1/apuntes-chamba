@@ -1,1 +1,141 @@
+
+/////////////////////////////////////////////PROYECTOS//////////////////////////////////////////////////
+
+
+CLUPP
+
+Documentación que manda este cliente:
+https://documenter.getpostman.com/view/18868163/2sA3QniZYU#3e85c796-b075-4d9e-b44c-bbdcbc97b69c
+
+
+Para generar la emisión primero es la cotización. Con base al id de la cotización rastreas la emisión.
+
+De 'respositories/caralogRepositories' donde viven esas tablas y como las podria consultar?
+Del application.yml extraer la url, username y password, meterlos al dbeaver.
+	url: rds-ws-clupp.cypym5wo7yt3.us-east-1.rds.amazonaws.com
+
+
+Entidades --------------------------
+
+'extracción': Consumir api y guardar esos datos en nuestra db.
+
+'quote': Para hacer las cotizaciones de vehículos.
+
+
+Endpoints --------------------------
+
+°°°°°°°°°° Entidad catalog °°°°°°°°°°
+
+'variants': se toma de la la descripción (descripción del vehiculo) y se pega en el post de cotización.
+
+
+°°°°°°°°°° Entidad qoute °°°°°°°°°°
+
+||||||| Post quote ||||||
+
+Se manda un cuerpo que inclya:
+
+Pe este:
+
+{
+   "aseguradora":"CLUPP",
+   "clave":"CC-07546-01",
+   "cp":"66005",
+   "descripcion":"ILX",
+   "detalle":"PREMIUM 4P L4 2.0L SPORTSHIFT AUT., 05 OCUP.",
+   "descuento":0,
+   "edad":41,
+   "fechaNacimiento":"1984-01-01",
+   "genero":"M",
+   "marca":"ACURA",
+   "modelo":"2013",
+   "movimiento":"COTIZACION",
+   "servicio":"PARTICULAR",
+   "paquete":"AMPLIA-NORMAL",
+   "periodicidadPago":"ANUAL",
+   "tipoValor":"CONVENIDO",
+   "conductorUniversal":false
+}
+
+De la respuesta, se toma: 
+
+Se deben llenar los datos del cliente y vehiculo.
+
+Datos del cliente: 
+
+numero de teléfono y correo tienen que ser reales pero no proipios porque si no te llenan de spam.
+
+
+Datos del vehiculo:
+
+marca, modelo, servicio submarca (ya vienen), placas (puede ser falso), numero de serie (se saca de una pagina random Vin), numero de motor (puede ser falso o ficticio, sin embargo tienen que ser 14 caracteres
+entre números y letras), numero de placas (tienen que ser 7 caracteres).
+
+Random Vim: https://randomvin.com/
+
+
+°°°°°°°°°° Entidad issue-policy °°°°°°°°°°
+
+||||||| Post issue-policy ||||||
+
+Responde 'emisión' que viene a ser la póliza.
+
+la respuesta del qoute 
+coberturas son todos los paquetes 
+
+prima neta: precio antes de impuestos
+prima total: lo que tiene que pagar el cliente en el lapso de tiempo que el haya elegido.
+
+idCotizacion: Este valor es el que interesa usar en issue (emision)
+
+
+
+
+
+/////////////////////////////////////////////TEORIA/////////////////////////////////////////////////////
+
+
+GLOSARIO
+
+Cotización de seguro vehicular: es el proceso mediante el cual una aseguradora calcula y te informa cuánto te costaría contratar un seguro para tu auto, de acuerdo con ciertos datos que tú proporcionas. Entre estos
+datos pueden ser: genero y edad del cliente, marca y modelo del coche, nivel de cobertura (tipo de paquete), etc.
+
+Periodicidad de pago: frecuencia con la que el cliente desea pagar el seguro.
+
+nivel de cobertura: se refiere a qué tanto te protege el seguro y contra qué riesgos. Es decir, cuáles cosas cubre y cuáles no en caso de accidente, robo, daños, etc.
+Se puede entender como que cada nivel tiene un paquete de beneficios distinto.
+
+emisión: Es el contrato que se genera una vez que el cliente adquiere el seguro.
+	id de la póliza (contrato)
+	En la documentación de las aseguradoras viene que hacen primero: 1. si cobran y después generan
+	la pliza o 2. si primero generan la póliza y después cobran.
+
+descuentos: varia entre aseguradora.
+	En temporada alta suben los descuentos: hot sale, buen fin, etc.
+
+Ws: Web service. Es un DTO (Data Transfer Object) usado para recibir datos desde un servicio externo (o enviarlos).
+
+
+
+
+ENDPOINTS
+
+PathVariable ------------------------------------
+
 En todos los endpoint de cualquier proyecto donde este {business} se escribe ahorra y es el único posible valor que puede tomar.
+
+
+
+Post ---------------------------------------------
+
+En un método post, esto son los posibles valores que se pueden mandar para ciertos atributos:
+
+tipo de valor: Siempre será 'convenido' a menos que la aseguradora indique que cambies el valor.
+Periodicidad de pago: anual, semestral, trimestral, mensual, contado.
+servicio: 
+	particular: para autos normales
+	motoApp: para aplicaciones como uber, didi.
+	pickup: camionatas (cherokee).
+
+cp: tiene que ser un valor real y existente.
+fecha y edad: deben tener valor valido y seguir el formato adecuado.

@@ -99,6 +99,13 @@ private val log = LoggerFactory.getLogger(this::class.java) -> -> Para registrar
 	la clase en la que está definido.
 
 
+DTO
+
+@JsonAlias("nombre1", "nombre2", "nombreN")
+var nombreAtributoX: tipoDato = valorInicial -> El uso de esta anoptacion es sin el modo de acceso 
+	private porque el modo de acceso tiene que ser public para que Jackson (u otras libs como Moshi) 	accedan directamente a las propiedades para deserializar.
+	Ademas Kotlin genera automáticamente los getters y setters públicos.
+	
 
 ///////////////////////////////////////////////CLIENTES//////////////////////////////////////////////////
 

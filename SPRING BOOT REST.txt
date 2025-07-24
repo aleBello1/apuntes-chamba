@@ -17,3 +17,20 @@ Pero es hasta cierto método del controlador que se capture ese valor.
 public ResponseEntity<?> nombreMetodoX(@PathVariable tipoDato nombreParametroY) {
     // N instrucciones
 } 
+
+
+
+MEJORAS
+
+Aplicar la inyección de dependencias correctamente.
+Quitar los transactional y modifyin ineccesarios de la capa repository.
+Remover los imports que no se usen.
+Agregar los transactional y transactional read only en el service cuando se necesite.
+
+
+DTO
+
+@JsonAlias({"nombre1", "nombre2", "nombreN"})
+private tipoDato nombreAtributoX; -> Para indicar que una propiedad o atributo de un objeto json, debe 	deserializarse pero este nombre de atributo pude tener múltiples nombres.
+	Usado cuando se esta recibiendo datos JSON de fuentes externas (como un Web Service), y a veces los 	campos pueden venir con diferentes nombres pero debe interpretarse com un mismo atributo.
+

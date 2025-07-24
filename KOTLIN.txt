@@ -65,6 +65,17 @@ for (i in valorInicial..valorFinal step valorStep) {
 } -> Crea un ciclo que va del valor final al valor inicial de step en step.
 
 
+ESTRUCTURAS DE CONTROL
+
+val newVariable = when (nombreVariableEntrada) {
+    valorEntrada1 -> valor1
+    valorEntrada2 -> valor2
+    valorEntradaN -> valorN
+    else -> valorDefault
+} -> Hace lo mismo que un switch case de otros lenguajes. Si la variable contiene el valor de entrada 1,
+	entonces devuelve el valor 1, si la variable contiene el valor de entrada 2, entonces devuelve el 	valor 2 y asi sucesivamente.
+
+
 FUNCIONES
 
 Existe el tipo de dato para retorno llamado Unit, este indica que no devuelve nada (Unit es como void en Java, aunque también se puede omitirlo).
@@ -203,6 +214,17 @@ Cada método de fabrica debe tener nombres semánticos que explican qué se esta
 
 //////////////////////////////////////////////////POO///////////////////////////////////////////////////
 
+
+val nombreObjetoX = nombreClaseX().apply {
+    nombreAtributo1 = valor1
+    nombreAtributo2 = valor2
+    nombreAtributoN = valorN
+} -> Sive para setear valores a multiples atributos de un objeto.
+	Seria equivalente en java a:
+		NombreClaseX objetoX = nombreClaseX();
+		objetoX.setNombreAtributo1(valor1);
+		objetoX.setNombreAtributo2(valor2);
+		objetoX.setNombreAtributoN(valorN);
 
 
 CONSTRUCTORES
