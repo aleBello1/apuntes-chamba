@@ -6,6 +6,10 @@ Kotlin no usa ;.
 
 val nombreVariable = valor -> Define una variable inmutable (como final en Java).
 
+En Kotlin, cuando se declara una variable var no-nullable, se tiene que inicializar inmediatamente. Entonces algo asi dará error: var apellido: String  *********
+
+lateinit var nombreVariable: tipoDato -> Para poder declarar una variable si haberla inicializado. **
+
 var nombreVariable = valor -> Define una variable mutable (se puede cambiar su valor).
 	Kotlin infiere el tipo de dato automáticamente de acuerdo a lo que almacene pero también se puede
 	indicar.

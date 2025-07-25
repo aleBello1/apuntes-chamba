@@ -1,12 +1,22 @@
 
 /////////////////////////////////////////////PROYECTOS//////////////////////////////////////////////////
 
+En geneal
+
+Controllers: se crea el endpoint que llama a cierto servicio.
+Services: se crea el servicio que consume a otro servicio, se da formato o transforma a los datos y retorna esos datos ya modificados.
+
+En un post, se debe verificar la documentación que proporciona el cliente para saber como quiere los datos.
+
+El id de cotización caduca. ******
+
 
 CLUPP
 
 Documentación que manda este cliente:
 https://documenter.getpostman.com/view/18868163/2sA3QniZYU#3e85c796-b075-4d9e-b44c-bbdcbc97b69c
 
+De las mejores clases de service es IssueService
 
 Para generar la emisión primero es la cotización. Con base al id de la cotización rastreas la emisión.
 
@@ -33,7 +43,7 @@ Endpoints --------------------------
 
 ||||||| Post quote ||||||
 
-Se manda un cuerpo que inclya:
+Se manda un cuerpo como este que inclye:
 
 Pe este:
 
@@ -57,12 +67,11 @@ Pe este:
    "conductorUniversal":false
 }
 
-De la respuesta, se toma: 
-
-Se deben llenar los datos del cliente y vehiculo.
+De la respuesta, se toma/copia absolutamente todo y se pega en el cuerpo de la solicitud de post/issue-policy. Una vez ahi, se deben llenar los datos del cliente y vehiculo.
 
 Datos del cliente: 
 
+tipo de persona física o moral.
 numero de teléfono y correo tienen que ser reales pero no proipios porque si no te llenan de spam.
 
 
@@ -113,7 +122,7 @@ emisión: Es el contrato que se genera una vez que el cliente adquiere el seguro
 descuentos: varia entre aseguradora.
 	En temporada alta suben los descuentos: hot sale, buen fin, etc.
 
-Ws: Web service. Es un DTO (Data Transfer Object) usado para recibir datos desde un servicio externo (o enviarlos).
+
 
 
 
@@ -138,4 +147,6 @@ servicio:
 	pickup: camionatas (cherokee).
 
 cp: tiene que ser un valor real y existente.
-fecha y edad: deben tener valor valido y seguir el formato adecuado.
+tipo persona: F (hace referencia a persona fisica).
+fecha: yyyy-mm-dd
+población: va el municipio 
