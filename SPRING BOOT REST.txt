@@ -39,3 +39,33 @@ CONSUMO DE SERVICIOS
 
 si tengo un servicio 1 que consume a un servicio 2, el servicio 1 en su capa de services, sus metodos pueden omitir la anotacion transactional.
 
+
+PERFILES
+
+Para elegir cual perfil de spring boot utilizar cuando se corra la aplicación hay varias formas.
+
+
+Configurando el application.properties -----------------------------------
+
+spring.profiles.active=nombrePerfil -> Como Spring siempre carga primero application.properties como 	configuración base o común porque es el perfil default, es en este archivo donde se coloca la 	instrucción de cual perfil seleccionar.
+	Se puede tener unas configuraciones en application.properties y en 
+	application-nombePerfilSelecionado.properties, si alguna de las configuraciones del 
+	application-nombePerfilSelecionado.properties son las mismas que las de application.properties, se 	sobreescriben. Esto permite Tener propiedades comunes en application.properties y solo diferencias 	específicas en application-{perfil}.properties.
+	 
+
+Cuando se crea el -jar -----------------------------------
+
+java -jar mi-aplicacion.jar --spring.profiles.active=nombrePefil -> Cargara determinado 	application.properties, clases y beanes.
+
+
+CREACION DE PROYECTOS (CON VSC Y SBv3)
+
+	Dependencias:
+		Creacion de web flux:
+		spring reactive web -> 
+		mongodb-reactive -> 
+		
+
+
+
+

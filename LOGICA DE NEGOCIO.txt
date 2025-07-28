@@ -1,5 +1,5 @@
 
-/////////////////////////////////////////////PROYECTOS//////////////////////////////////////////////////
+
 
 GENERAL
 
@@ -15,7 +15,7 @@ Los nuevos cambios se suben a dev y lo testean los de qa.
 Si pasan las pruebas se suben los cambios de dev a prod.
 
 
-CLUPP
+/////////////////////////////////////////////CLUP//////////////////////////////////////////////////
 
 Documentación que manda este cliente:
 https://documenter.getpostman.com/view/18868163/2sA3QniZYU#3e85c796-b075-4d9e-b44c-bbdcbc97b69c
@@ -103,7 +103,70 @@ idCotizacion: Este valor es el que interesa usar en issue (emision)
 
 
 
+/////////////////////////////////////////////EL AGUILA/////////////////////////////////////////////////
 
+Hay dos proyectos que representan a esta seguradora: el águila (es el mas nuevo pero aun no se lanza
+porque falta corregir un descuadre (es problema de la aseguradora)) y el águila core (es el mas
+viejo pero como aun no se lanza el otro, este es el que actualmente se usa).
+
+
+EL AGUILA
+
+Este se revisa. Esta en su versión 4.
+
+Ahorita hay un descuadre por parte de esta aseguradora, en el paquete de cobertura 100.
+
+documentación de catalogos: no hacerle tanto caso, porque el águila tiene su propio servicio de extracción.
+
+documentación de la aseguradora: únicamente hay para cotización y no hay servicio emisión.
+
+.pdf -> Estudiarle para saber que moverle.
+	Específicamente los servicios de cotización.
+
+.XML -> se abre con el soapUi.
+
+collection Cat calcula -------------------
+	
+De todos los servicios que vienen en el XML el que interesa es cotizaAguila. Para cotizar se necesita el modelo del auto, el idModeloAuto, el subRamo (siempre vale 'R' (residente)), la fecha de nacimiento (checar documentación para saber el formato //), genero del cliente, estado civil, nombre y apellidos del cliente, numTelefono, correo, la contraseña nunca cambia. 
+Solo permite cotizar del año 2012 al 2026.
+
+
+collection Cat cotizador -------------------
+
+para consultar catalogos de auto.
+valida el cp, 
+marca: devuelve todas las marcas de auto dependiendo del año, 
+modelo: devuelve los años disponibles para cotizar.
+
+
+Consumir el cliente ----------------------------
+
+Pasos para cotizar:
+
+Primero consumir el endpoint subramo y se extrae el valor (aunque siempre se debe utilizar el valor 'R')
+consumir modelo de auto: se mete el subramo aquí y se extrae algún año valido.
+consumir el servicio de marca ingresando el año y se extrae la marca y idMarca
+consumir el servicio de submarca: colocar los datos anteriores, se extrae el idSubmarca y submarca
+consumir el servicio de submarcaTipo: colocar todos los datos anteiorres y extraer la clave (modelo 
+del auto).
+
+Ahora a cotizar usando el endpoint cotizaAguila, se coloca el modelo del auto (año de auto), submarcaTipoId y un cp valido (11000 para cdmx). Si se gusta se modifica la info del cliente pe si se modifica su estado civil se obtiene un descuento distintos. La respuesta son: los paquetes y coberturas.
+
+Pe:
+subRamo: R
+intModeloAuto (año): 2019
+intMarca (idMarca): 10 
+strDesMarca (Marca): BMW
+intTipo (idSubMarca): 126
+SubMarca: BMW SERIE 3
+intModelo (submarcaTipoId): 5623
+
+
+EL AGUILA (CORE)
+
+Es el proyecto mas viejo pero se usa actualmente para cotización y tampoco hay servicio de emisión.
+
+Cuando se arregle el descuadre del otro, el otro reemplazara a este.
 
 /////////////////////////////////////////////TEORIA/////////////////////////////////////////////////////
 
@@ -126,7 +189,11 @@ emisión: Es el contrato que se genera una vez que el cliente adquiere el seguro
 descuentos: varia entre aseguradora.
 	En temporada alta suben los descuentos: hot sale, buen fin, etc.
 
+descuadre de precios: Se da en el servicio de cotización.
+	El problema normalmente serán las coverturas (Viene mal el precio en determinado paquete)
 
+los comercial: personas de nuestra compañía que consumen nuestros servicios. 
+	Ellos mandan las incidencias (los descuadres, el paquete no es ese, fecha invalida, etc).
 
 
 

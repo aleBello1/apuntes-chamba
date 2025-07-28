@@ -139,6 +139,44 @@ lateinit var nombreObjetoX: NombreComponenteX -> Inyección por atributo. Como e
 	inicialice).
 
 
+CONFIGURACION DEL CORS
+
+En el package config/ crear una clase llamada: 'CorsConfig'.
+
+@Configuration
+class CorsConfig : WebMvcConfigurer {} -> Crea una clase de configuración para el cors.
+
+override fun addCorsMappings(registry: CorsRegistry) {} -> Funcion para configurar al cors.
+
+registry.addMapping("/api/**") -> Habilita el cors a todas estas rutas. 
+	Todas las rutas que no esten aquí no se les habilitara el cors.
+
+.allowedOrigins("*") -> Permite que cualquier origen (dominio ó IP y puerto) pueda hacer solicitudes CORS.
+	- .allowedOrigins("http://ip_servidor:numPuerto") -> Permite que cualquier origen (IP y puerto) 		pueda hacer solicitudes CORS.
+	- .allowedOrigins("http://url-fron") -> Permite que cualquier origen (domiio) pueda hacer 			solicitudes CORS.
+
+.allowedMethods("*") -> Indica que permite todo tipo de métodos http sean consumidos.
+	- .allowedMethods("NOMBRE_METODO_HTTP", "NOMBRE_METODO_HTTP", "NOMBRE_METODO_HTTP") -> Para
+		que solo se permitan ciertos metodos http.
+
+.allowCredentials(true) -> Para poder recibir cookies y hearders de autenticacion.
+	Comunmente usado cuando se impementa spring security.
+
+Wildcards en addMapping -----------------------------
+
+/api/* -> Toma cualquier valor en un único sub nivel siguiente.
+	Entonces si tenemos las rutas /api/uno, /api/dos, /api/tres y /api/cuatro/cinco y aplicamos /api/* 	en addMapping, se aplicaria a todas las rutas menos a /api/cuatro/cinco porque tiene dos subniveles
+	siguientes después de /api/.
+
+/api/** -> Se aplica a cualquier cantidad de subrutas dentro de api.
+	Por ejemplo a /api/uno, /api/cuatro/cinco y /api/seis/siete/ocho.
+
+/api/*/sub-nivel-dos -> Para que tome cualquier valor en el subnivel que esta entre el 1 y 3.
+	Esta forma es útil cuando tenemos un @RequestMapping con @PathVariable como por ejemplo:
+	@RequestMapping("/v4/{business}/clupp-CAR") porque .addMapping(...), NO puede interpretar los {} 	como tal @RequestMapping. *******
+
+
+
 POR DEFINIR EL NOMBRE
 
 Si un json esta conformado por un buen de objetos, las claess que representan a esos objetos se 
