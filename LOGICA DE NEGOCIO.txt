@@ -1,7 +1,7 @@
 
 /////////////////////////////////////////////PROYECTOS//////////////////////////////////////////////////
 
-En geneal
+GENERAL
 
 Controllers: se crea el endpoint que llama a cierto servicio.
 Services: se crea el servicio que consume a otro servicio, se da formato o transforma a los datos y retorna esos datos ya modificados.
@@ -9,6 +9,10 @@ Services: se crea el servicio que consume a otro servicio, se da formato o trans
 En un post, se debe verificar la documentación que proporciona el cliente para saber como quiere los datos.
 
 El id de cotización caduca. ******
+
+Hay dos jar en la nube: dev y prod
+Los nuevos cambios se suben a dev y lo testean los de qa.
+Si pasan las pruebas se suben los cambios de dev a prod.
 
 
 CLUPP

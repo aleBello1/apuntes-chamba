@@ -113,6 +113,19 @@ var nombreAtributoX: tipoDato = valoInicial -> Para que cuando se serialice este
 	el objeto json se llame: 'nombreAtributoXJson' y no 'nombreAtributoX'.
 
 
+CREAR COMPONENTES/BEANS
+
+En la raíz del proyecto se crea el paquete config/ y dentro de él una clase llamada AppConfig.
+
+@Configuration
+class AppConfig {} -> Pertmite definir beanes dentro de la clase.
+
+@Bean
+fun objetoBean(): NombreClaseBean {
+   return NombreClaseBean()
+} -> Crea un bean.
+
+
 INYECCION DE DEPENDENCIAS
 
 class NombreClaseZ(
@@ -139,6 +152,8 @@ Se pone como postfijo a una clase.
 
 REST TEMPLATE
 	
+Incluida en la dependencia: spring-boot-starter-web.
+
 Crear el paquete llamado config/ y dentro de este una clase de configuración, ahí crear el bean para
 restTemplate.
 
