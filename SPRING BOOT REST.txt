@@ -25,8 +25,10 @@ MEJORAS
 Aplicar la inyección de dependencias correctamente.
 Quitar los transactional y modifyin ineccesarios de la capa repository.
 Remover los imports que no se usen.
-Agregar los transactional y transactional read only en el service cuando se necesite.
-
+Agregar los transactional y transactional read only en el service cuando se necesite (cuando se acceda
+a la db y no a un servicio externo (api rest o api soap)).
+Corregir el nombre de clases, enums, etc.
+Refactorizar variables, lógica, etc.
 
 DTO
 
@@ -65,6 +67,20 @@ CREACION DE PROYECTOS (CON VSC Y SBv3)
 		spring reactive web -> 
 		mongodb-reactive -> 
 		
+
+DTO
+
+Hay de dos tipos: de entrada y salida.
+Entrada: 
+	- Cuando vienen de un cliente (un fron). 
+	Ejemplo: cuando no requerimos todos los datos pe solo necesitamos username y contraseña para logear
+	un usuario.
+	- Cuando consumimos un web service, es decir, un servicio externo como pe una api rest, api soap,
+		etc.
+
+Salida: Son como vistas personalizadas (como en sql), los cuales se envían al cliente (fron)
+	Ejemplo: una tabla user tiene los campos nombre, edad apellido y password, al cliente no le
+	enviaremos el password, asi que solo todo lo demás.
 
 
 

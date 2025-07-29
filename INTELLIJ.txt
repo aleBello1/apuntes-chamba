@@ -1,6 +1,12 @@
 Descargar o cambiar el  jdk: En la parte sup der -> click en el engrane -> Project structure
 	-> Project settings -> Project -> SDK -> download jdk.
 
+Buscar todos los lugares donde se manda a llamar un método: ir al lugar donde se define el método -> 
+	click der sobre el nombre -> find usages.
+	- Dar un click para ver una previsualización.
+	- Dos clcks para que nos lleve a esa clase.
+
+
 problemas -------------------------------------------------
 
 En ocasiones no esta habilitado el button de correr proyecto: en la parte sup der darle click en el button

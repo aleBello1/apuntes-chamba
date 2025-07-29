@@ -15,6 +15,8 @@ Los nuevos cambios se suben a dev y lo testean los de qa.
 Si pasan las pruebas se suben los cambios de dev a prod.
 
 
+
+
 /////////////////////////////////////////////CLUP//////////////////////////////////////////////////
 
 Documentación que manda este cliente:
@@ -162,11 +164,116 @@ SubMarca: BMW SERIE 3
 intModelo (submarcaTipoId): 5623
 
 
+CODIGO DEL AGUILA 
+
+
+paquete catalog --------------------------------
+
+°°°°°° controllers °°°°°°°°
+
+ExtractionController -> Sirve para usar todos los enpoints necesarios para hacer la cotización pero extrae
+	esos catalogos y se guardan en nuestra db para que supongo después las muestre el front en 	selectores.*
+	Al inicio de cada lista se concatena (para que aparezca primero en el fron) las categorías
+	mas vendidas.
+	Pe es necesario consultar los modelos (todos los años disponibles) para cotizar, todos esos años
+	se guardan en catalogos.
+
+CatalogCarController -> Tiene un endpoint por catalogo para verificar que se extrajo todo correctamente.
+
+
+°°°°°° models °°°°°°°°
+
+
+Tal cual contiene las clases entity y un enum (esta mal el nombre)
+
+°°°°°° Repositories °°°°°°°°
+
+En su mayoría muy normal, puras clases que hacen consultas personalizadas y nativas, salvo por dos 
+clases.
+Estas dos clases tiene operaciones de truncate y reinicio de secuencia (del id) porque cuando se extraen los catalogos de cliente se borran los que tenemos en nuestra db y reiniciamos la secuencia y volvemos a
+extraer.
+
+
+°°°°°° xmls °°°°°°°°
+
+Contiene plantillas XML que son usados para enviar cuerpos de solicitud a las peticiones soap.
+Esta carpeta no debería existir.
+
+
+°°°°°° services °°°°°°°°
+
+catalogService: contiene el acceso a nuestra db para la pura devolución de los catalogos. 
+	El mas fácil.
+
+ExtractSErvice: Consulta todos los catalogos del api soap y los guarda en nuestra db.
+	Para hacerlo Manda a llamar los métodos de DataExtractService y GetExtractService.
+
+DataExtractService: Hace un especie de polimorfismo porque hace un switch case que pregunta si es de tal
+	tipo haz tal cosa.
+	Solo hay dos operaciones: 1. hacer truncate y reinicio de secuencia y 2.
+
+GetExtractService: Contiene los métodos que usan de manera individual los endpoints para hacer
+	la cotización.
+	Usa las plantillas XML.
+
+
+paquete quote --------------------------------
+
+°°°°°° controllers °°°°°°°°
+
+QuoteController: Srive para cotizar
+
+
+°°°°°° services °°°°°°°°
+
+QuoteService: 
+	- codPost: extrae el cp que viene en el cuerpo de una respuesta, y verifica si es o no valido
+		dependiendo si tiene el valor true o false.
+		Este método no debería estar aquí, debería ser parte del metodo cp.
+	- quote: contiene el método el cual se encarga de cotizar.
+		Valida el paquete y genero del cliente, cp y que los seriviios de la aseguradora esten 
+		activos. Si todo esta correcto, prepara los datos para la cotización y después cotiza.
+		Cotiza solo anulidades, mete a mano los planes y manda la respuestas.
+
+GetCPService: 
+	- cp: hace la petición para verificar un cp valido.
+
+GetQuoteService:
+	- xmlCot: hace la petición para la cotización.
+
+°°°°°° models °°°°°°°°
+
+todo normal clases entity y dto
+
+
+°°°°°° repository °°°°°°°°
+
+la única consulta sirve para verificar que los seriviios de la aseguradora esten activos, para saber si
+se puede o no cotizar.
+
+ 
 EL AGUILA (CORE)
 
 Es el proyecto mas viejo pero se usa actualmente para cotización y tampoco hay servicio de emisión.
 
 Cuando se arregle el descuadre del otro, el otro reemplazara a este.
+
+
+
+CUALQUIER PROYECTO
+
+Primero me enseñaron a usar los endpoints de la aseguradora.
+Después replique ese consumo por mi cuenta por mi cuenta.
+
+Después ya revise flujo por flujo los endpoint's, comenzando por los endpoints.
+Anote por cada paquete y cada clase, que hace cada método dentro de él. ESto con la finalidad de que no 
+se me olvide anotar el comportamiento de cada método.
+
+Después me enseñaron a usar los endpoints resultantes.
+Replicarlo por mi cuenta.
+
+
+
 
 /////////////////////////////////////////////TEORIA/////////////////////////////////////////////////////
 
