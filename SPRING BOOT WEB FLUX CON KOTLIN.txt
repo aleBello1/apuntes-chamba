@@ -1,0 +1,18 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+MONGODB REACTIVO
+
+MongoDB reactivo es una versión no bloqueante del driver oficial de MongoDB, diseñada para usarse con 
+WebFlux o cualquier otro framework reactivo.
+
+Bloqueante y no bloqueante ----------------------------------------
+
+Bloqueante es cuando el hilo que ejecuta una operación (como acceder a una base de datos o un servicio 
+externo (api rest, api soap, entre otros)) se queda esperando hasta obtener una respuesta.
+
+No bloqueante es cuando el hilo no se detiene. En lugar de esperar la respuesta, la operación se ejecuta en segundo plano y la app puede seguir haciendo otras cosas,
+
+Metáfora útil:
+Bloqueante: te formas y no haces nada hasta que te atienden.
+No bloqueante: tomas un turno y mientras te llaman, vas a hacer otras cosas.
