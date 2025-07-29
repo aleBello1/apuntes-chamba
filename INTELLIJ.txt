@@ -1,2 +1,8 @@
 Descargar o cambiar el  jdk: En la parte sup der -> click en el engrane -> Project structure
 	-> Project settings -> Project -> SDK -> download jdk.
+
+problemas -------------------------------------------------
+
+En ocasiones no esta habilitado el button de correr proyecto: en la parte sup der darle click en el button
+	de notificaciones.
+	Si no queda con eso, preguntar cual jdk debe estar instalado en el SO y no en el intelliJ

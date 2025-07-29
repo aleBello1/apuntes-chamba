@@ -125,7 +125,53 @@ mediatype
 action() -> 
 
 
-////////////////////////////////////////////////////WSDL///////////////////////////////////////////////////////
+////////////////////////////////////////////////////WSDL///////////////////////////////////////////////////
 
-Web Services Description Language (WSDL): documento XML que describe un servicio web. Funciona como un contrato 	entre un cliente y un servidor.
-	Analogo a swagger solo que este es para soap.
+Web Services Description Language (WSDL): documento XML que describe un servicio web. Funciona como un contrato entre un cliente y un servidor.
+Analogo a swagger solo que este es para soap.
+
+
+
+
+////////////////////////////////////////////////////SVC//////////////////////////////////////////////////
+
+url.svc: Servicio WCF (Windows Communication Foundation). Tecnología de Microsoft usada para construir servicios web (como SOAP).
+
+SOAPAction: indica qué método del servicio SOAP se desea invocar.
+Esto de invocar el metodo es análogo a cuando en rest indicamos el endpoint a consumir, solo que aquí se 
+configura en el encabezado y no en el endpoint.
+
+
+
+REST TEMPLATE (PARA SOAP)
+
+val header = HttpHeaders().apply {
+   // depende si es soap 1.1 ó 1.2
+} -> Configura el soap action.
+	- contentType = MediaType("text", "xml", Charsets.UTF_8)
+    	  set("SOAPAction", "url-dominio/nombreServicio/nombreMetodo") -> En SOAP 1.1 el SOAPAction es 			obligarotio agregarlo como encabezado.
+		La primera linea indica que el cuerpo de la petición será XML plano.
+		La segunda linea es para indicar el método remoto que se está invocando.
+		Supuestamente este es el mas común.
+	- contentType = MediaType.parseMediaType(
+              "application/soap+xml; charset=utf-8; action=\"url-dominio/Servicio/ObtenerVehiculo\""
+    	  ) -> En SOAP 1.2 se agrega en el content-type.
+	Para determinar la versión de soap se toma la url (la que termina en .svc, mas no la que nos 
+	indica el servicio y método a consumir) se le agrega al final '?wsdl' y se pega en el navegador
+	si casi hasta arriaba hay una etiqueta llamada: 'soap12:binding' es soap 1.2 pero si hay una 	llamada: 'soap:binding' es soap 1.1 (buscarla en la pagina con ctrl + f).
+
+val requestEntity: HttpEntity<String> = HttpEntity(bodyRequest, header) -> Mete el body request y header
+	en un objeto.
+	Este bodyRequest lógicamente será un string que contenga el XML a enviar. *
+
+cadena.trimIndent() -> Cuando se define un String con """ ... """, normalmente se indenta para que el 	código sea legible, pero esa indentación se incluye en el valor de la cadena. Este método elimina 	esa identacion.
+
+
+En SOAP (casi siempre): Usas el método HTTP POST para todas las operaciones, sin importar si es "consultar", "crear", "actualizar", etc. Porque SOAP envía todo dentro del cuerpo del mensaje (el XML), no en la URL ni en los parámetros.
+
+
+
+
+	
+	
+
