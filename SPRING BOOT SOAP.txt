@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////SOAP///////////////////////////////////////////////////////
+////////////////////////////////////////////////////SOAP//////////////////////////////////////////////////
 
 Simple Object Access Protocol (SOAP): protocolo de mensajería basado en XML usado para intercambiar datos estructurados entre aplicaciones.
 
@@ -125,14 +125,6 @@ mediatype
 action() -> 
 
 
-////////////////////////////////////////////////////WSDL///////////////////////////////////////////////////
-
-Web Services Description Language (WSDL): documento XML que describe un servicio web. Funciona como un contrato entre un cliente y un servidor.
-Analogo a swagger solo que este es para soap.
-
-
-
-
 ////////////////////////////////////////////////////SVC//////////////////////////////////////////////////
 
 url.svc: Servicio WCF (Windows Communication Foundation). Tecnología de Microsoft usada para construir servicios web (como SOAP).
@@ -140,6 +132,40 @@ url.svc: Servicio WCF (Windows Communication Foundation). Tecnología de Microso
 SOAPAction: indica qué método del servicio SOAP se desea invocar.
 Esto de invocar el metodo es análogo a cuando en rest indicamos el endpoint a consumir, solo que aquí se 
 configura en el encabezado y no en el endpoint.
+
+
+WEB SERVICES DESCRIPTION LANGUAGE (WSDL) 
+
+documento XML que describe un servicio web. Funciona como un contrato entre un cliente y un servidor.
+Analogo a swagger solo que este es para soap.
+
+Operations: Dentro de un wsdl se busca con control + f las etiquetas 'operation' cada una de estas indica
+los métodos que ofrece ese soap. *******
+Aquí mismo vienen dentro las etiquetas que indican los tipos de datos usados para parámetros de entrada/salida.
+
+Ejemplo:
+
+<wsdl:operation name="CotizaAguila">
+<wsdl:input wsaw:Action="http://tempuri.org/ICalculoAguila/CotizaAguila" message="tns:ICalculoAguila_CotizaAguila_InputMessage"/>
+<wsdl:output wsaw:Action="http://tempuri.org/ICalculoAguila/CotizaAguilaResponse" message="tns:ICalculoAguila_CotizaAguila_OutputMessage"/>
+</wsdl:operation>
+
+Del ejemplo anterior si se quisiera saber el schema del objeto de entrada, se busca con contrl + f en
+el documento. El nombre del objeto seria el valor asociado message. 
+Entonces pe el nombre del objeto de entrada en este caso es: 'ICalculoAguila_CotizaAguila_InputMessage'.
+
+Si eso no funciona, buscar en el wsdl con control + f la etiqueta que se llama 'types', esta multiples
+links el cual al accesar estarán los schemas de todos los objetos.
+
+Ejemplo:
+
+<wsdl:types>
+<xsd:schema targetNamespace="http://tempuri.org/Imports">
+<xsd:import schemaLocation="https://www.elaguila.com.mx/Clientes/WcfCalculoCotizador/CalculoAguila.svc?xsd=xsd0" namespace="http://tempuri.org/"/>
+<xsd:import schemaLocation="https://www.elaguila.com.mx/Clientes/WcfCalculoCotizador/CalculoAguila.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+<xsd:import schemaLocation="https://www.elaguila.com.mx/Clientes/WcfCalculoCotizador/CalculoAguila.svc?xsd=xsd2"/>
+</xsd:schema>
+</wsdl:types>
 
 
 

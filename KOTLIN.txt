@@ -241,11 +241,77 @@ class NombreClase(var nombreAtributo1: tipoDato, var nombreAtributo2: tipoDato2,
 
 class NombreClase(var nombreAtributo1: tipoDato = valor1, var nombreAtributo2: tipoDato2 = valo2, 
 	var nombreAtributoN: tipoDatoN) -> Constructor en la definición de clase indicando que hay valor 		por defecto.
+		Se puede poner valores por defecto solo a algunos parámetros y no a todos.
+		Cuando se define asi el constructor primario, pierde mucho el sentido definir 
+		constructores secundarios.
+		
 
-constructor(var nombreAtributo1: tipoDato, var nombreAtributo2: tipoDato2, var nombreAtributoN: tipoDatoN) {
+Constructor secundario cuando NO existe el primario ----------------------------
+
+Cuando no se define el constructor primario cada constructor secundario debe inicializar absolutamente
+todos los atributos
+
+constructor(nombreAtributo1: tipoDato, nombreAtributo2: tipoDato2, nombreAtributoN: tipoDatoN) {
     this.nombreAtributo1 = nombreAtributo1
     this.nombreAtributo2 = nombreAtributo2
     this.nombreAtributoN = nombreAtributoN
 } -> Para definir un constructor secundario.
+	Ya no se coloca var ni val en el constructor secundario. *******
+
+Constructor secundario cuando existe el primario ----------------------------
+
+Cuando se tiene el constructor primario, dentro de un constructor secundario lo primero en ejecutarse es
+la llamada al constructor primario. ****
+Entonces la llamada al constructor primario implica que siempre se debe cubrir sus parámetros.
+
+constructor(nombreAtributo1: tipoDato, nombreAtributo2: tipoDato2, 
+	nombreAtributoR: tipoDatoR): this(valor1, valor2, valorN) {
+    this.nombreAtributo1 = nombreAtributo1
+    this.nombreAtributo2 = nombreAtributo2
+    this.nombreAtributoN = nombreAtributoN
+} -> Para definir un constructor secundario.
+	La parte de ': this(valor1, valor2, valorN)' significa la llamada y paso de valores al constructor 
+	primario.
+	En un constructor secundario, puedes tener cualquier cantidad de parámetros. Lo importante es que 	la llamada : this(...) debe cumplir con todos los parámetros requeridos por el constructor 	primario. ********
+
+Parámetros adicionales en constructor secundario -----------------------------
+
+Si en un constructor primario se definieron N parámetros, un constructor secundario puede definir mas
+de N parámetros. Sin embargo, los parámetros adicionales (es decir, aquellos que no corresponden a una propiedad de la clase) no tendrán getter ni setter.
+
+Ejemplo:
+class Usuario(val nombre: String, val edad: Int) {
+    constructor(nombre: String, edad: Int, correo: String): this(nombre, edad) {
+        // correo no existe como propiedad
+    }
+} -> Si se instancia asi val u = Usuario("Luis", 25, "luis@mail.com"), el objeto 'u' no podrá usar
+	su setter ni getter porque correo no se declaró como propiedad en la clase.
+	
+Si no se tiene constructor primario, cada atributo se debe definir en la clase y aquellos constructores
+secundarios que tengan atributos distintos a los definidos en la clase no podrán usar su respectivo 
+setter ni getter.
+
+Ejemplo:
+class Usuario {
+    var nombre: String
+    var edad: Int
+
+    constructor(nombre: String, edad: Int, correo: String) {
+        this.nombre = nombre
+        this.edad = edad
+        // correo no existe como propiedad
+    }
+} -> Si se instancia asi val u = Usuario("Luis", 25, "luis@mail.com"), el objeto 'u' no podrá usar
+	su setter ni getter.
+
+
+bloque init ----------------------------------------------------------
+
+Este bloque siempre se ejecuta después de todos los constructores que se tengan definidos.
+Si se tiene mas de un bloque init, todos se ejecutaran después de todos los constructores que se tengan definidos en el orden en el que están definidos (de arriba a abajo).
+
+Queda incluso este tema, para investigar después.
+
+
 
 

@@ -37,7 +37,7 @@ private tipoDato nombreAtributoX; -> Para indicar que una propiedad o atributo d
 	Usado cuando se esta recibiendo datos JSON de fuentes externas (como un Web Service), y a veces los 	campos pueden venir con diferentes nombres pero debe interpretarse com un mismo atributo.
 
 
-CONSUMO DE SERVICIOS
+CONSUMO DE SERVICIOS EXTERNOS
 
 si tengo un servicio 1 que consume a un servicio 2, el servicio 1 en su capa de services, sus metodos pueden omitir la anotacion transactional.
 

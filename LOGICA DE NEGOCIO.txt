@@ -14,7 +14,11 @@ Hay dos jar en la nube: dev y prod
 Los nuevos cambios se suben a dev y lo testean los de qa.
 Si pasan las pruebas se suben los cambios de dev a prod.
 
+Negocios -------------------------------------------
 
+ahorra: el negocio principal.
+go: es otro negocio donde se dan precios distintos.
+	Si la aseguradora lo solicita, se mete este otro negocio.
 
 
 /////////////////////////////////////////////CLUP//////////////////////////////////////////////////
@@ -258,6 +262,81 @@ Es el proyecto mas viejo pero se usa actualmente para cotización y tampoco hay 
 
 Cuando se arregle el descuadre del otro, el otro reemplazara a este.
 
+consumir el proyecto con postman ------------------------------------
+
+Consumir catalogos:
+
+Primero las marcas
+Después el año y se inserta una marca
+Después models insertando año y marca
+Después variants insertando años, marca y modelo.
+
+Para variants {{DEV}}/v2/elaguila-car/variants?brand=NISSAN&year=2021&model=MARCH
+
+Realizar cotización:
+
+En el cuerpo de la respuesta se de observar que se esten presentes los mismos datos del coche que se 
+están mandando y además los valores para prima total, prima neta, derechos (valor numerico), recargos,
+primero pago, id de cotización, las coberturas.
+
+
+
+CODIGO DEL AGUILA (CORE)
+
+De todo el repositorio, el proyecto esta dentro de la carpeta java.
+Se debe usar jdk 22 de openJdk.
+
+Documentación swagger: https://ws-aguila.com/swagger-ui/index.html
+
+Controllers -----------------------------------------------------
+
+CatalogosControllerV1:
+	- getMarca: Llama al método getMarcas.
+	- getModelo: Llama al método getModelo con la marca la cual la recibe por parmetro en la url.
+	- getSubmarca: Llama al método getSubmarca con la marca y modelo las cuales las recibe por parmetro 		en la url.
+	- getDescripcion: Llama al método getDescripcion con la marca, modelo y submarca las cuales las 		recibe por parmetro en la url.
+
+CatalogosControllerV2: Al parcer manda a llamar a los mismos métodos que manda a llamar la v1.
+	No hay versión 3 porque algunos proyectos estaban ya en v3, entonces se paso directamente a la
+	v4. Para la v4 ya no se uso el cache porque se determino que no se necesita por haber muy poca
+	cantidad de registros.
+
+CotizacionControllerV1: 
+	- quote: Recibe un objeto y de ese objeto toma el atributo paquete y evalúa diversos caminos: si
+		el paquete tiene el valor ALL, Amplia o si tiene otro valor lanzara un error.
+		Si el paquete tiene el valor all llamara al método cotización all del objeto 				CotizacionService
+		Si el paquete tiene el valor amplia llamara al método cotizar del objeto 				CotizacionService
+	- go: Al parecer hace la cotización pero para el negocio de go.
+
+
+services -----------------------------------------------------
+
+CatalogosService: Usa multiples repositories de distintas entidades.
+	- getMarcas: Al inicio escribe manualmente las marcas mas vendidas y le concatena la consulta 
+		a nuestra db para extraer todas las marcas (con el objeto MarcasRepository), de todas 
+		estas lógicamente nos quedamos con solo elementos distintos.
+	- getModelo: Hace la consulta a nuestra db para extraer todas los modelos con base a la marca 
+		(con el objeto ModelosRepository).
+	- getSubmarca: Hace la consulta a nuestra db para extraer todas las submarcas con base a la marca 
+		y modelo (con el objeto SubmarcaRepository).
+	- getDescripcion: Hace la consulta a nuestra db para extraer todas las descripciones con base a 
+		la marca, submarcas y modelo (con el objeto DescripcionRepository).
+	- Los mismos anteriores métodos pero en cache.
+
+CotizacionService:
+	- cotizar:  
+Este constructor 'BasicHttpsBinding_ICalculoAguilaStub()' se conecta a una URL (con extensión .svc) y configura un stub, que es un cliente SOAP generado automáticamente. Este stub te permite invocar métodos del servicio SOAP remoto como si fueran funciones locales en Kotlin o Java.
+
+
+
+repositories -----------------------------------------------------
+
+Todo normal, puras consultas. Pero hay algunas consultas medio insanas.
+
+
+models -----------------------------------------------------
+
+Todo normal, aunque hay varias anotaciones JsonProperty de mas.
 
 
 CUALQUIER PROYECTO
@@ -302,6 +381,12 @@ descuadre de precios: Se da en el servicio de cotización.
 los comercial: personas de nuestra compañía que consumen nuestros servicios. 
 	Ellos mandan las incidencias (los descuadres, el paquete no es ese, fecha invalida, etc).
 
+Derechos, Derechos de póliza ó derechos de emisión: son cargos adicionales fijos aplicados al emitir 
+	una póliza de seguro, independientes de la prima.
+
+primaNeta: es el costo puro del seguro, sin impuestos ni cargos.
+
+primaTotal: la suma de todos los conceptos: prima neta + impuestos + derechos + recargos.
 
 
 
