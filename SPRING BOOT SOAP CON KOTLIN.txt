@@ -1,0 +1,72 @@
+
+
+REST TEMPLATE (PARA SOAP)
+
+val header = HttpHeaders().apply {
+   // depende si es soap 1.1 ó 1.2
+} -> Configura el soap action.
+	- contentType = MediaType("text", "xml", Charsets.UTF_8)
+    	  set("SOAPAction", "url-dominio/nombreServicio/nombreMetodo") -> En SOAP 1.1 el SOAPAction es 			obligarotio agregarlo como encabezado.
+		La primera linea indica que el cuerpo de la petición será XML plano.
+		La segunda linea es para indicar el método remoto que se está invocando.
+		Supuestamente este es el mas común.
+	- contentType = MediaType.parseMediaType(
+              "application/soap+xml; charset=utf-8; action=\"url-dominio/Servicio/ObtenerVehiculo\""
+    	  ) -> En SOAP 1.2 se agrega en el content-type.
+	Para determinar la versión de soap se toma la url (la que termina en .svc, mas no la que nos 
+	indica el servicio y método a consumir) se le agrega al final '?wsdl' y se pega en el navegador
+	si casi hasta arriaba hay una etiqueta llamada: 'soap12:binding' es soap 1.2 pero si hay una 	llamada: 'soap:binding' es soap 1.1 (buscarla en la pagina con ctrl + f).
+
+Almacenamiento de plantilas xml's --------------------------------
+
+cadena.trimIndent() -> Cuando se define un String con """ ... """, normalmente se indenta para que el 	código sea legible, pero esa indentación se incluye en el valor de la cadena. Este método elimina 	esa identacion.
+	Esta instruccion no es de buena practica pero se ha visto usarla con strings que almacenan 
+	xml's. Esta instruccion no forma parte de esta receta. ***
+
+En la ubicacion src/main/kotlin/resources/ se colocan plantillas XML que son usadas en el cuerpo de la solicitud a la hora de invocar servicios SOAP con la nombeclatura: 'nombreMetodoRequest.xml'
+
+Si se manejan muchas plantillas SOAP, se deben agrupar por tipo de servicio o cliente por ejemplo:
+src/main/resources/soap-templates/
+ ├── clienteA/
+ │   └── request1.xml
+ └── clienteB/
+     └── request2.xml
+
+Dentro de una plantilla xml, para especificar donde hay variables que van a cambiar dinámicamente
+se usa interpolación. Pe:
+	<tem:anio>{anio}</tem:anio>
+        <tem:claveMarca>{marca}</tem:claveMarca>
+
+Uso de plantillas xml's ---------------------------
+
+*En una clase de servicio*
+fun cargarPlantilla(nombreArchivo: String): String {
+    val inputStream = this::class.java.classLoader.getResourceAsStream("soap-templates/$nombreArchivo")
+        ?: throw FileNotFoundException("No se encontró la plantilla: $nombreArchivo")
+    return inputStream.bufferedReader().use { it.readText() }
+} -> Método para cargar alguna plantilla xml
+
+*Dentro de un metodo en la clase de servicio*
+val xmlBodyRequest = cargarPlantilla("modeloAutoRequest.xml")
+    .replace("{nombreVariable1}", "valor1")
+    .replace("{nombreVariable2}", "valor2")
+    .replace("{nombreVariableN}", "valorN") -> Para usar determinada plantilla y cambiar dinámicamente 	ciertas valores de variables.
+
+Envio de petición ------------------------------------
+
+En SOAP (casi siempre): Usas el método HTTP POST para todas las operaciones, sin importar si es "consultar", "crear", "actualizar", etc. Porque SOAP envía todo dentro del cuerpo del mensaje (el XML), no en la URL ni en los parámetros.
+
+val requestEntity: HttpEntity<String> = HttpEntity(xmlBodyRequest, header) -> Mete el body request y header
+	en un objeto.
+	Este bodyRequest lógicamente será un string que contenga el XML a enviar. *
+
+val bodyResponse = responseEntity.body -> Devuelve el cuerpo de la respuesta.
+
+val statusCode: HttpStatus = responseEntity.statusCode -> Devuelve el código de status http.
+	Para comparar con esta variable:
+	- HttpStatus.OK
+
+val responseXml = body.toString()
+val responseJson = XML.toJSONObject(responseXml) -> Convierte el XML en string y desepuse ese string en 
+	objeto json.
+	

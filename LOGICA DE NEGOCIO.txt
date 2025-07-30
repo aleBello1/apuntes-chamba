@@ -324,9 +324,15 @@ CatalogosService: Usa multiples repositories de distintas entidades.
 	- Los mismos anteriores métodos pero en cache.
 
 CotizacionService:
-	- cotizar:  
-Este constructor 'BasicHttpsBinding_ICalculoAguilaStub()' se conecta a una URL (con extensión .svc) y configura un stub, que es un cliente SOAP generado automáticamente. Este stub te permite invocar métodos del servicio SOAP remoto como si fueran funciones locales en Kotlin o Java.
-
+	- cotizar:  De manera general hace una cotización para un solo plan.
+		De lo mas relevante que hace son dos cosas:
+		1. Este constructor 'BasicHttpsBinding_ICalculoAguilaStub()' se conecta a una URL 
+		(con extensión .svc) y configura un stub, que es un cliente SOAP generado automáticamente. 		Este stub te permite invocar métodos del servicio SOAP remoto como si fueran funciones 			locales en Kotlin o Java.
+		2. El objeto llamado 'calculo' es un objeto que contiene al atributo '_any' el cual es 
+		un arreglo de objetos XML 
+	- cotizarAll: Al parecer hace la misma cotización (en el sentido de que usa el mismo servicio de 		cotizacion) pero usa otro tipo de clase para instanciar el objeto de la respuesta en 			comparación con el que utilizar el método cotizar. Esto sucede porque a pesar de que se
+		usa el servicio una sola vez, aquí se arma una cotizacion para tres planes: Amplia, 			AmpliaBásica y Cobertura100
+		Cotizar all usa la clase ResponseAll() y cotizar usa la clase Response.
 
 
 repositories -----------------------------------------------------
@@ -340,6 +346,7 @@ Todo normal, aunque hay varias anotaciones JsonProperty de mas.
 
 
 CUALQUIER PROYECTO
+
 
 Primero me enseñaron a usar los endpoints de la aseguradora.
 Después replique ese consumo por mi cuenta por mi cuenta.
