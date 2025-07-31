@@ -6,9 +6,29 @@ Buscar todos los lugares donde se manda a llamar un método: ir al lugar donde s
 	- Dar un click para ver una previsualización.
 	- Dos clcks para que nos lleve a esa clase.
 
+Busca una palabra en todo el proyecto: control + shift + f.	
+
+
+
+Debuggear ------------------------------------------
+
+Correr el proyecto y entre el button de re-run y stop presionar el bicho.
+
+
 
 problemas -------------------------------------------------
 
 En ocasiones no esta habilitado el button de correr proyecto: en la parte sup der darle click en el button
 	de notificaciones.
 	Si no queda con eso, preguntar cual jdk debe estar instalado en el SO y no en el intelliJ
+
+
+
+terminales -----------------------------------------------
+
+Sacar y Elegir una terminal: En la parte inf. izq se muestra el logo de la terminal -> al darle click 
+	se muestra una ventana que contiene una terminal por defecto.
+	Para cambiarla se da click en la flecha hacia abajo dentro de esa ventana y se elige la git bash.
+
+Los comandos que se ejecuten en esta terminal son equivalentes a los que se podría hacer con la interfaz 
+grafica de intelliJ. *******

@@ -3,7 +3,10 @@ Al bajar un nuevo proyecto cambiarse a la rama develop.
 
 RAMAS
 
-Rama feature ------------------------
+Cuando cambias de una rama a otra y tienes cambios pendientes sin hacer commit, existe el riesgo de perder esos cambios si fuerzas el cambio de rama. Por eso, antes de cambiar de rama, es recomendable hacer commit de todos los cambios. *************************
+
+
+Rama feature ---------------------------------------------
 
 Nos posicionamos en la rama develop.
 	git switch devlop

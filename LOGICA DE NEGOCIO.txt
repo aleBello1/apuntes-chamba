@@ -108,6 +108,66 @@ prima total: lo que tiene que pagar el cliente en el lapso de tiempo que el haya
 idCotizacion: Este valor es el que interesa usar en issue (emision)
 
 
+CODIGO CLUPP
+
+Controllers -----------------------------------------------------------
+
+CatalogController:
+	- Brand: Crea una lista de las marcas mas vendidas y le concatena las marcas que hay en nuestra
+		db después logicamnete nos quedamos con los elementos distintos.
+	- anio: Se manda a llamar a los años dispoinibles por marca, este parámetro se recibe por parámetro
+		en la url.
+	- model: Se manda a llamar a las submarcas dispoinibles por marca y año, estos parámetros se 
+		reciben por parámetros en la url.
+	- variants: Se manda a llamar las claves y descripciones de autos dispoinibles por submarcas, marca 		y año, estos parámetros se reciben por parámetros en la url.
+	- findCar:  dispoinible por clave y año, estos parámetros se reciben por parámetros en la url.
+
+ExtraccionCatalogController:
+	- getMarcas: Consulta las marcas de la api de clup. Este controller tiene el propósito de saber
+		si el método 'getMarcas' del clase 'ExtraccionCatalogService' funciona correctamente.
+
+
+services -----------------------------------------------------------
+
+CatalogService: Manda a llamar a las marcas; año por marcas; submarca por año y marca; variants por 	submarca, marca y año y findCar por clave y año de nuestra db.
+
+
+Repositories -----------------------------------------------------------
+
+La consulta para obtener las marcas en promedio tarda entre 87ms y 110ms.
+
+
+°°°°°°°°° CatalogRepositories °°°°°°°°°°°°°°°
+
+Se debería reemplazar la consulta marca por esta:
+
+WITH marcas_distintas AS (
+        SELECT DISTINCT marca
+        FROM ExtraccionCluppNoviembre2024
+    )
+    SELECT 
+        ROW_NUMBER() OVER (ORDER BY marca) AS id,
+        marca AS text
+    FROM marcas_distintas;
+
+Se debería reemplazar la consulta modelo por esta:
+
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY modelo DESC) AS id,
+    modelo AS text
+FROM ExtraccionCluppNoviembre2024
+WHERE marca = 'AUDI'
+GROUP BY modelo
+ORDER BY text DESC;
+
+models ------------------------------------
+
+Carpeta Catalog:
+	Cuando se busca en la db, para almacenar el resultado de marca, año, submarca y variantes se usa 
+	el mismo modelo.
+	Cuando se busca en la db, para almacenar el resultado de findCar se usa otro modelo.
+
+
 
 /////////////////////////////////////////////EL AGUILA/////////////////////////////////////////////////
 

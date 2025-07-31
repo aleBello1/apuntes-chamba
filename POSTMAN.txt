@@ -14,3 +14,20 @@ Para usar una variable de un enviroment en los endpoint se coloca:
 	{{nombreVariable}}
 
 
+AUTORIZACION
+
+Se usa cuando vamos a ingresar un token que solicita un servicio externo o nuestra propia seguridad
+que implementamos por ejemplo con spring security + jwt.
+
+*Estando en una peticion* -> click en el apartado 'authorization' -> elegir el tipo de autorización
+	en la opcion 'Auth type' (lo común será seleccionar: 'Bearer Token') después se ingresa el tokan.
+
+
+WORKSPACES
+
+Es útil para tener aislado todas las collections que tienen que ver con el mismo proyecto pe una collection
+para la api externa y otra collection para la api que uno esta desarrollando.
+
+Crear workspace: parte sup der de postman -> workspaces -> créate workspaces -> blank workspaces.
+
+ 

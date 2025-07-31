@@ -1,2 +1,6 @@
 quote: cotizar
 issue: emisor.
+
+commits --------------------------------
+
+update to -> Para decir que algo se actualizo.
