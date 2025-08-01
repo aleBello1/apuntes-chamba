@@ -20,13 +20,20 @@ ahorra: el negocio principal.
 go: es otro negocio donde se dan precios distintos.
 	Si la aseguradora lo solicita, se mete este otro negocio.
 
+Endpoints --------------------------------
+
+como sé como debo entregarle la respuesta al fron? Que atributos, con que formato, etc
+Para mandar los objetos json que representan las cotizaciones, emisión y pago siempre tienen la misma estructura. Todo eso esta homologado sin importar cual aseguradora se consuma.
+
+Find car: Ocupado por pla para realizar emisiones masivas.
+
+extracion: Lo de la extracción solo es ejecutado en desarrollo.
+
 
 /////////////////////////////////////////////CLUP//////////////////////////////////////////////////
 
 Documentación que manda este cliente:
 https://documenter.getpostman.com/view/18868163/2sA3QniZYU#3e85c796-b075-4d9e-b44c-bbdcbc97b69c
-
-De las mejores clases de service es IssueService
 
 Para generar la emisión primero es la cotización. Con base al id de la cotización rastreas la emisión.
 
@@ -35,23 +42,9 @@ Del application.yml extraer la url, username y password, meterlos al dbeaver.
 	url: rds-ws-clupp.cypym5wo7yt3.us-east-1.rds.amazonaws.com
 
 
-Entidades --------------------------
+Usar endpoints de nuestro proyecto ----------------------------------------
 
-'extracción': Consumir api y guardar esos datos en nuestra db.
-
-'quote': Para hacer las cotizaciones de vehículos.
-
-
-Endpoints --------------------------
-
-°°°°°°°°°° Entidad catalog °°°°°°°°°°
-
-'variants': se toma de la la descripción (descripción del vehiculo) y se pega en el post de cotización.
-
-
-°°°°°°°°°° Entidad qoute °°°°°°°°°°
-
-||||||| Post quote ||||||
+°°°°°°°° Quote °°°°°°°°
 
 Se manda un cuerpo como este que inclye:
 
@@ -93,8 +86,6 @@ entre números y letras), numero de placas (tienen que ser 7 caracteres).
 Random Vim: https://randomvin.com/
 
 
-°°°°°°°°°° Entidad issue-policy °°°°°°°°°°
-
 ||||||| Post issue-policy ||||||
 
 Responde 'emisión' que viene a ser la póliza.
@@ -106,6 +97,8 @@ prima neta: precio antes de impuestos
 prima total: lo que tiene que pagar el cliente en el lapso de tiempo que el haya elegido.
 
 idCotizacion: Este valor es el que interesa usar en issue (emision)
+
+rfc: debe ser un valor existente (bueno cambiarle un solo valor) porque clupp si lo valida bien.
 
 
 CODIGO CLUPP
@@ -123,14 +116,58 @@ CatalogController:
 	- findCar:  dispoinible por clave y año, estos parámetros se reciben por parámetros en la url.
 
 ExtraccionCatalogController:
-	- getMarcas: Consulta las marcas de la api de clup. Este controller tiene el propósito de saber
-		si el método 'getMarcas' del clase 'ExtraccionCatalogService' funciona correctamente.
+	- getMarcas: Consulta las marcas de la api de clup con base al tipo de vehiculo. El tipo de 
+		vehiculo se envia el la url. 
+		Este controller tiene el propósito de saber si el método 'getMarcas' del clase 				'ExtraccionCatalogService' funciona correctamente porque será mandado a llamar 
+		multiples veces dentro de un ciclo. 
+	- getModelos:  Consulta los modelos de la api de clup con base al tipo de vehiculo y marca. Estos
+		parámetros se envian el la url. 
+		Este controller tiene el propósito de saber si el método 'getModelos' del clase 			'ExtraccionCatalogService' funciona correctamente porque será mandado a llamar 
+		multiples veces dentro de un ciclo. 
+	- getAnios: Consulta los años de la api de clup con base al tipo de vehiculo, marca y version.
+		Estos parámetros se envian el la url. 
+		Este controller tiene el propósito de saber si el método 'getModelos' del clase 			'ExtraccionCatalogService' funciona correctamente porque será mandado a llamar 
+		multiples veces dentro de un ciclo. 
+	- getProducto: Consulta el producto (toda la información del carro)*** de la api de clup con base 		al tipo de vehiculo, marca, versión y años. Estos parámetros se envian el la url. 
+		Este controller tiene el propósito de saber si el método 'getModelos' del clase 			'ExtraccionCatalogService' funciona correctamente porque será mandado a llamar 
+		multiples veces dentro de un ciclo. 
+	- getAllExtrac: Usando un mismo tipo de vehiculo, se mandan a llamar todas las marcas, por cada
+		marca se mandan a llamar todas las submarcas, por cada submarca se mandan a llamar todos
+		los años (en si desde el año 2000 hasta el 2027, quien sabe porque). 
+		Con base a esta información se obtienen los productos.
+		Después se buscan las variantes del qualitas y si no se encuentran aquí se buscan en 
+		Banorte.
+		(si al buscar la variante en qualitas los atributos: id, marca o modelo no existen o si
+		el id existe pero contiene un null no hubo resultado y es necesario buscar en Banorte)
+		Finalmente se guarda la información del producto en la db pero añadiendo las variantes
+		de este.
+
+QuoteController: Hace la cotización.
+	- postQuote: Mediante la url recibe el tipo de negocio (ahorra ó go) y llama al método service
+		que hace la cotización dependientemente si es all o amplia.
+
+issuePolicy: Hace la póliza.
+	- issuePolicy: Mediante la url recibe el tipo de negocio (ahorra ó go) y llama al método service
+		que hace la emision.
 
 
 services -----------------------------------------------------------
 
 CatalogService: Manda a llamar a las marcas; año por marcas; submarca por año y marca; variants por 	submarca, marca y año y findCar por clave y año de nuestra db.
 
+QuoteService: 
+	- postQuote: Verificar que el servicio de cotización este activo.
+
+
+IssueService:
+	- mapToCluppRequest: Convierte el json que mandamos al json que entienda clup.
+	- processCluppResponse: Agrega valores por defecto a unos atributos del objeto de la póliza 
+		si estos vienen vacíos.
+	- issuePolicy: Con base al cuerpo que mandamos en la solicitud, toma unos datos y crea
+		el cuerpo que solicita clup para hacer la poliza.
+		Después a la respuesta de la póliza se le da formato (En si solo le asigna valores por 			defectos a los atributos que vengan vacíos).
+		Actualiza el json que mandamos en la solicitud, agregando nuevos datos de la poliza
+	
 
 Repositories -----------------------------------------------------------
 
