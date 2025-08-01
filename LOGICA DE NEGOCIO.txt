@@ -161,7 +161,7 @@ ExtraccionCatalogController:
 
 QuoteController: Hace la cotización.
 	- postQuote: Mediante la url recibe el tipo de negocio (ahorra ó go) y llama al método service
-		que hace la cotización dependientemente si es all o amplia.
+		que hace la cotización dependientemente si es 'all' o 'amplia' el paquete.
 
 issuePolicy: Hace la póliza.
 	- issuePolicy: Mediante la url recibe el tipo de negocio (ahorra ó go) y llama al método service
@@ -173,8 +173,18 @@ services -----------------------------------------------------------
 CatalogService: Manda a llamar a las marcas; año por marcas; submarca por año y marca; variants por 	submarca, marca y año y findCar por clave y año de nuestra db.
 
 QuoteService: 
-	- postQuote: Verificar que el servicio de cotización este activo.
-
+	- postQuote: Instancia el objeto json respuesta que será enviado al front. 
+		Adapta la clave (que parece ser del coche) a una clave que pueda entender clupp, 			Verifica que el servicio de cotización este activo (si no esta activo mandara un error
+		en el objeto json respuesta front y se envia al front), adapta el paquete y periodicidad
+		a uno que entienda clupp.
+		Instancia el objeto que será usado en la solicitud de cotización (pareciera ser que 
+		hacen falta meter los datos del cliente, porque al parecer se meten solo los datos
+		del vehiculo) y realiza la petición. Si la respuesta contiene el atributo message 
+		siginifica ue ocurrió un error.
+		De la respuesta extrae el id, el periodo de cotización y las coberturas.
+		El objeto json respuesta que será enviado al front se llena con ciertos datos de la 
+		respuesta a la api de clup.
+		Se inserta un log.
 
 IssueService:
 	- mapToCluppRequest: Convierte el json que mandamos al json que entienda clup.

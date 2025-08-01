@@ -1,4 +1,9 @@
 
+Buscar determinada palabra: Ctrl + F.
+	Esto es útil porque al estar dentro del cuerpo de una respuesta o solicitud nos permite 
+	buscar mas rápido un atributo o valor. ********
+
+
 ENVIROMENTS
 
 Se crea un ambiente por cada proyecto. Cada ambiente tiene multiples variables. Estas variables sirven para que cuando probemos endpoints, podamos cambiar de servidor (pasar de local, develop, etc).

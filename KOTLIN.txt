@@ -314,4 +314,24 @@ Queda incluso este tema, para investigar después.
 
 
 
+///////////////////////////////////////////////STRINGS///////////////////////////////////////////////////
+
+
+cadena.substringBefore("cadenaBuscar") -> Se queda con todo lo que este antes de la primera vez 
+	que aparezca la cadena 'cadenaBuscar'.
+
+cadena.substringBeforeLast("cadenaBuscar") -> Se queda con todo lo que este antes de la utlima vez 
+	que aparezca la cadena 'cadenaBuscar'.
+	Ejemplo:
+	val texto = "nombre::apellido::edad"
+	val resultado = texto.substringBeforeLast("::")
+	println(resultado) // nombre::apellido
+
+cadena.substringAfter("cadenaBuscar") -> Se queda con todo lo que este despues de la primera vez 
+	que aparezca la cadena 'cadenaBuscar'.
+
+cadena.substringAfterLast("cadenaBuscar") -> Se queda con todo lo que este despues de la ultima vez 
+	que aparezca la cadena 'cadenaBuscar'.
+
+
 

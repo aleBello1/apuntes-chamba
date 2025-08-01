@@ -14,7 +14,7 @@ Convertir en mayuscular o minúsculas toda la palabra seleccionada:  ctrl + shif
 
 Crea un multicursor en todas las coincidencias de la palabra seleccionada: ctrl + shift + alt + J
 
-seleccionar una ocurrencia una por una de la palbra seleccionada: alt + J
+seleccionar una ocurrencia una por una de la palabra seleccionada: alt + J
 
 
 Debuggear ------------------------------------------
