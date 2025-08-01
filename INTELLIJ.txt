@@ -8,6 +8,13 @@ Buscar todos los lugares donde se manda a llamar un método: ir al lugar donde s
 
 Busca una palabra en todo el proyecto: control + shift + f.	
 
+Duplicar la linea actual: ctrl + d
+
+Convertir en mayuscular o minúsculas toda la palabra seleccionada:  ctrl + shift + u
+
+Crea un multicursor en todas las coincidencias de la palabra seleccionada: ctrl + shift + alt + J
+
+seleccionar una ocurrencia una por una de la palbra seleccionada: alt + J
 
 
 Debuggear ------------------------------------------

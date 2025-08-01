@@ -10,6 +10,11 @@ En un post, se debe verificar la documentación que proporciona el cliente para 
 
 El id de cotización caduca. ******
 
+Entre aseguradoras las claves de coche pueden cambiar asi como las peridicidad pago y nombres de los paquetes. ****
+
+
+Procesos técnicos ---------------------------------
+
 Hay dos jar en la nube: dev y prod
 Los nuevos cambios se suben a dev y lo testean los de qa.
 Si pasan las pruebas se suben los cambios de dev a prod.
@@ -24,6 +29,9 @@ Endpoints --------------------------------
 
 como sé como debo entregarle la respuesta al fron? Que atributos, con que formato, etc
 Para mandar los objetos json que representan las cotizaciones, emisión y pago siempre tienen la misma estructura. Todo eso esta homologado sin importar cual aseguradora se consuma.
+
+porque se permite las solicitudes de cualquier fron y no de uno en especifico?
+los del fron no saben que dominio tienen por eso se pone el asterisco
 
 Find car: Ocupado por pla para realizar emisiones masivas.
 
@@ -42,11 +50,12 @@ Del application.yml extraer la url, username y password, meterlos al dbeaver.
 	url: rds-ws-clupp.cypym5wo7yt3.us-east-1.rds.amazonaws.com
 
 
-Usar endpoints de nuestro proyecto ----------------------------------------
+Usar endpoints de nuestro proyecto --------------------------------------------
 
 °°°°°°°° Quote °°°°°°°°
 
-Se manda un cuerpo como este que inclye:
+Se manda un cuerpo como este que inclye: datos del cliente, el vehiculo
+que quiere cotizar y el tipo de paquete que solicita.
 
 Pe este:
 
@@ -70,7 +79,14 @@ Pe este:
    "conductorUniversal":false
 }
 
-De la respuesta, se toma/copia absolutamente todo y se pega en el cuerpo de la solicitud de post/issue-policy. Una vez ahi, se deben llenar los datos del cliente y vehiculo.
+Quizas se elmine el siguiente grupo de texto:
+Lo ideal es que de la respuesta, se toma/copia absolutamente todo y se pega en el cuerpo de la solicitud de 
+post/issue-policy. Una vez ahi, se deben llenar los datos del cliente y vehiculo.
+Sin embargo, lo mejor es solo tomar el idCotizacion y usarlo en el otro endpoint.
+
+De la respueta de la cotización se copian todos los datos dentro de los objetos que representan al vehiculo, coberturas y cotización 
+(todos estos objetos deben estar llenos de informacion) pero mas aparte se agrega en el vehiculo: numero de motor, numero de series 
+y números de placas. 
 
 Datos del cliente: 
 
@@ -86,7 +102,8 @@ entre números y letras), numero de placas (tienen que ser 7 caracteres).
 Random Vim: https://randomvin.com/
 
 
-||||||| Post issue-policy ||||||
+°°°°°°°° Post issue-policy °°°°°°°°
+
 
 Responde 'emisión' que viene a ser la póliza.
 
