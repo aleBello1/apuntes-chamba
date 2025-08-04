@@ -173,7 +173,8 @@ services -----------------------------------------------------------
 CatalogService: Manda a llamar a las marcas; año por marcas; submarca por año y marca; variants por 	submarca, marca y año y findCar por clave y año de nuestra db.
 
 QuoteService: 
-	- postQuote: Instancia el objeto json respuesta que será enviado al front. 
+	- postQuote: Hace la cotización para un solo paqeute (el que reciba el metodo).
+		Instancia el objeto json respuesta que será enviado al front. 
 		Adapta la clave (que parece ser del coche) a una clave que pueda entender clupp, 			Verifica que el servicio de cotización este activo (si no esta activo mandara un error
 		en el objeto json respuesta front y se envia al front), adapta el paquete y periodicidad
 		a uno que entienda clupp.
@@ -185,6 +186,9 @@ QuoteService:
 		El objeto json respuesta que será enviado al front se llena con ciertos datos de la 
 		respuesta a la api de clup.
 		Se inserta un log.
+	- postQuoteAll: Hace la cotización para todos los paquetes disponibles (son solo 3: 
+		"AMPLIA-REDUCIDA", "AMPLIA-NORMAL", "AMPLIA-INTENSIVA").
+		Manda a llamar dentro de un ciclo al postQuote.*
 
 IssueService:
 	- mapToCluppRequest: Convierte el json que mandamos al json que entienda clup.

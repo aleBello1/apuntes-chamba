@@ -19,12 +19,15 @@ que en Java, pero la sintaxis cambia:
 data class NombreClaseX(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    var id: Long? = null
 
     var nombreAtributo1: tipoDato,
     var nombreAtributo2: tipoDato,
     var nombreAtributoN: tipoDato,
-)
+) ->
+	La unica diferencia es que en el atributo id, se usas var porque se genera y se asigna automáticamente c	cuando guardas el objeto (no tienes que darlo tú).
+	Es nullable (Long? = null) porque inicialmente no tiene valor, y solo la base de datos lo asignará.
+	Es mutable (var) para que JPA pueda asignar el valor al guardar.
 
 En Kotlin, no se necesita escribir manualmente los getters y setters como en Java. Kotlin los genera automáticamente cuando se define una propiedad.
 

@@ -6,15 +6,25 @@ Buscar todos los lugares donde se manda a llamar un método: ir al lugar donde s
 	- Dar un click para ver una previsualización.
 	- Dos clcks para que nos lleve a esa clase.
 
+Atajos de teclado (shortcuts) ---------------------------------------
+
+Aquí viene un pdf donde vienen todos los shortcuts de intelliJ:
+	https://rubentejera.com/atajos-de-teclado-shortcuts-para-intellij-idea/
+
+Agregar o modificar un shortcut: presionar ctrl + alt + S -> apartado keymaps -> escribir en el buscador el 
+	nombre del shortcut a editar -> click der sobre el shortcut -> add keyboard shortcut.
+	Esto se uso porque se tenia una lap donde para comentar multiples linea de código se tenia que usar
+	el carácter '/' pero del teclado numerico, asi que se modifico. *****
+
 Busca una palabra en todo el proyecto: control + shift + f.	
 
-Duplicar la linea actual: ctrl + d
+Duplicar la linea actual: ctrl + d. duplicate current line.
 
 Convertir en mayuscular o minúsculas toda la palabra seleccionada:  ctrl + shift + u
 
 Crea un multicursor en todas las coincidencias de la palabra seleccionada: ctrl + shift + alt + J
 
-seleccionar una ocurrencia una por una de la palabra seleccionada: alt + J
+seleccionar una ocurrencia una por una de la palabra seleccionada: alt + J. Selection for next ocurrence.
 
 
 Debuggear ------------------------------------------
