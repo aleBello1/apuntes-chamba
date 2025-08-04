@@ -487,6 +487,29 @@ Después me enseñaron a usar los endpoints resultantes.
 Replicarlo por mi cuenta.
 
 
+/////////////////////////////////////////////GNP//////////////////////////////////////////////////
+
+VIDEO GNP
+
+El proyecto tiene catalogos, cotiza, emite y cobra.
+Solo esta el negocio de ahorra y no de go.
+
+Tiene autos, tractocamione y chofer.
+
+El endpoint issueFull respondera la emisión, numero de póliza y un pdf. 
+
+lógica del pago: viene en paymentService.
+
+Endpoint validCard: valida que sea una tarjeta existente. 
+	Devuelve los datos mas relevantes de una tarjeta. Lo importate de esto es que devolverá el numero de la
+	tarjeta encriptado, este valor se meterá en el request de pago. 
+
+Endpoint MSI: Devuelve las formas de pago que puede utilizar cierta tarjeta.
+
+Endpoint valideCard: payment.
+	- objeto pago: necesita los datos: nombre del cliente, los datos que devuelven los endpoint's validCard 
+		y MSI (la clave, no la descripcion).
+
 
 
 /////////////////////////////////////////////TEORIA/////////////////////////////////////////////////////
@@ -523,7 +546,7 @@ primaNeta: es el costo puro del seguro, sin impuestos ni cargos.
 
 primaTotal: la suma de todos los conceptos: prima neta + impuestos + derechos + recargos.
 
-
+MSI: meses sin intereses.
 
 ENDPOINTS
 
