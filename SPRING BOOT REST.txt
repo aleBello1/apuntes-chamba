@@ -1,4 +1,10 @@
 
+@Transactional -> No es compatible con corrutinas asincrónicas, entonces si un método service contiene
+	operaciones de corrutinas o hilo no se debe usar. *********
+	Si se tiene un servicio 1 que consume a un servicio 2, el servicio 1 en su capa de services, 
+	sus metodos pueden omitir la anotacion transactional. *********
+
+
 Crear una ruta de primer nivel, ruta raiz ó ruta base -------------
 
 
@@ -30,6 +36,7 @@ a la db y no a un servicio externo (api rest o api soap)).
 Corregir el nombre de clases, enums, etc.
 Refactorizar variables, lógica, etc.
 
+
 DTO
 
 @JsonAlias({"nombre1", "nombre2", "nombreN"})
@@ -37,9 +44,8 @@ private tipoDato nombreAtributoX; -> Para indicar que una propiedad o atributo d
 	Usado cuando se esta recibiendo datos JSON de fuentes externas (como un Web Service), y a veces los 	campos pueden venir con diferentes nombres pero debe interpretarse com un mismo atributo.
 
 
-CONSUMO DE SERVICIOS EXTERNOS
 
-si tengo un servicio 1 que consume a un servicio 2, el servicio 1 en su capa de services, sus metodos pueden omitir la anotacion transactional.
+
 
 
 PERFILES
@@ -81,6 +87,27 @@ Entrada:
 Salida: Son como vistas personalizadas (como en sql), los cuales se envían al cliente (fron)
 	Ejemplo: una tabla user tiene los campos nombre, edad apellido y password, al cliente no le
 	enviaremos el password, asi que solo todo lo demás.
+
+
+JOBS
+
+@EnableScheduling
+*Sobre la clase principal* -> Activa la capacidad de programar tareas automáticas (tareas recurrentes) en 
+	tu aplicación. Es decir, te permite ejecutar métodos en intervalos específicos (como cada minuto, 
+	cada hora, a una hora fija, etc.) sin necesidad de intervención manual.
+	Habilita el uso de las anotaciones: @Scheduled y @Schedules.
+
+
+SAVE VS SAVEALL VS INSERCION PERSONALIZADA
+
+La velocidad de inserción de datos depende del volumen de registros.
+
+Usar save() para insertar muchos registros: es más rápido cuando insertas pocos registros (ej. 1 a 10).
+Si insertas miles de registros, genera múltiples consultas SQL individuales (lento).
+
+Usar saveAll() para insertar muchos registros: es más rápido cuándo cuando insertas cientos o miles de registros. Solo será rápido si activas las configuraciones de batch inserts en Hibernate, si no se activan saveAll se comporta como si se llamara a save de uno en uno.
+
+Usar Inserción Personalizada (JPQL o SQL nativo) para insertar muchos registros: es más rápido cuando insertas grandes volúmenes de datos (miles/millones).
 
 
 

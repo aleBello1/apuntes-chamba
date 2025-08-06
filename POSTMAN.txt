@@ -35,4 +35,22 @@ para la api externa y otra collection para la api que uno esta desarrollando.
 
 Crear workspace: parte sup der de postman -> workspaces -> créate workspaces -> blank workspaces.
 
+
+ENVIAR DIFERENTES ARCHIVOS AL BACKEND USANDO POSTMAN
  
+Enviar un archivo HTML ----------------------------------
+
+Subir el archivo a postman: primero en el apartador headers -> agregar a la llave 'Content-Type' el 
+	valor 'multipart/form-data'.
+	En el apartado body seleccionar 'form-data' agregar la llave 'file' (debe tener el mismo nombre que
+	se definio en el backend en el requestParam) y modificarle el tipo: de text a file, y como valor 
+	postman nos permitirá subir el archivo.
+
+
+
+
+
+
+
+  
+

@@ -12,6 +12,11 @@ El id de cotización caduca. ******
 
 Entre aseguradoras las claves de coche pueden cambiar asi como las peridicidad pago y nombres de los paquetes. ****
 
+pick ups: camionetas.
+
+líneas de negocio: tipo de seguro que una aseguradora ofrece
+	Pe Seguro para vehículos personales, Autos comerciales, Gastos médicos mayores, vida, etc.
+
 
 Procesos técnicos ---------------------------------
 
@@ -571,3 +576,234 @@ cp: tiene que ser un valor real y existente.
 tipo persona: F (hace referencia a persona fisica).
 fecha: yyyy-mm-dd
 población: va el municipio 
+
+
+
+/////////////////////////////////////////////AFIRME/////////////////////////////////////////////////
+
+
+WS-AFIRME
+
+Primero se paga y después se emite.
+Para pagar se usan los endpoints que nos da la aseguradora.
+
+El repositorio llamado 'centralized' en la carpeta 'core-afirme' contiene los ambientes (los application) usados para el proyecto.
+
+La api de la aseguradora es soap.
+
+bancos: tipo de carpeta que acepta, tipo de pago que acepta la tarjeta y los bancos que acepta.
+
+Nadamas concentrarse en lo que diga v4 y relacionado, lo demás es relacionado a la anterior version.
+
+Actualmanete, nadamas cotiza autos individuales.
+
+
+Endpoints-----------------------------------------------
+
+buscar clientes: sirve para buscar los clientes que han cotizado con base a su rfc.
+
+agente: especie de licencia para que podemos consumir el servicio de la aseguradora.
+
+
+cuerpo de la cotización ------------------------------------
+
+idTipoPersonas: siempre 1.
+
+fecha vigencia: depende si el paquete es anual, mensual, etc, si es anual seria la fecha actual mas un año.
+
+getListTipoPoliza: devuelve el id de póliza.
+
+zonaCirculacion se debe usar el catalogo de address.
+
+vechiculo: se obtiene de catalago vehiculo.
+
+paquete se saca de getIdPaquete.
+	el atrbuto 'idFormaPago' se saca de donde catalogo pagos
+	el atributo pctDescuento lo colocamos nosotros de manera maual.
+
+contratante:
+	idCiudad y idEstado se sacan de catalogo address.
+
+
+
+CODIGO DE WS-AFIRME (FLUJO VIEJO)
+
+
+Controllers ------------------------------------
+
+CatalogControllerV4:
+	- getBrand: Manda a llamar a getIDLineaNegocio (esto podría meterse en un método de service y no
+		dejarlo en un controller).
+		si el producto es invalido se le retorna al front (esta lógica también debería ir en un 
+		método de service)?? pero si es valido se manda a llamar a las marcas con base a ese id 
+		de producto
+	- getYears: Manda a llamar a getIDLineaNegocio si el producto es invalido se le retorna al front
+		pero si es valido se manda a llamar a los modelos (años) con base a ese id de producto
+		y la marca.
+	- getSubBrands: Este al parecer hace falta pero si esta su service y repository.
+	- getVariant: Manda a llamar a getIDLineaNegocio si el producto es invalido se le retorna al front
+		pero si es valido se manda a llamar a las variants con base a ese id de producto, la marca,
+		modelo y submarca.
+
+CatalogBankController: 
+	- saveBanks: 
+
+ExtractionController: 
+	- extract: manda a llmar el servicio de extracción.
+
+
+		
+Service ------------------------------------
+
+CatalogServiceV4: 
+	- getBrands: coloca manualmente las marcas mas solicitadas, se solicitan de nuestra db todas las
+		marcas con base al tipo de vehiculo.
+	- getYear: se solicitan de nuestra db todas los modelos (años) con base al tipo de vehiculo y marca.
+	- getSubBrands: se solicitan de nuestra db todas las submarcas con base al tipo de vehiculo, marca
+		y modelo.
+	- getVariant: se solicitan de nuestra db todas las variants con base al tipo de vehiculo, marca
+		modelo, submarca y modelo.
+
+ExtractionService:
+	- extract: Llama a 'getLineasNegocio', limpia una tabla auxiliar (como una base temporal) y con 
+		cade linea de negocio manda a llamar el metodo 'loopBrands'.
+		Devuelve una lista de errores cada elemento representa el error que hubo con alguna linea 
+		de negocio.
+	- loopBrands: Funcion que se ejecuta de forma paralela para obtener las marcas, submarcas y 
+		modelos de cada linea de negocio.
+		Con base a esta información, se obtienen todas las descripciones (las variants).	
+	- loopVariants: Funcion para obtener de forma paralela todas las descriciones de los tipos de
+		vehiculo.
+		Con cada estilos le quitamos lo que esa después del guion. si hay un error en la consulta
+		de estilos se guarda en una lista de errores.
+		Manda a llamar la función 'brandHomologate'.
+		Guarda cada variant. si hay un error con el guardado se guarda el error en una lista de 
+		errores.
+	- brandHomologate: función para homologar las marcas. 
+	- subBrandHomologate: función para homologar las submarcas. 
+			
+
+Services XML ---------------------------------
+
+Todos estos no deberían de ir.
+
+CatalogoAutosXML: 
+	- getXMLLineasNegocio: obtiene las líneas de negocio.
+	
+	
+
+Utils ------------------------------------
+
+UtilsServiceV2:
+	- getIDLineaNegocio: Con base al nombre del tipo de producto (tipo de vehiculo) se devuelve un id.
+		Esto podría mejorarse metiéndolo en una tabla, esta conformado por el nombre
+		del vehiculo y el id (ambos de tipo string)???
+	- 
+
+Catalog: Cambio: debería llamarse catalogUtils o algo asi.
+	- getLineasNegocio: obtiene Todos las líneas de negocio (tipos de vehiculo disponibles).
+	- getMarcas: obtiene todas las marcas de una liena de negocio con base a la claeve de negocio.
+	- getSubmarca: obtiene todas las submarcas de cada marca de una liena de negocio con base a la 			claeve de negocio.
+	- getModelos: obtiene todas los modelos de cada marca y submarca de una liena de negocio con base a 		la claeve de negocio.
+
+	- getEstilos: Obtiene los estilos de un coche con base al tipo de vehiculo, marca, submarca y 
+		modelo
+
+
+
+Models ------------------------------------
+
+AfirmeCoreEntity: Se cree será usado para almacenar datos del catalogo.
+	Todo para indicar que si, se puede copiar del clupp porque almacena los datos de marcas, modelos
+	(años), submarcas.
+
+
+
+Enums ---------------------------------------
+
+VehicleType: Contiene los posibles productos.
+
+// BusinessType: Contiene los posibles negocios.
+
+
+
+
+
+
+
+
+
+CatalogBankController ---------------------------------------------
+
+°°°°°° saveBanks °°°°°°°
+
+Controller: Llama al método de servicio 'saveBanks'.
+
+Service:
+	- CatalogBankService:
+		- getListBancos: obtiene la lista de bancos permitidos para el pago.
+		- saveBanks: Guarda todos los bancos (clave y nombre) en la db.
+			Al paracer se uso una inserción personalizada porque es mas rápida y además
+			porque no se tiene la entidad bank.
+
+repository:
+	- CatalogBankRepository
+		- saveBanks: inserción personalizada.
+	
+
+°°°°°° getBanks °°°°°°°
+
+Controller: Llama al método de servicio 'getBanks'.
+
+Service:
+	- CatalogBankService:
+		- getBanks: Llama al método repository para obtenre los bancos.
+
+repository:
+	- CatalogBankRepository
+		- saveBanks: Devuelve los bancos insertados.
+
+
+°°°°°° getCard °°°°°°°
+
+Controller: Llama al método de servicio 'getCards'.
+
+Service:
+	- CatalogBankService:
+		- getCards: Llama al método repository para obtenre las tarjetas.
+
+repository:
+	- CatalogBankRepository
+		- getCards: Devuelve las tarjetas.
+
+
+°°°°°° getMsi °°°°°°°
+
+
+
+REESTRUCTURACION
+
+Conocer el flujo del código.
+
+crear mi rama
+cambiar en el application.properties el perfil de prod a dev.
+
+Meter los XML en resources.
+Orgnaizar las carpetas bien.
+todas los modelos que tienen que ver en una misma clase.
+meter lo de las cotizaciones en el mismo servicio.
+donde van los enums?
+
+cuidar la estructura pe: un proyecto sin el paquete de pruebas (src/test/kotlin), que en el paquete de
+pruebas la clase principal de pruebas se llame como la clase 
+principal (NombreClasePrincipalApplicationTests).
+
+Crear el swagger.yaml
+
+
+
+
+
+
+En la tabla 'sepomexCat' estan todos los datos del codigo postal, para que no uses el servicio de la aseguradora.
+

@@ -313,6 +313,21 @@ Si se tiene mas de un bloque init, todos se ejecutaran después de todos los con
 Queda incluso este tema, para investigar después.
 
 
+DOBLE Y TRIPLE
+
+Triple(varlor1, valor2, valor3) -> Crea un objeto que contiene tres elementos (una tupla de tres valores).
+	Es una forma sencilla de agrupar tres valores relacionados sin necesidad de crear una clase 	
+	específica.
+	Inmutable: Una vez creado, no se pueden modificar sus valores.
+	Genérico: Puede contener valores de cualquier tipo (Triple<A, B, C>).
+	Para acceder a los elementos se usa:
+		.first: primer valor.
+		.second: segundo valor.
+		.third: tercer valor.
+	o se puede hacer destructuring (como en js).
+
+También existe Pair<a, b> y es completamente análogo.
+
 
 ///////////////////////////////////////////////STRINGS///////////////////////////////////////////////////
 
@@ -332,6 +347,60 @@ cadena.substringAfter("cadenaBuscar") -> Se queda con todo lo que este despues d
 
 cadena.substringAfterLast("cadenaBuscar") -> Se queda con todo lo que este despues de la ultima vez 
 	que aparezca la cadena 'cadenaBuscar'.
+
+
+
+///////////////////////////////////////////////AVANZADO////////////////////////////////////////////////////
+
+CORRUTIANAS
+
+Son una característica propia de Kotlin, diseñadas para facilitar la programación asíncrona y concurrente de forma ligera y estructurada. En Java puro, no existen corrutinas nativas.
+
+Es una forma ligera y eficiente de hacer varias cosas al mismo tiempo (concurrencia), sin necesidad de crear hilos pesados.
+Es como una mini tarea o subproceso que puedes pausar y reanudar sin bloquear todo el programa.
+
+Son mucho más livianas que los hilos (Thread), mientras que un cuando se crea un hilo el SO necesita 
+reservar 512 KB - 1 MB, una corrutiana es administrada por java o kotlin y solo necesita reservar aprox
+1 kb.
+Puedes lanzar miles de corrutinas sin colapsar tu app.
+
+val corrutinas = mutableListOf<Deferred<T>>() -> Crea una lista mutable vacía que solo acepta elementos
+	de tipo Deferred<T>.
+	Cuando se lanza una corrutina con el método async, el resultado que obtienes es un objeto de 
+	tipo Deferred<T>, donde T es el tipo de dato que devuelve la corrutina cuando termina.
+	Entonces esta linea de código srive para almacenar lo que devuelve cada corrutina, se hace de esta
+	manera por lo mismo que las corrutinas se ejecutan en paralelo.
+
+val scope = CoroutineScope( tipoJob + tipoDispatch ) -> Crea una corrutina.
+	- tipo de jobs:
+		- Job() -> Si una corrutina falla, todas las demás se cancelan.
+		- SupervisorJob() -> Permite ejecutar multiples corrutinas en paralelo y si una falla se 
+			lanzara una exception pero las otras continúan ejecutándose.
+			Se usa cuando las tareas no dependen entre sí.
+	- tipo de dispatch: controla en qué hilos corren las corrutinas.
+		- Dispatchers.Default: Ideal para tareas como procesamiento de datos, cálculos, 
+			lógica empresarial y lo que no requiere acceso a disco.
+		- Dispatchers.IO: Para tareas de entrada/salida (I/O): lectura de archivos, llamadas de 
+			red, acceso a base de datos, etc.
+
+scope.async { ... } -> Lanza un corrutina
+	Dentro de las llaves va el bloque de código que se ejecutará de forma paralela.
+	Este metodo siempre devuelve un Deferred<T>, asi que aunque el bloque de codigo no retorne nada,
+	en si esta retornando un Deferred<Unit> (Unit == void). *****
+	- corrutinas.add(scope.async { ... }) -> Si se lanzan multiples corrutinas estas se deben almacenar
+		en una lista especial (de tipo Deferred<T>), porque esta lista nos ayuda a saber
+		cuando todas las corrutinas ha terminado.
+
+runBlocking { threads.awaitAll() } -> Espera a que terminen las corrutinas para continuar.
+	El bloque runBlocking { ... } bloquea el hilo actual (no cada corrutina, si no el hilo actual) 	además permite usar funciones de tipo suspend.
+	La instrucción threads.awaitAll() indica: No continúes hasta que todas las corrutinas de esta 
+	lista hayan terminado. Esta función es de tipo suspend.
+
+Si ocurre una excepción dentro del async, no se lanza en ese momento.
+Se retiene internamente dentro del Deferred (lo que devuelve), y solo se lanza cuando llamas al metodo
+await. 
+Con awaitAll recorre cada elemento dentro de la lista especial y les aplica await, si varias corrutinas fallan awaitAll() lanza solo la primera excepción que encuentra. Las otras excepciones de corrutinas que también fallaron, se pierden, a menos que tú manejes cada await() individualmente.
+
 
 
 
