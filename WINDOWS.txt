@@ -1,0 +1,64 @@
+///////////////////////////////////////////////ARCHIVOS BAT///////////////////////////////////////////////
+
+Estos archivos usan una serie de comandos escritos en un lenguaje de scripting sencillo llamado Batch Script,
+que se ejecuta mediante el Símbolo del sistema (cmd.exe).
+Excelente forma de automatizar tareas en Windows. *****
+
+archivo .bat: Archivo de texto plano que contiene comandos para ejecutar en cmd).
+
+Comandos básicos ----------------------------------------
+
+@echo off ->  De esta instrucción, la parte de 'echo off' sirve para que el intérprete de comandos deje 
+	de mostrar los comandos en pantalla mientras se ejecutan y el símbolo '@' delante evita que se 
+	muestre el propio comando echo off.
+	Ejemplo si se el archivo .bat contiene: 
+		echo Hola
+		pause
+	Entonces aparecera en el cmd: 
+		C:\Users\Usuario\Desktop>echo Hola
+		Hola
+
+set nombreVariable=valor -> Declara e inicializa una variable.	
+	
+rem ó :: comentarios -> Sirve para comentar una sola linea.
+	 En Batch, no existen comentarios multilínea nativos.
+
+pause –> Espera a que el usuario presione una tecla para continuar.
+
+start https://www.ejemplo.com -> Para abrir el navegador predeterminado y llevarnos a la página 
+	indicada.
+	Es necesario usar 'http://' ó 'https://' en la url para que el comando no piense que es un programa.
+	- start chrome https://www.ejemplo.com -> Para abrir cierto navegador y llevarnos a la pagina 			indicada.	
+		Para que funcione, el navegador debe estar en el PATH del sistema. Si no lo está, deberías 		usar la ruta completa.
+	- start "" "C:\ruta\nombreNavegador.exe" https://www.ejemplo.com -> Para abrir cierto navegador y 		llevarnos a la pagina indicada, indicando la ruta del navegador.
+
+start "" "C:\ruta\aplicacion.exe" -> Abrir determinada aplicación.
+	- nombreAplicacion -> Ejecutar un programa que está en el PATH.
+	
+
+estructuras de control -----------------------------------------
+
+comparadores de valores: 
+	- GEQ -> Greater or Equal (mayor o igual).
+	- NEQ -> Not equal (no igual). 
+	- LSS -> Less (menor). 
+	- GTR -> Greater (mayor). 
+	- LEQ -> Less or Equal (menor o igual).
+
+if exist "nombreArchivo.extension" (
+    echo El archivo existe.
+) else (
+    echo El archivo no existe.
+) -> Verifica si existe o no determinado archivo de cualquier tipo.
+	Dentro de las comillas dobles se pueden poner rutas completas.
+	Si no se coloca la extensión del archivo se entiend que se esta preguntando por la existencia de 
+	una carpeta. *
+	Si no se especifica la ruta completa, se entiende que el archivo esta en la misma ruta que el 
+	el archivo .bat.
+	El lenguaje Batch no tiene una estructura else if, pero sí puedes simularlo anidando varios if 
+	o usando múltiples condiciones.
+
+	
+
+
+
