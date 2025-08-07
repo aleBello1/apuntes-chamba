@@ -132,13 +132,13 @@ fun objetoBean(): NombreClaseBean {
 INYECCION DE DEPENDENCIAS
 
 class NombreClaseZ(
-    val nombreObjetoX: NombreComponenteX 
+    private val nombreObjetoX: NombreComponenteX 
 ) -> Inyección por constructor. Esta es la manera mas recomendada en un proyecto de spring boot + kotlin.
 
 @Autowired
-lateinit var nombreObjetoX: NombreComponenteX -> Inyección por atributo. Como este atributo lo inicializa
-	spring boot en tiempo de ejecución si no se pone el lateinit kotlin piensa que no tiene valor, 
-	entonces se coloca eso para indicar que tomara un valor después (cuando spring boot lo 
+private lateinit var nombreObjetoX: NombreComponenteX -> Inyección por atributo. Como este atributo lo 
+	inicializa spring boot en tiempo de ejecución si no se pone el lateinit kotlin piensa que no tiene
+	valor, entonces se coloca eso para indicar que tomara un valor después (cuando spring boot lo 
 	inicialice).
 
 
@@ -291,5 +291,32 @@ for (i in 0 until JSONArray.length()) {
 }
 
 
+
+//////////////////////////////////////INYECCION DE VALORES//////////////////////////////////
+
+
+INYECTAR VALORES QUE VIENEN DE ARCHIVOS PROPERTIES
+
+Estos valores son de configuracion y se crean dentro de archivos de tipo properties para ser
+utilizados en uno o mas clases. 
+
+Utilizando el archivo de properties que viene por defecto -----------------------
+
+
+°°°°°°° En nombreProyecto\demo\src\main\resources\application.properties °°°°°°°
+
+config.nombreAtributoX=valor -> Crea un valor de configuracion.
+	Si el valor es string NO se envuelve entre comillas dobles. NO se debe utilizar 
+	acentos en las cadenas ni otros caracteres especiales.
+
+
+°°°°°°° En la clase donde se utilizara los valores de configuracion °°°°°°°
+
+*Donde se definen atributos de clase*
+@Value("\${config.nombreAtributoX}")  
+private lateinit var nombreAtributoX: String -> Para poder inyectar los valores que estan en 
+	los archivos de properties a la clase actual mediante creacion de atributos de clase.
+
+Si se tiene levantada la app, se debe reiniciar después de hacer esto.
  
 

@@ -723,12 +723,7 @@ Enums ---------------------------------------
 
 VehicleType: Contiene los posibles productos.
 
-// BusinessType: Contiene los posibles negocios.
-
-
-
-
-
+BusinessType: Contiene los posibles negocios.
 
 
 
@@ -778,6 +773,141 @@ repository:
 
 
 °°°°°° getMsi °°°°°°°
+
+Controller: Llama al método de servicio 'getMSI' reciba el numero de tarjeta por la url.
+
+Service:
+	- CatalogBankService:
+		- getMSI: Llama al método 'getTokenMidas', utilizando el token se
+			piden las formas de pago para la tarjeta con base a la
+			tarjeta y el token (llama al método: 'getPromocionesMSIXML'),
+			realiza la solicitud (llama al método: 'connect') y crea
+			un arreglo de objetos json con cada promoción y clave.
+	- TokenServiceV2:
+		- getTokenMidas: Solicita un token a midas el cual se nos pide en los 
+			request al paracer este cambiara dinámicamente cada vez que 
+			se solicite. A su vez, hay dos tipos de tokens que podemos
+			pedir: 1. si el negocio es el normal ó internal o 2. si el 
+			negocio es go.
+	- PagoXML
+		- getPromocionesMSIXML: Contiene el esqueleto de un XML.
+	- UtilsServiceV2:
+		- connect: Envia una solicitud con base a la url y un cuerpo xml 
+			que se le es proporcionado y retorna lo que sea que haya 
+			respondido.
+
+
+IssueControllerV4 ---------------------------------------------
+
+°°°°°° issue °°°°°°°
+
+Controller: Llama al método de servicio 'issuePolicy' recibe un cuerpo de solicitud
+	(el cual tiene validaciones de jakarta pero sin pasar el objeto 
+	bindingResult) y el tipo de negocio y tipo de vehiculo por medio de la 
+	url.
+
+service:
+	- getIssuePolicy: Se llenan la response con los datos proporcionados en el 
+		Request, verifica si el servicio esta disponible (si no lo esta
+		lanza una exception con el error), obtiene el token, prepara
+		solitud y mételo en un esqueleto de XML (si no se obtuvo éxito
+		responde al fron el error), con base al xml manda la solicitud a 
+		la api de la aseguradora, valida si nos respondieron con un json,
+		(si no es asi, responde un error al fron), llena la response
+		con los datos proporcionados por la respuesta de la aseguradora.
+		Se verifica que el cobro hay sido exitoso (si no lo fue se 
+		llama al método 'getRecibosPoliza' para ver el estado del pago),
+		se genera el pdf y se guarda esta accion en los logs.
+		- downloadPoliza: verifica si la póliza existe (si existe y 
+			esta cancelada se notifica o bien si no existe se 
+			notifica), se intenta buscar el documento y con base
+			en el se genera la url de pdf (si no se manda 
+			error).
+			Resumen: genera la url donde esta el pdf de la póliza.
+	- PaymentService
+		- getRecibosPoliza: se da el formato requerido para la poliza si 
+			no tiene los "-", se prepara un XML para solicitar el 
+			recibo de póliza, manda la solicitud (si el recibo esta
+			vacio o hay un error, se manda un error al front), con 
+			la respuesta se determina si el estatus de pago y 
+			respuesta ahorra tiene cierto valor eso significara
+			que el pago esta siendo procesado.
+			Resumen: checa el estado del pago.
+
+°°°°°° print-policy °°°°°°°
+
+
+Controller: Llama al método de servicio 'downloadPoliza' recibe un cuerpo de solicitud
+	(el cual tiene validaciones de jakarta pero sin pasar el objeto 
+	bindingResult) y el tipo de negocio y tipo de vehiculo por medio de la 
+	url.
+	Resumen: al parecer el propósito de este endpoint sea probar el funcionamiento
+	de el método 'downloadPoliza'
+
+°°°°°° dummy °°°°°°°
+
+Controller: Llama al método de servicio 'dummy' recibe un cuerpo de solicitud
+	(el cual tiene validaciones de jakarta pero sin pasar el objeto 
+	bindingResult) y el tipo de negocio y tipo de vehiculo por medio de la 
+	url.
+
+service:
+	- IssuePolicyServiceV2
+		- dummy: Instancia un objeto de la clase '' y la devuelve.
+			Resumen: pareciera ser que solo quieren probar el
+			funcionamiento de este método. 
+
+
+°°°°°° cancel °°°°°°°
+
+Controller: Llama al método de servicio 'cancelarPoliza' recibe el tipo de 
+	negocio y id de poliza mediante la url.
+
+service:
+	- IssuePolicyServiceV2
+		- cancelarPoliza: Obtiene el token, se obtiene la fecha de 
+			inicio de la póliza, se prepara el XML para cancelar
+			y se envia el XML.
+			Resumen: cancela la póliza. Pero extrañamente no se
+			usa en ningún lado.
+	
+
+PaymentController ---------------------------------------------
+
+°°°°°° getBanks °°°°°°°
+
+Controller: Llama al método de servicio 'getBanks' (renombrado a 
+	getextractBankList).
+
+Service:
+	- getextractBankList: Consulta la api de la aseguradora y devuelve
+		todos los bancos que se pueden pagar.
+	
+
+°°°°°° getPaymentStatus °°°°°°°
+
+Controller: Llama al método de servicio 'getRecibosPoliza' recibe el tipo de 
+	negocio, id de póliza y el tipo de vehiculo mediante la url.
+
+Service:
+	- PaymentService
+		- getRecibosPoliza: Usado para probar este método.
+
+
+QuoteControllerV4 ---------------------------------------------
+
+°°°°°° cotizacionDummy °°°°°°°
+
+Controller: Llama al método de servicio 'dummy' recibe un cuerpo de solicitud
+	el tipo de vehiculo y el tipo de negocio en la url.
+
+Service:
+	- nombreSErvicio:
+		- dummy: Solo crea la instancia de un objeto.
+			Resumen parace que solo quieren probar los objetos
+			de una clase.
+
+
 
 
 

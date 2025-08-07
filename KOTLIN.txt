@@ -77,7 +77,20 @@ val newVariable = when (nombreVariableEntrada) {
     valorEntradaN -> valorN
     else -> valorDefault
 } -> Hace lo mismo que un switch case de otros lenguajes. Si la variable contiene el valor de entrada 1,
-	entonces devuelve el valor 1, si la variable contiene el valor de entrada 2, entonces devuelve el 	valor 2 y asi sucesivamente.
+	entonces devuelve el valor 1, si la variable contiene el valor de entrada 2, entonces devuelve el 
+	valor 2 y asi sucesivamente.
+
+
+CONDICIONES
+
+val nombreVariable = if ( condición ) {
+    // n intrucciones en caso true
+    *devolver un valor*
+} else {
+    // n intrucciones en caso true
+   *devolver un valor*
+} -> Kotlin permite usar if-else como una expresión que devuelve un valor, asi la condicion sea verdadera
+	o false, la variable tendra un valor. 
 
 
 FUNCIONES
