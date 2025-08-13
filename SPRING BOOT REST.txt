@@ -3,6 +3,10 @@
 	operaciones de corrutinas o hilo no se debe usar. *********
 	Si se tiene un servicio 1 que consume a un servicio 2, el servicio 1 en su capa de services, 
 	sus metodos pueden omitir la anotacion transactional. *********
+	Cuando se usa métodos estándar de Spring Data JPA (como pe: save(), delete(), etc.), Spring ya los 	envuelve en una transacción automáticamente. Mientras que, operaciones personalizadas de 
+	INSERT, UPDATE ó DELETE hechas con @Modifying + @Query se deben envolver dentro de uan transaction
+	(en la clase repository) pero si el método de servicio usa muchas de estas operaciones 	personalizadas se debe anotar también con @transactional para agruparlas en una sola 
+	transacción.
 
 
 Crear una ruta de primer nivel, ruta raiz ó ruta base -------------
