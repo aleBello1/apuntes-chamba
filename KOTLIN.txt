@@ -120,9 +120,20 @@ setOf() -> Crea una lista no mutable, equivalente en Java a Set.of(...).
 
 MutableList ----------------------------------
 
-Son listas mutables, es decir, que se puede modificar su contenido.
+Mantiene el orden de inserción
+Permite añadir, eliminar y modificar elementos, es decir, son mutables.
 
-mutableListOf() -> Crea una lista mutable vacía, equivalente en Java a new ArrayList<>().
+val listaMasVendidos: MutableList<CatalogModels> = mutableListOf() -> Crea una lista mutable vacía, 	
+	equivalente en Java a new ArrayList<>().
+
+val resultado = lista1 + lista2 -> Para concatenar listas.
+	Si se usa esta forma, se crea una nueva lista.
+	Esta nueva lista será inmutable. ***
+
+lista1.addAll(lista2) -> Concatena dos listas listas y guarda el resultado en la lista que manda 
+	a llamar el método.
+	Más eficiente en memoria (no crea una nueva lista, reutiliza la existente).
+	Mejor rendimiento para listas grandes.
 
 mutableSetOf() -> Crea una lista mutable vacía, equivalente en Java a new HashSet<>() (no guarda un orden).
 
@@ -242,6 +253,11 @@ val nombreObjetoX = nombreClaseX().apply {
 		objetoX.setNombreAtributo1(valor1);
 		objetoX.setNombreAtributo2(valor2);
 		objetoX.setNombreAtributoN(valorN);
+	Cuando usas apply, el this dentro del bloque apunta al objeto sobre el que estás aplicando el 
+	apply, no a la clase que lo contiene. Entonces usar this. dentro de apply es para hacer 	this.nombreAtributoX o this.nombreMetodoX, donde X son atributos o nombres de metodos pero de 
+	la instancia. *****
+	- this@NombreClase -> Para usar el this externo (el de la clase y no el del objeto que usa el 
+		apply).
 
 
 CONSTRUCTORES

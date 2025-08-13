@@ -728,6 +728,9 @@ BusinessType: Contiene los posibles negocios.
 
 
 
+
+
+
 CatalogBankController ---------------------------------------------
 
 °°°°°° saveBanks °°°°°°°
@@ -902,10 +905,25 @@ Controller: Llama al método de servicio 'dummy' recibe un cuerpo de solicitud
 	el tipo de vehiculo y el tipo de negocio en la url.
 
 Service:
-	- nombreSErvicio:
+	- nombreServicio:
 		- dummy: Solo crea la instancia de un objeto.
-			Resumen parace que solo quieren probar los objetos
-			de una clase.
+			Resumen: parace que solo quieren probar crear objetos
+			con una clase.
+
+
+°°°°°° cotizacion °°°°°°°
+
+Controller: Llama al método de servicio 'getIDLineaNegocio' para conocer el id del tipo de vehiculo,
+	si el objeto de solicitud solicita todos los paquetes se llama a 'quoteAll' si no se cotiza 
+	un paquete en especifico llamando a 'quote'. 
+	Recibe un cuerpo de solicitud, el tipo de vehiculo y el tipo de negocio en la url.
+	Resumen: cotiza todos los paquetes o uno en especifico.
+
+Service:
+	QuoteService:
+		- quote: 
+			Resumen: hace la cotización de un paquete en especifico.
+
 
 
 

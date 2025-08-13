@@ -26,3 +26,7 @@ Cuando nos aseguremos de que todo esta bien se elmina la rama feature.
 
 
 
+GIT FLOW
+
+
+
