@@ -28,5 +28,20 @@ Cuando nos aseguremos de que todo esta bien se elmina la rama feature.
 
 GIT FLOW
 
+Gestionar ramas de manera más eficiente y Automatiza merge's.
+No es una herramienta nueva, sino un método que puedes aplicar usando Git.
+
+main (o master) → Contiene el código estable (versiones finales).
+develop → Rama de integración (aquí se juntan las nuevas features antes del release).
+feature/* → Ramas para desarrollar nuevas funcionalidades.
+release/* → Ramas para preparar una nueva versión.
+hotfix/* → Ramas para corregir errores críticos en producción.
+
+git flow init -> Configura en tu repositorio local las reglas y nombres que usará para crear y 
+	finalizar ramas.
+	Detecta cual es la rama principal, cual es la rama de desarrollo (Si no tienes develop, la crea 
+	a partir de main).
+	Se definen los prefijos para cada tipo de rama (el texto que se coloca antes del nombre de la 
+	rama para indicar su tipo pe feature, realese, etc)
 
 
