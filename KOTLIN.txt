@@ -106,52 +106,6 @@ fun saludar(nombre: String = "amigo") {
 } -> Ejemeplo de función con valor por defecto para un parámetro.
 
 
-COLECCIONES
-
-List ----------------------------------
-
-Son listas inmutables.
-
-listOf() -> Crea una lista no mutable, equivalente en Java a List.of(...).
-
-setOf() -> Crea una lista no mutable, equivalente en Java a Set.of(...).
-
-
-
-MutableList ----------------------------------
-
-Mantiene el orden de inserción
-Permite añadir, eliminar y modificar elementos, es decir, son mutables.
-
-val listaMasVendidos: MutableList<CatalogModels> = mutableListOf() -> Crea una lista mutable vacía, 	
-	equivalente en Java a new ArrayList<>().
-
-val resultado = lista1 + lista2 -> Para concatenar listas.
-	Si se usa esta forma, se crea una nueva lista.
-	Esta nueva lista será inmutable. ***
-
-lista1.addAll(lista2) -> Concatena dos listas listas y guarda el resultado en la lista que manda 
-	a llamar el método.
-	Más eficiente en memoria (no crea una nueva lista, reutiliza la existente).
-	Mejor rendimiento para listas grandes.
-
-mutableSetOf() -> Crea una lista mutable vacía, equivalente en Java a new HashSet<>() (no guarda un orden).
-
-
-Mapas ---------------
-
-val errors = mutableMapOf<String, String>() -> Crea un mapa mutable vacio.
-	
-errors["nombreLlave"] = valor -> Agrega determinada llave y valor.
-	Equivalente al método put.
-
- val errors = mapOf(
-        "nombreLlave1" to valor1,
-        "nombreLlave2" to valor2,
-	"nombreLlaveN" to valorN
-    ) -> Crea e inicializa un mapa inmutable.
-
-
 EXCEPCIONES
 
 Kotlin no tiene checked exceptions, por lo tanto no estás forzado a usar try-catch o throws para muchas operaciones. Sin embargo, Lo mejor será usar trycatch par
@@ -431,5 +385,56 @@ await.
 Con awaitAll recorre cada elemento dentro de la lista especial y les aplica await, si varias corrutinas fallan awaitAll() lanza solo la primera excepción que encuentra. Las otras excepciones de corrutinas que también fallaron, se pierden, a menos que tú manejes cada await() individualmente.
 
 
+///////////////////////////////////////////////COLECCIONES////////////////////////////////////////////////
 
+
+LIST
+
+Son listas inmutables.
+
+listOf() -> Crea una lista no mutable, equivalente en Java a List.of(...).
+
+setOf() -> Crea una lista no mutable, equivalente en Java a Set.of(...).
+
+
+
+MUTABLELIST
+
+Mantiene el orden de inserción
+Permite añadir, eliminar y modificar elementos, es decir, son mutables.
+
+val listaMasVendidos: MutableList<CatalogModels> = mutableListOf() -> Crea una lista mutable vacía, 	
+	equivalente en Java a new ArrayList<>().
+
+val resultado = lista1 + lista2 -> Para concatenar listas.
+	Si se usa esta forma, se crea una nueva lista.
+	Esta nueva lista será inmutable. ***
+
+lista1.addAll(lista2) -> Concatena dos listas listas y guarda el resultado en la lista que manda 
+	a llamar el método.
+	Más eficiente en memoria (no crea una nueva lista, reutiliza la existente).
+	Mejor rendimiento para listas grandes.
+
+val nuevaLista = lista.distinct() -> Elimina elementos duplicados. 
+	Devuelve una nueva lista que conserva solo una copia de cada elemento único (el orden se mantiene
+	según la primera aparición).
+	La nueva lista es inmutable (de tipo list).
+
+
+
+mutableSetOf() -> Crea una lista mutable vacía, equivalente en Java a new HashSet<>() (no guarda un orden).
+
+
+MAPAS
+
+val errors = mutableMapOf<String, String>() -> Crea un mapa mutable vacio.
+	
+errors["nombreLlave"] = valor -> Agrega determinada llave y valor.
+	Equivalente al método put.
+
+ val errors = mapOf(
+        "nombreLlave1" to valor1,
+        "nombreLlave2" to valor2,
+	"nombreLlaveN" to valorN
+    ) -> Crea e inicializa un mapa inmutable.
 
