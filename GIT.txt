@@ -37,11 +37,48 @@ feature/* → Ramas para desarrollar nuevas funcionalidades.
 release/* → Ramas para preparar una nueva versión.
 hotfix/* → Ramas para corregir errores críticos en producción.
 
-git flow init -> Configura en tu repositorio local las reglas y nombres que usará para crear y 
-	finalizar ramas.
+git flow init -> Activar el modo Git Flow" en el repositorio.
+	Configura en tu repositorio local las reglas y nombres que usará para crear y finalizar ramas.
 	Detecta cual es la rama principal, cual es la rama de desarrollo (Si no tienes develop, la crea 
 	a partir de main).
 	Se definen los prefijos para cada tipo de rama (el texto que se coloca antes del nombre de la 
-	rama para indicar su tipo pe feature, realese, etc)
+	rama para indicar su tipo pe feature, realese, etc).
+	A todos lo que nos pregunte el comando se le da enter, al finalizar la preguntas nos dejara en 
+	la rama develop.
+	No importa en que rama nos encontremos, este comando se puede usar, sin embargo si en la rama 
+	actual tenemos algo pendiente por darle commit, este comando fallara. ******
+
+ramas feature ---------------------------------------------
+
+git flow feature start nombreRama -> Crea una rama local con el prefijo utilizado (feature en este caso)
+	a partir de la rama develop.
+	Internamente ejecuta varios comando de git: ejecuta el comando para que nos cambiemos a la rama
+	develop (checkout/switch), bajemos lo relacionado a esa rama para tenerla actualizada (pull), crea 	la rama de feature y nos cambia a esta nueva rama (switch).
+	El nombre de la rama será un nombre que describa la funcionalidad que se implementara.
+
+git flow feature finish nombreRama -> Fusiona (merge) la rama feature/nombreRama en develop, despues
+	Borra la rama feature/nombreRama (localmente) y nos posiciona automáticamente en develop.
+	Fallara el comando si hay algo pendiente por hacerle commit en la rama feature.
+	Si hay conflictos Git Flow detendrá el proceso y te pedirá resolverlos manualmente (como en un
+	merge clásico).
+
+
+ramas realese ---------------------------------------------
+
+pendiente de investigar a detalle
+
+git flow release start vx.y.z -> 
+	Nos dejara en la rama de realse que hemos creado.
+	Donde de vx.y.z el valor 'x.y.z' es la versión del proyecto. Para saber que numero ponerle uno
+	de debe guiar del resultado del comando git tag, pero si no hay tags el valor que se pondrá 
+	es: 'v1.0.0'.
+	
+Para proyectos en spring boot, nos dirigimos al application-default, cambiar el perfil a prod y hacer commit. 
+
+Investigar tema de versionamiento de sistemas.
+
+Para cambios pequeños se incrementa en uno a zeta.
+
+git flow release finish vx.y.z -> 
 
 

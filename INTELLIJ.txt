@@ -39,6 +39,9 @@ En ocasiones no esta habilitado el button de correr proyecto: en la parte sup de
 	de notificaciones.
 	Si no queda con eso, preguntar cual jdk debe estar instalado en el SO y no en el intelliJ
 
+Solución al problema 'de la nada empezo a fallar mi proyecto de kotlin + spring boot, los tipos de datos y 
+clases me marcaron que no están importados pero si lo estan': esto sucede cuando la indexación o el build de Gradle/Maven se rompe, y marca mal los imports aunque estos esten correctos. En intelliJ irse a menú File -> Invalidate Caches / Restar -> seleccionar Invalidate and Restart.
+
 
 
 terminales -----------------------------------------------
