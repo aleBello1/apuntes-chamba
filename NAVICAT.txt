@@ -1,0 +1,14 @@
+Se recuerda que es un gestor de db entonces si se quiere conectar a MySQL o postregres se de tener
+instalado en el SO.
+
+Cambiarse de connection: En la part izq se enlistan las connections -> darle doble click a alguna ->
+	En la parte superior (inmediatamente arriba de la query) aparecerá la connection que se 
+	esta usuando.
+
+
+COMBINACION DE TELCAS
+
+Correr todo el script actual: ctrl + R
+
+correr solo la query seleccionada: ctrl + shift + r.
+
