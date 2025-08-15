@@ -6,6 +6,18 @@ Buscar todos los lugares donde se manda a llamar un método: ir al lugar donde s
 	- Dar un click para ver una previsualización.
 	- Dos clcks para que nos lleve a esa clase.
 
+Para generar un jar utilizando la interfaz grafica de intelliJ: en la parte der dar click en el button the 	Maven y dar doble click sobre todas las siguientes opciones:
+	- clean -> Elimina el directorio target/.
+		Esto implica que se eliminen: Los archivos compilados (.class), Los JAR/WAR generados y 
+		y archivos temporales de la compilación.
+		Asegura que la próxima compilación empiece desde cero, evitando que queden restos de 
+		compilaciones anteriores que puedan causar errores o comportamientos raros.
+	- compile -> Compile el código fuente del proyecto, pero sin generar paquetes (.jar, .war, etc.) 
+		ni ejecutar tests.
+	- install -> Compilar el código, Ejecutar las pruebas unitarias y empaquetar el resultado 
+		en un .jar o .war.
+
+
 Atajos de teclado (shortcuts) ---------------------------------------
 
 Aquí viene un pdf donde vienen todos los shortcuts de intelliJ:

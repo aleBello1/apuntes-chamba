@@ -25,6 +25,19 @@ Cuando nos aseguremos de que todo esta bien se elmina la rama feature.
 	git push origin --delete feature/nombre-descriptivo-x
 
 
+RECUPERAR ARCHIVOS ELIMINADOS
+
+Si el archivo eliminado estaba versionado y no se le dio commit -------------------------
+
+Primero se hizo git status y se reviso que el estado del archivo era 'deleted' en 'changes to be 
+commited' que vendría a ser algo como 'preparado para ser elminado en el próximo commit'.
+
+git restore --staged rutaCompleta/nombreArchivo.extension -> Esto quita el archivo del área de 
+	staged (área de preparación), donde está marcado como "deleted".
+
+git restore rutaCompleta/nombreArchivo.extension -> Esto restaura el archivo en tu directorio de 
+	trabajo.
+
 
 GIT FLOW
 

@@ -337,7 +337,17 @@ cadena.substringAfterLast("cadenaBuscar") -> Se queda con todo lo que este despu
 
 CORRUTIANAS
 
-Son una característica propia de Kotlin, diseñadas para facilitar la programación asíncrona y concurrente de forma ligera y estructurada. En Java puro, no existen corrutinas nativas.
+Hay que agregar la dependencia 'org.jetbrains.kotlinx'.
+
+<dependency>
+	<groupId>org.jetbrains.kotlinx</groupId>
+	<artifactId>kotlinx-coroutines-core</artifactId>
+	<version>1.9.0</version>
+	<type>pom</type>
+</dependency> -> Esta versión agarro bien con la versión de spring boot 3.5.3 y jdk 17.
+
+Son una característica propia de Kotlin, diseñadas para facilitar la programación asíncrona y concurrente 
+de forma ligera y estructurada. En Java puro, no existen corrutinas nativas.
 
 Es una forma ligera y eficiente de hacer varias cosas al mismo tiempo (concurrencia), sin necesidad de crear hilos pesados.
 Es como una mini tarea o subproceso que puedes pausar y reanudar sin bloquear todo el programa.

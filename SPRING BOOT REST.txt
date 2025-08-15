@@ -1,3 +1,9 @@
+@Lob
+private String nombreAtributo; -> Por defecto, JPA/Hibernate asigna VARCHAR(255) a cualquier String 
+	si no se le indicas lo contrario, pero si quieres que el campo sea TEXT (sin límite de 255 	caracteres), En JPA la anotación @Lob (Large Object) le dice a Hibernate que el campo debe 
+	almacenarse como CLOB (Character Large Object) en SQL, lo que en MySQL se traduce a TEXT.
+	No se ha comprobado.
+
 
 @Transactional -> No es compatible con corrutinas asincrónicas, entonces si un método service contiene
 	operaciones de corrutinas o hilo no se debe usar. *********

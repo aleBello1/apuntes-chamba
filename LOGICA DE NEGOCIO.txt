@@ -949,9 +949,27 @@ principal (NombreClasePrincipalApplicationTests).
 Crear el swagger.yaml
 
 
+ACCIONES CUANDO SE TERMINO LA RESTRUCTURACION DE AFIRME
+
+el puerto original era: 5000 pero se cambio a 5001, pero en local era 5001 y se cambio a 5002.
+
+En el application-default.yaml cambiar el perfil a local.
+Configurar la propiedad en el application-local que permite crear las tablas (ddl-auto: update).
+Después quitar esa configuration por lo delicada que es (ddl-auto: none).
+Crear una db local y crear las tablas ahí 
+Se probaron los endpoints.
+
+Fue necesario tener toda la tabla y registros de la llamada 'sepomexcat'.
+Fue necesario traerse todos los registros de la tabla llamada 'operations'.
+Fue necesario traerse la estructura de la tabla llamada 'logscotizacionv2', 'logsPagoV2' y 'logsemisionv2' auque estas ya se tuvieran porque los atrbituos están configurados para no tener limite de longitud en los campos de texto.
+Fue necesario tener toda la tabla y registros de la llamada 'tarjetas'.
+Fue necesario tener la tabla 'extraccionaux'.
 
 
+endpoint emisión --------------------------------------
 
+Para probar la emisión: se cotiza y de la respuestas de la cotización se copia desde el objeto vehiculo hacia abajo hasta el objeto cotización (emisión ya no se copia). (se tienen que completar los datos del vehiculo como: placas, noSerie, motor, etc).
 
-En la tabla 'sepomexCat' estan todos los datos del codigo postal, para que no uses el servicio de la aseguradora.
+Fue necesario agregar placas, noSerie (sacado de https://randomvin.com/), se ajusto el numero de tarjeta
+y msi para esa tarjeta.
 
