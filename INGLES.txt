@@ -1,7 +1,0 @@
-quote: cotizar
-issue: emisor.
-Insurance: seguro.
-
-commits --------------------------------
-
-update to -> Para decir que algo se actualizo.

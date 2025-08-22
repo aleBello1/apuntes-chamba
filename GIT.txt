@@ -1,42 +1,4 @@
-Al bajar un nuevo proyecto cambiarse a la rama develop.
 
-
-RAMAS
-
-Cuando cambias de una rama a otra y tienes cambios pendientes sin hacer commit, existe el riesgo de perder esos cambios si fuerzas el cambio de rama. Por eso, antes de cambiar de rama, es recomendable hacer commit de todos los cambios. *************************
-
-
-Rama feature ---------------------------------------------
-
-Nos posicionamos en la rama develop.
-	git switch devlop
-
-Crear la rama feature. Para nombrar a la rama se usa la nomeclatura kebab-case (guiones medios) y se asigna
-un nombre descriptivo de acuerdo a la funcionalidad que se agregara. Pe: feature/agregar-login, feature/mejorar-busqueda-productos, etc.
-	git switch -c feature/nombre-descriptivo-x
-
-En la rama feature hacer todo las tareas que se nos encarga.
-Al finalizar las tareas, nos posicionamos en la rama develop y la unimos con la rama feature.
-	git switch develop
-	git merge feature/nombre-descriptivo-x
-
-Cuando nos aseguremos de que todo esta bien se elmina la rama feature.
-	git branch -d feature/nombre-descriptivo-x
-	git push origin --delete feature/nombre-descriptivo-x
-
-
-RECUPERAR ARCHIVOS ELIMINADOS
-
-Si el archivo eliminado estaba versionado y no se le dio commit -------------------------
-
-Primero se hizo git status y se reviso que el estado del archivo era 'deleted' en 'changes to be 
-commited' que vendría a ser algo como 'preparado para ser elminado en el próximo commit'.
-
-git restore --staged rutaCompleta/nombreArchivo.extension -> Esto quita el archivo del área de 
-	staged (área de preparación), donde está marcado como "deleted".
-
-git restore rutaCompleta/nombreArchivo.extension -> Esto restaura el archivo en tu directorio de 
-	trabajo.
 
 
 GIT FLOW
@@ -74,24 +36,36 @@ git flow feature finish nombreRama -> Fusiona (merge) la rama feature/nombreRama
 	Fallara el comando si hay algo pendiente por hacerle commit en la rama feature.
 	Si hay conflictos Git Flow detendrá el proceso y te pedirá resolverlos manualmente (como en un
 	merge clásico).
+	Se nos manda a vim y debemos escribir el mensaje del commit (sin las comillas dobles envolviendo 
+	al string), para eso presionar i (insert) para que nos deje escribir después presionar esc para 	indicar que terminamos de escribir, y escribimos :wq! -> Para guardar y salir de vim. Nos pide el 	commit en vim 2 veces pero solo lo escribimos una vez (el otro nos lo saltamos).
+	
+En este momento deberemos hacer el git push.
 
 
 ramas realese ---------------------------------------------
 
 pendiente de investigar a detalle
 
-git flow release start vx.y.z -> 
+git flow release start vx.y.z -> Crea una rama de release llamada release/vx.y.z, Prepara una nueva 
+	versión para producción, Permite realizar últimas pruebas y ajustes antes del lanzamiento, 
+	Fusiona con main y develop, crea tag
 	Nos dejara en la rama de realse que hemos creado.
 	Donde de vx.y.z el valor 'x.y.z' es la versión del proyecto. Para saber que numero ponerle uno
 	de debe guiar del resultado del comando git tag, pero si no hay tags el valor que se pondrá 
 	es: 'v1.0.0'.
+	Para cambios pequeños se incrementa en uno a zeta.
 	
-Para proyectos en spring boot, nos dirigimos al application-default, cambiar el perfil a prod y hacer commit. 
+Para proyectos en spring boot, nos dirigimos al application-default, cambiar el perfil a prod y hacer commit.
+Antes de ejecutar el siguiente comando, cambiarse a master y hacer pull para tener actualizada esa rama.
+Después regresar a nuestro realese y terminarlo. *****
 
-Investigar tema de versionamiento de sistemas.
+git flow release finish vx.y.z -> Fusiona la rama de release en main (master), Crea un tag con el nombre 
+	de la versión, Borra la rama release/vx.y.z localmente.
+	Se nos manda a vim y debemos escribir el mensaje del commit (sin las comillas dobles envolviendo 
+	al string), para eso presionar i (insert) para que nos deje escribir después presionar esc para 	indicar que terminamos de escribir, y escribimos :wq! -> Para guardar y salir de vim. Nos pide 2 	mensajes: el primero es para el tag (puedes aceptar el predeterminado o personalizarlo) y el 
+	segundo es para el tag (este se puede quedar con el valor por default, que seria el que 
+	utilizamos al crear el realese (vx.y.z)).
 
-Para cambios pequeños se incrementa en uno a zeta.
-
-git flow release finish vx.y.z -> 
+En este momento deberemos hacer el git push.
 
 

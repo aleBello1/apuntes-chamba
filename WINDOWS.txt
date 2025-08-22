@@ -1,12 +1,16 @@
 ///////////////////////////////////////////////ARCHIVOS BAT///////////////////////////////////////////////
 
-Estos archivos usan una serie de comandos escritos en un lenguaje de scripting sencillo llamado Batch Script,
-que se ejecuta mediante el Símbolo del sistema (cmd.exe).
+Estos archivos usan una serie de comandos escritos en un lenguaje de scripting sencillo llamado Batch Script, que se ejecuta mediante el Símbolo del sistema (cmd.exe).
 Excelente forma de automatizar tareas en Windows. *****
 
 archivo .bat: Archivo de texto plano que contiene comandos para ejecutar en cmd).
 
-Comandos básicos ----------------------------------------
+crear un archivo .bat: Crear un archivo txt, abrir el explorador de archivos y dirigirse a la misma ruta
+donde se enuntra ese txt, ahí habilitar que aparezca las extensiones de archivo y cabmiar la extensión
+de .txt a .bat.
+
+
+COMANDOS BASICOS
 
 @echo off ->  De esta instrucción, la parte de 'echo off' sirve para que el intérprete de comandos deje 
 	de mostrar los comandos en pantalla mientras se ejecutan y el símbolo '@' delante evita que se 
@@ -18,8 +22,35 @@ Comandos básicos ----------------------------------------
 		C:\Users\Usuario\Desktop>echo Hola
 		Hola
 
+CLS -> Limpiar pantalla
+
+TITLE cadena -> Para cambiar el título de la ventana de la consola o símbolo del sistema.
+
 set nombreVariable=valor -> Declara e inicializa una variable.	
-	
+
+SET /a variable=expresión_matemática -> Le indica al comando SET que debe realizar una operación 
+	matemática en lugar de una asignación normal de texto.
+	El /a significa "arithmetic" (aritmética).
+	Se pueden hacer todas las operaciones aritméticas de manera normal, salvo por algunas excepciones:
+	- a%%b -> Para hacer la operación de modulo.
+
+
+VARIABLES DE ENTORNO DEL SISTEMA
+
+%date% -> devuelve la fecha actual del sistema en el formato regional configurado.
+	El formato depende de la configuración regional. **
+
+%time% -> devuelve la hora actual del sistema
+
+%USERNAME% -> Devuelve el nombre del usuario actual.
+
+%CD% -> Devuelve el directorio actual.
+
+%__CD__% -> Devuelve la unidad actual.
+
+muchísimos mas
+
+
 rem ó :: comentarios -> Sirve para comentar una sola linea.
 	 En Batch, no existen comentarios multilínea nativos.
 
@@ -31,12 +62,17 @@ start https://www.ejemplo.com -> Para abrir el navegador predeterminado y llevar
 	- start chrome https://www.ejemplo.com -> Para abrir cierto navegador y llevarnos a la pagina 			indicada.	
 		Para que funcione, el navegador debe estar en el PATH del sistema. Si no lo está, deberías 		usar la ruta completa.
 	- start "" "C:\ruta\nombreNavegador.exe" https://www.ejemplo.com -> Para abrir cierto navegador y 		llevarnos a la pagina indicada, indicando la ruta del navegador.
+	- Opciones:
+		- --new-window -> Para que esa pagina se abra en una nueva ventana y no en la misma.
 
 start "" "C:\ruta\aplicacion.exe" -> Abrir determinada aplicación.
 	- nombreAplicacion -> Ejecutar un programa que está en el PATH.
+
+taskkill /F /IM chrome.exe -> Para cerrar todas las ventanas de un navegador
+
 	
 
-estructuras de control -----------------------------------------
+ESTRUCTURAS DE CONTROL
 
 comparadores de valores: 
 	- GEQ -> Greater or Equal (mayor o igual).
@@ -58,7 +94,49 @@ if exist "nombreArchivo.extension" (
 	El lenguaje Batch no tiene una estructura else if, pero sí puedes simularlo anidando varios if 
 	o usando múltiples condiciones.
 
+FOR %%variable_iteradora IN (lista) DO (
+    comando1
+    comando2
+    ...
+) -> Manera de hacer un for.
+	- %%variable_iteradora: Si la variable iteradore se usa dentro del bloque asi se usa.
+	- lista: Esta puede ser una secuencia numérica, nombre de archivos, cadenas o combinación de
+		estos.
+		Nunca se separan los elementos por comas. *******
+
+FOR /L %%i IN (valorInicio,incremento/decremento,valorFinal) DO (
+    SET lista=!lista! elemento%%i
+) -> Manera de hacer un for iterando un rango.
+	El /L significa "Loop" (bucle).
+	- !variable! se usa para acceder al valor actualizado de una variable que cambia dentro de un 
+		bloque.
+		Si se usara %variable%, siempre e utilizaria el valor de la variable que tuvo cuando fue
+		creada la variable. ***
+	- SETLOCAL EnableDelayedExpansion -> Sirve exclusivamente para habilitar el uso de !variable! 
+		(expansión retardada de variables) por lo que esta instruccion siempre se debe ejecutar
+		antes de un for como este.
+
+FOR /D %%d IN (C:\ruta\*) DO (
+    echo Unidad C: %%d
+) -> Para iterar todas las carpetas de determinada ruta.
+
+FOR /R "C:\ruta" %%f IN (*.txt) DO (
+    echo Archivo encontrado: %%f
+) -> Para iterar todos las archivos de determinado tipo (misma extension) en determinada ruta
+
+SETLOCAL 
+  …
+ENDLOCAL -> crea un "ámbito local" para las variables y cambios de configuración. Todo lo que 
+	modifiques después de SETLOCAL se revertirá automáticamente cuando encuentre un ENDLOCAL o cuando 
+	el script termine.
+
 	
+CADENAS
+
+Cuando se crean variables que almacenaran cadenas, estas cadenas se pueden envolver con comiilas dobles
+o sin ellas, pero es de mejor practica con comillas dobles.
+
+
 
 
 

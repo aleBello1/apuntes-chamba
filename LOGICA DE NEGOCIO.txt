@@ -956,7 +956,7 @@ el puerto original era: 5000 pero se cambio a 5001, pero en local era 5001 y se 
 En el application-default.yaml cambiar el perfil a local.
 Configurar la propiedad en el application-local que permite crear las tablas (ddl-auto: update).
 Después quitar esa configuration por lo delicada que es (ddl-auto: none).
-Crear una db local y crear las tablas ahí 
+Crear una db local y crear las tablas ahí con el orm de spring boot.
 Se probaron los endpoints.
 
 Fue necesario tener toda la tabla y registros de la llamada 'sepomexcat'.
@@ -972,4 +972,28 @@ Para probar la emisión: se cotiza y de la respuestas de la cotización se copia
 
 Fue necesario agregar placas, noSerie (sacado de https://randomvin.com/), se ajusto el numero de tarjeta
 y msi para esa tarjeta.
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+PRUEBAS
+
+Primero en local se apunta a local.
+Después en local se apunta a dev.
+Se sube a dev.
+Después se apunta a dev.
+Después se apunta a prod.
+
+
+PROBLMAS
+
+Sabemos que un request esta mal si en el response el atributo aseguradora no contiene valor o si 
+el aributo codigoErro contiene valor.
+
+La respuesta debe contener:
+	El objeto cliente dbe contener almenos su fecha de nacimiento, edad y genero
+	El objeto del vechiculo debe contener al menos los mismos datos que enviamos en el request.
+	Se debe tener lleno el arreglo de coberturas
+	Se debe tener cotización: precios.
+
 
