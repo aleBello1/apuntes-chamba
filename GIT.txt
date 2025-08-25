@@ -69,3 +69,22 @@ git flow release finish vx.y.z -> Fusiona la rama de release en main (master), C
 En este momento deberemos hacer el git push.
 
 
+
+STASH
+
+git stash show -p -> Compara lo que hay en el stash más reciente con lo que esta en nuestro commit actual.
+	Esto se ha usado para saber que hay dentro del ultimo stash, antes de pegarlo en el commit 
+	actual. ****+
+
+git stash pop -> Para sacar lo del stash más reciente, aplicarlo a el commit actual y Elimina 	automáticamente ese stash de la lista.
+
+git stash apply -> Para sacar lo del stash más reciente, aplicarlo a el commit actual y NO Elimina 	automáticamente ese stash de la lista.
+	Útil si quieres aplicar los mismos cambios en múltiples branches.
+
+git stash clear -> Elimina todos los stashes.
+
+
+
+
+
+

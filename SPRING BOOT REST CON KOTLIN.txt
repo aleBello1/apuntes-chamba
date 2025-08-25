@@ -27,5 +27,120 @@ val objetoX = NombreClaseX(
 
 
 
+///// OTROS
+
+CONSULTAS NATIVAS
+
+Es cuando en un método dentro de una clase repositorio hace una consulta personalizada usando la anotación
+query y usando sql nativo (la sintaxis de sql y no la jpql).
+Hacerlo de esto modo tiene la característica que el resultado será de tipo 'TupleBackedMap' (resultado genérico de una consulta nativa).
+
+Para convertir el resultado de una consulta nativa a un objeto java hay varias formas: 1. si el objeto de 
+retorno coincide con un objeto de una clase entity, en este caso spring boot hará la conversión 
+automáticamente 2. si el objeto de retorno debe ser un dto, se deben aplicar diversas técnicas.
+
+Convertir el objeto de retorno de una consulta nativa a un dto -----------------------------------
+
+Se debe hacer un mapeo explícito con: @SqlResultSetMapping, @ConstructorResult, proyección de interfaz o constructor expresivo en JPQL.
+
+°°°°°°°° Usando proyección °°°°°°°
+
+Esta forma se usa cuando el dto nunca se necesita para instanciar objetos en todo el proyecto, solo se
+ocupara para cachar lo que retornan las consultas nativas.
+
+interface NombreClaseDto {
+    val nombreAtributo1: tipoDato1
+    val nombreAtributo2: tipoDato2
+    val nombreAtributoN: tipoDatoN
+} -> Cambiar la clase dto por una interface.
+	Si se define un DTO como interfaz, Spring hace el mapeo por nombre de columnas, entonces las
+	queries deben devolver las columnas con los mismos nombres de atributos de la interface dto.
+
+
+°°°°°°°° Usando proyección + clase dto °°°°°°°
+
+Esta forma se usa cuando el dto se necesita para instanciar objetos en alguna parte del proyecto y mas
+aparte se necesita la proyección para cachar lo que retornan las consultas nativas.
+ 
+*se crea la proyección*
+
+data class NombreClaseDto {
+    val nombreAtributo1: tipoDato1
+    val nombreAtributo2: tipoDato2
+    val nombreAtributoN: tipoDatoN
+}
+
+*En un método de servicio*
+*Al usar un método repositorio que hace la consulta nativa*
+objetoXRepository.nombreMetodoX().map {
+        NombreClaseDto(it.nombreAtributo1, it.nombreAtributo2, it.nombreAtributoN)
+} -> se debe convertir el resultado a la clase dto.
+
+
+ENTITY MANAGER
+ 
+Es una alternativa a usar las operaciones que brinda una clase repository que implmenta el Spring Data de jpa.
+Se usa en consultas dinámicas donde el nombre de la tabla o campos cambian, porque en las consultas de jpa 
+solo se puede cambiar dinámicamente el valor que se le pasan a los campos y no el nombre de tablas o 
+campos. ******
+
+Se crea una clase llamada: NombreClaseXRepository y se le inyecta el objeto entityManager.
+
+@Repository
+class NombreClaseXRepository(
+    @PersistenceContext private val entityManager: EntityManager
+) {...} -> Crea una clase y la vuelve un componente de spring boot.
+	Inyecta el objeto entityManager el cual sirve para ejecutar consultas JPQL o nativas y Persistir o 
+	eliminar entidades.
+
+*Dentro de algun metodo*
+
+val sql = """
+            sentencia sql
+        """.trimIndent() -> Se crea un string el cual contiene a la operación sql a realizar.
+
+Crear queries ----------------------------------
+
+val query = entityManager.createNativeQuery(sql) -> Crea un objeto Query que representa la consulta
+	a realizar (No ejecuta nada todavía).
+	La variable sql contiene una operación de sql nativa. ***
+
+val query = entityManager.createQuery(sql, NombreClaseEntidadX::class.java) -> Crea un objeto Query que 	representa la consulta a realizar (No ejecuta nada todavía).
+	La variable sql contiene una operación de sql nativa. ***
+	El resultado se mapeara automáticamente a entidades JPA.
+
+query.setParameter("paramName", valor) -> Para inyectar valores a nivel (WHERE), SET en UPDATE, INSERT.
+	No funciona para inyectar el nombre de tablas. ****
+	En la consulta sql iría algo como: ':paramName' y para inyectar ese valor seria con esta 
+	instrucción.  
+	
+Para ejecutar consultas ------------------------
+
+query.getResultList() → Ejecuta la consulta y devuelve una lista de resultados.
+	- @Suppress("UNCHECKED_CAST")
+	  val result = query.resultList as List<Array<Any>>
+	  return result.map {
+    		NombreClaseDto(
+        	   nombreAtributo1 = it[0] as tipoDato1,
+        	   nombreAtributo2 = it[1] as tipoDato2,
+		   nombreAtributoN = it[n] as tipoDatoN
+    		)
+	  } -> Si se da el caso en el que la consulta fue nativa, esta es la manera para convertir 
+		el arreglo de filas en una lista de objetos dto.
+		- cols[0].toString() -> Esta seria la manera de convertir un campo que contiene un 
+			valor diferente de string a string (pe convertir un int, bigInt, etc a string).
+
+query.getSingleResult() → Ejecuta la consulta y devuelve un solo resultado.
+	- @Suppress("UNCHECKED_CAST")
+	  val result = query.singleResult as Array<Any>
+		NombreClaseDto(
+        	   nombreAtributo1 = it[0] as tipoDato1,
+        	   nombreAtributo2 = it[1] as tipoDato2,
+		   nombreAtributoN = it[n] as tipoDatoN
+    		) -> Si se da el caso en el que la consulta fue nativa, esta es la manera para convertir 
+			la fila en un objeto dto.
+
+query.executeUpdate() → Para insert, update o delete (no devuelve filas).
+
  
 
