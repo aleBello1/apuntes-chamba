@@ -3,4 +3,118 @@ private String nombreAtributo; -> Por defecto, JPA/Hibernate asigna VARCHAR(255)
 	si no se le indica lo contrario, pero si desea que el campo siga siendo de tipo varchar y pueda 	almacenar mas caracteres entonces se debe especificar el tamanio del varchar en esta anotación.
 
 
+//////////////////////////////////////OTROS///////////////////////////////
+
+SPRING BOOT ACTUATOR
+
+ulr's de spring actuator:
+	- /actuator/health → Define el estado de la app (si está UP, DOWN, etc.).
+	- /actuator/metrics → Se ven métricas (CPU, memoria, etc.)
+	- /actuator/env → variables de entorno
+	- /actuator/beans → lista de beans cargados.
+	- /actuator/mappings → todos los endpoints registrados en Spring.
+	- /actuator/info → sirve para exponer información “general” de la aplicación.
+		Solo devuelve información que fue configurada en algún application.
+	- y muchos más.
+
+*En application.properties*
+
+management.endpoints.web.exposure.include=valor -> Define que endpoints de spring actuator se pueden 	consumir.
+	Por defecto, Spring Boot solo expone health e info. Eso quiere decir que si no configuras nada, 
+	solo esos dos estarán accesibles.
+	No es recomendable en producción porque puede mostrar información sensible. ****
+	- * -> Para que se puedan consumir todos.
+
+management.endpoint.health.show-details=always -> Sirve para que el endpoint de health de mas detalles
+	pe si La base de datos está disponible, si la app Puede conectarse al broker de mensajería (Kafka, 
+	RabbitMQ, etc.), si se pudo conectar con el servidor externo donde se traen otras configuraciones
+	(la opción spring.config.import=valor) 
+	Configuración opcional.
+
+Definir información para /actuator/info ------------------------
+
+*En application.properties*
+
+info.app.name=MiAplicacion
+info.app.version=1.2.3
+info.app.description=Servicio de catálogo de autos
+
+info.build.time=2025-08-26T10:00:00Z
+info.build.artifact=mi-aplicacion
+info.build.group=com.miempresa
+
+
+CONFIGURACIONES EN LOS APPLICATION
+
+spring.config.import=valor
+	- valores:
+		- configserver:url -> para importar configuraciones externas desde un servidor de 
+			configuración centralizado. 
+			Es como importar otro application.yaml o application.properties, pero desde un 
+			servidor remoto.
+			Las configuraciones remotas sobrescriben las locales. ****
+			La aplicación FALLARÁ al iniciar si el Config Server no está disponible. ***
+		- file:./local-overrides.yaml -> para importar un archivo de configuración local 
+			adicional que sobrescribe o complementa las configuraciones principales. 
+			Es de buena practica crear un .gitignore que ignore este archivo.
+	Si se tuviera un remoto y un local, el último archivo importado sobrescribe a los anteriores. ****
+	Ventajas: Seguridad centralizada para datos sensibles.	
+	- Optional: La aplicación puede iniciar aunque el Config Server no esté disponible o no se 
+		encuentre el archivo local.
+		Se coloca entre el = y la palabra configserver o file, según sea el caso.
+
+spring.main.allow-circular-references=true -> Para permitir referencias circulares entre beans.
+	Una referencia circular sucede cuando dos o más beans dependen entre sí directamente o de 
+	manera indirecta. Pe supongamos que la clase ServiceA inyecta a ServiceB y la clase ServiceB inyecta 	a ServiceA, esto provoca una referencia circular. Esto crea un ciclo que, por defecto, en Spring 	Boot 2.6 en adelante se considera un error.
+	A partir de spring boot v2.6, el valor por defecto es false.
+	Si se tienen referencias circulares y no se activa esta opción, al correr la aplicación esta 
+	fallara.
+	Para eliminar la dependencia circular, se introducie un tercer bean que rompa el ciclo. ****
+ 
+
+Configuraciones para pool de conexiones -----------------------
+
+Pool de conexiones: son varias conexiones listas para usar, en lugar de abrir y cerrar una conexión cada
+vez.
+Sin pool: cada vez que necesitas acceder a la base de datos, abres una conexión → haces tu consulta → cierras la conexión. Esto es lento porque abrir y cerrar conexiones constantemente consume tiempo y recursos.
+Con pool: la aplicación toma una conexión que ya estaba abierta → hace la consulta → devuelve la conexión al pool. Así, la misma conexión puede reutilizarse muchas veces, y tu app va mucho más rápido y consume menos recursos.
+
+spring.datasource.validation-query=SELECT 1 -> Consulta que se usa para verificar si la conexión sigue 
+	viva. Por sí sola, no valida automáticamente; solo le dice al pool qué consulta ejecutar cuando 
+	haga la validación.
+	Esto solo es necesario en algunos pools (como Tomcat JDBC o DBCP), mientras que HikariCP lo 
+	hace automáticamente con su “ping” interno.
+	Si tu DB se reinicia con frecuencia o hay firewalls que cierran conexiones, validation-query
+	ayuda a evitar errores como Connection reset o CommunicationsException. ****
+
+spring.datasource.test-while-idle=true -> Indica cuándo ejecutar la consulta de validación (la de 
+	validation-query o alguna equivalente), en este caso, mientras la conexión está inactiva en el 
+	pool.
+	Para que funcione correctamente, necesita que también exista validationQuery o que el pool 
+	tenga otro método de validación.
+
+spring.datasource.hikari.maximum-pool-size=n -> Controla el tamaño máximo del pool de conexiones.
+	el valor por defecto es: 10.
+	Si lo pones muy alto, puedes sobrecargar la base de datos.
+
+
+///////////////////////////////////////////AVANZADO//////
+
+JOBS
+
+logging.level.org.springframework.scheduling=DEBUG -> Para que cuando la aplicación arranque, spring 
+	boot mustre qué schedulers se registraron.
+
+scheduler.cron=segundo minuto hora díaDelMes mes díaDeLaSemana año(opcional) -> Para configurar un 
+	scheduler (programador de tareas).
+	Indica cuándo debe ejecutarse una tarea programada.
+	Ejemplo si 0 0/30 12-16 8/10 * ?, entonces:
+		0 → segundo: en el segundo 0.
+		0/30 → minuto: cada 30 minutos, empezando en el minuto 0 (0 y 30).
+		12-16 → hora: de 12 PM a 4 PM (inclusive).
+		8/10 → día del mes: empieza en el día 8 y luego cada 10 días (8, 18, 28…).
+		* → mes: todos los meses.
+		? → día de la semana: no se especifica (evita conflicto con el día del mes).
+
+
 

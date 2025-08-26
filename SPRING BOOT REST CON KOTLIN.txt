@@ -27,7 +27,7 @@ val objetoX = NombreClaseX(
 
 
 
-///// OTROS
+///// OTROS ///////////////////////////////////////////////////
 
 CONSULTAS NATIVAS
 
@@ -142,5 +142,12 @@ query.getSingleResult() → Ejecuta la consulta y devuelve un solo resultado.
 
 query.executeUpdate() → Para insert, update o delete (no devuelve filas).
 
- 
 
+Se tuvo la situación de que se particiono una tabla mediante la técnica de partición por catálogos, de 
+tal modo que se tenia una tabla llamada extracción y contenía datos de todos los vehículos pero había
+muchos tipos de vehículos asi que se creo una tabla para cada tipo de vehiculo obteniendo las tablas:
+extraccion_auto, extraccion_tractocamion y extracción_pickup. Cada una de estas 3 tablas evidentmente
+tenían la misma estructura que la tabla original (tabla extraccion).
+Entonces al hacer este cambio las consultas que habían originalmente quedaron totalmente igual pero ahora
+había que cambiar dinamicamnete el nombre de la tabla para que apuntara de acuerdo al tipo de camión
+buscado. Entonces para eso se uso entity manager.
