@@ -1,11 +1,21 @@
 
+Aclarar que pair o triple pueden ser útiles cuando se esta dentro de una función y se necesita devolver
+dos o tres variables/objetos/colleccion.
 
 
+FOR EACH
 
-
-PARA PREGUNTAR DESPUES
-
-Operadores let, run, also, with (scoping functions).
+coleccion.forEach { elemento ->
+    // hacer algo con "elemento"
+    println("Elemento: $elemento")
+    procesar(elemento)
+} -> Para iterar una collection (Listas (List, MutableList), Sets (Set, MutableSet), Mapas (Map, 	MutableMap), Arrays (de cualquier tipo), etc.)
+	Podemos especificar nosotros el nombre del elemento que representa a cada elemento en la lista
+	u omitirlo y usar el nombre de elemento que nos da kotlin por defualt: 'it'. ** 
+	Si se recorre un mapa tambien se puede usar it de la manera: it.key y/o it.value. Pero para mayor
+	legibilidad se opta por la destructuracion.
+	Un for como este NO permite el uso de break/continue. ***
+	
 
 
 

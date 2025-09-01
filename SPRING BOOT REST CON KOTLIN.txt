@@ -151,3 +151,244 @@ tenían la misma estructura que la tabla original (tabla extraccion).
 Entonces al hacer este cambio las consultas que habían originalmente quedaron totalmente igual pero ahora
 había que cambiar dinamicamnete el nombre de la tabla para que apuntara de acuerdo al tipo de camión
 buscado. Entonces para eso se uso entity manager.
+
+
+
+//////AVANZADO //////
+
+CIFRADO Y DESCIFRADO DE DATOS
+
+Utilizado para cifrar llaves y credenciales, tambien para cifrar tokens.
+
+Teoría ------------------------------------------------------
+
+Initialization Vector (IV): es un valor ALEATORIO que asegura que un mismo texto al ser cifrado con la misma
+llave se obtenga siempre un diferente resultado.
+Un IV siempre debe ser:
+ 	ÚNICO: Nunca reusar el mismo IV con la misma clave
+	ALEATORIO: Debe ser impredecible (usar SecureRandom).
+
+Tamaño del iv según el algoritmo:
+Algoritmo	Tamaño de bloque	Tamaño de IV requerido
+AES	        128 bits (16 bytes)	16 bytes
+DES	        64 bits (8 bytes)	8 bytes
+3DES	       64 bits (8 bytes)	8 bytes
+Blowfish	64 bits (8 bytes)	8 bytes
+
+Aes
+Longitudes:
+Tamaño	       Bits	Intentos para romper	Tiempo estimado
+16 bytes	128	2¹²⁸	Billones de años
+24 bytes	192	2¹⁹²	Edad del universo
+32 bytes	256	2²⁵⁶	Múltiples edades del universo
+
+
+Flujos --------------------------------------------------
+
+Cifrado:
+	Generar IV aleatorio nuevo
+	Cifrar texto con clave + IV aleatorio
+	Concatenar: IV_aleatorio + texto_cifrado
+	Devolver todo en Base64
+
+Descifrar:
+	Separar IV y texto cifrado
+	Descifrar con clave + IV recibido
+	Devolver texto plano
+	
+
+Configuraciones -----------------------------------------
+
+Se crea un application llamado: application-secrets. Aquí se depositan la llave que se usa para cifrar y 
+descifrar (secretKey) y otras claves y valores sensibles.
+
+*En application-secrets*
+ clave1: valor1
+ clave2: valor2
+ claveN: valorN 
+
+*En application-default*
+spring.profiles.include=secrets -> Le dice a Spring que active el perfil "secrets" ADEMÁS de los perfiles
+	ya activos.
+	De esta manera es como si esta configuraciones se incluyen automáticamente en todos los entornos.
+
+
+En utils/crypto/ ---------------------------------------
+
+Crear la clase que genera la llave que va en application-secrets.
+
+°°°°°°°°° KeyGeneratorUtil °°°°°°°°°°
+
+// Para poder generar una nueva llave de cifrado cada que asi se necesite
+object KeyGeneratorUtil {
+
+    @Throws(Exception::class)
+    fun generarClaveSecreta(tamanio: Int): Map<String, String> {
+        require(tamanio == 16 || tamanio == 24 || tamanio == 32) {
+            "Tamaño debe ser 16, 24 o 32"
+        }
+
+        val keyGen = KeyGenerator.getInstance("AES")
+        keyGen.init(tamanio * 8)
+        val secretKey = keyGen.generateKey()
+        val claveBase64 = Base64.getEncoder().encodeToString(secretKey.encoded)
+
+        return mapOf(
+            "base64" to claveBase64,
+            "string" to String(Base64.getDecoder().decode(claveBase64), Charsets.UTF_8),
+            "tamanio" to tamanio.toString(),
+            "bits" to (tamanio * 8).toString()
+        )
+    }
+
+    fun generarLlavesCompletas(tamanioClave: Int = 32): Map<String, Any> {
+        val clave = generarClaveSecreta(tamanioClave)
+
+        return mapOf(
+            "clave" to clave,
+            "yamlConfig" to """
+                crypto:
+                  secret-key: "${clave["string"]}"
+                  algorithm: "AES/CBC/PKCS5Padding"
+                  key-algorithm: "AES"
+            """.trimIndent()
+        )
+    }
+
+}
+
+Crear un Controller que llama a la función generarLlavesCompletas() y la llave colocarla en el
+application-secrets.
+De todos los valores que retorna la función, la llave vendría a ser la correspondiente al atributo base64.
+
+Generar el servicio de cifrado y descifrado.
+
+
+°°°°°°°°° CryptoUtil °°°°°°°°°°
+
+Se convierte la clase en un componenete de spring boot.
+
+*Donde se crean los atributos de clase*
+ private var algorithm: String = "AES/CBC/PKCS5Padding"
+ private var keyAlgorithm: String = "AES"
+
+ @Value("\${secretKey}")
+ private var secretKey: String = ""
+
+
+// Decodifica Base64 si es posible, sino usa el string como está
+    private fun decodeBase64OrString(input: String): ByteArray {
+        return try {
+            // Intenta decodificar como Base64
+            Base64.getDecoder().decode(input)
+        } catch (e: Exception) {
+            print(e.message)
+            // Si falla, usa el string como bytes UTF-8
+            input.toByteArray(Charsets.UTF_8)
+        }
+    }
+
+// Cache para los bytes decodificados
+    private val secretKeyBytes: ByteArray by lazy {
+        decodeBase64OrString(secretKey)
+    }
+
+    fun cifrar(texto: String): String {
+        try {
+            // Validar que las llaves estén configuradas
+            validarConfiguracion()
+
+            // Crear la clave secreta desde bytes decodificados
+            val secretKey = SecretKeySpec(
+                secretKeyBytes,
+                keyAlgorithm
+            )
+
+            // 🎲GENERAR IV ALEATORIO (nuevo por cada cifrado)
+            val ivAleatorio = ByteArray(16)
+            SecureRandom().nextBytes(ivAleatorio)
+            val ivParameterSpec = IvParameterSpec(ivAleatorio)
+
+            // Inicializar el cifrador
+            val cipher = Cipher.getInstance(algorithm)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
+
+            // Cifrar el texto
+            val textoCifrado = cipher.doFinal(texto.toByteArray(Charsets.UTF_8))
+
+            // Devolver: IV_aleatorio + texto_cifrado (ambos en Base64)
+            return Base64.getEncoder().encodeToString(ivAleatorio) + ":" +
+                    Base64.getEncoder().encodeToString(textoCifrado)
+
+        } catch (e: Exception) {
+            throw Exception("Error al cifrar el texto: ${e.message}", e)
+        }
+    } -> Algoritmo para cifrar.
+
+private fun validarConfiguracion() {
+        if (secretKey.isBlank()) {
+            throw IllegalStateException("La clave secreta no está configurada")
+        }
+    } -> Funcion para validar que exista la llave para cifrar y descrifrar.
+
+fun descifrar(textoCifradoCompleto: String): String {
+        try {
+            // Validar que las llaves estén configuradas
+            validarConfiguracion()
+
+            // SEPARAR IV y texto cifrado (formato: "IV_base64:texto_base64")
+            val partes = textoCifradoCompleto.split(":")
+            if (partes.size != 2) {
+                throw IllegalArgumentException("Formato inválido. Debe ser: IV_base64:textoCifrado_base64")
+            }
+
+            val ivDecodificado = Base64.getDecoder().decode(partes[0])
+            val textoCifradoDecodificado = Base64.getDecoder().decode(partes[1])
+
+            // Crear la clave secreta
+            val secretKey = SecretKeySpec(
+                secretKeyBytes,
+                keyAlgorithm
+            )
+
+            // Crear el vector de inicialización desde el IV recibido
+            val ivParameterSpec = IvParameterSpec(ivDecodificado)
+
+            // Inicializar el cifrador
+            val cipher = Cipher.getInstance(algorithm)
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
+
+            // Descifrar el texto
+            val textoDescifrado = cipher.doFinal(textoCifradoDecodificado)
+
+            return String(textoDescifrado, Charsets.UTF_8)
+
+        } catch (e: Exception) {
+            throw Exception("Error al descifrar el texto: ${e.message}", e)
+        }
+    } -> Algoritmo para descifrar.
+
+En el mismo controller, crear endpoints que llamen a la funciónes para cifrar y descifrar.
+
+
+
+CREAR CLASE PARA INYECTAR VALORES 
+
+@Configuration
+@ConfigurationProperties(prefix = "clavePrincipal")
+class CryptoConfig {
+    var nombreAtributo1: String = ""
+    var nombreAtributo2: String = ""
+    var nombreAtributoN: String = ""
+} -> Para crear una clase que contiene puros atributos, los cuales almacenaran valores de un
+	application-personalizado.
+	- @ConfigurationProperties(prefix = "clavePrincipal") -> Busca en el application default y despues 		busca en el application activo y al final busca en otros application extra activos las 
+		claves que empiencen con el nombre clavePrincipal. 
+		Se debe considerar que los valores se pueden sobreescribir, de tal modo que el ultimo 			application en escribir el valor para una clave, se tomara ese valor. **
+
+*En un application*
+clavePrincipal:
+    clave1: valor1
+    clave2: valor2
+    claveN: valorN 
+

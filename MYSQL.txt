@@ -1,0 +1,3 @@
+CREATE TABLE nueva_tabla LIKE tabla_existente; -> Crea una tabla con las mismas columnas, índices y 	restricciones que otra tabla, pero sin registros.
+
+

@@ -42,6 +42,10 @@ Find car: Ocupado por pla para realizar emisiones masivas.
 
 extracion: Lo de la extracción solo es ejecutado en desarrollo.
 
+Si se usa el negoio de ahorra siempre el 'tipo de valor' será 'comercial' (haciendo referencia que es un
+precio para todos) pero si el negocio es go el tipo
+de valor será 'convenido' (haciendo referencia de )
+
 
 /////////////////////////////////////////////CLUP//////////////////////////////////////////////////
 
@@ -506,14 +510,145 @@ El endpoint issueFull respondera la emisión, numero de póliza y un pdf.
 lógica del pago: viene en paymentService.
 
 Endpoint validCard: valida que sea una tarjeta existente. 
-	Devuelve los datos mas relevantes de una tarjeta. Lo importate de esto es que devolverá el numero de la
-	tarjeta encriptado, este valor se meterá en el request de pago. 
+	Devuelve los datos mas relevantes de una tarjeta. Lo importate de esto es que devolverá 
+	el numero de la tarjeta encriptado, este valor se meterá en el request de pago. 
 
 Endpoint MSI: Devuelve las formas de pago que puede utilizar cierta tarjeta.
 
 Endpoint valideCard: payment.
-	- objeto pago: necesita los datos: nombre del cliente, los datos que devuelven los endpoint's validCard 
-		y MSI (la clave, no la descripcion).
+	- objeto pago: necesita los datos: nombre del cliente, los datos que devuelven los 
+		endpoint's validCard y MSI (la clave, no la descripcion).
+
+
+
+CORE GNP (PROYECTO VIEJITO)
+
+
+Controllers/Autos/ahorra/Particular ---------------------------------------
+
+Nuevamente esta dividido por tipo de vehiculo: partituclar y pick up.
+
+°°°°°° PagoController °°°°°°
+
+Tdoso estos no consumen una capa de service, todo esta aquí en los controllers, si ha dado caso 
+se llama a un repository para guardar los logs.
+
+pago3d: Realiza una emisión de póliza de seguro mediante una conexión a un servicio externo.
+	Recibe los datos del seguro en formato JSON.
+	Construye un XML con credenciales y número de cotización.
+	Se conecta a un servicio externo (SOAP/XML) para procesar la emisión.
+	Procesa la respuesta:
+		Si es exitosa: extrae el número de póliza y guarda en base de datos.
+		Si hay error: captura el mensaje de error y también lo registra.
+	Retorna la respuesta con el resultado de la operación (éxito o error).
+
+urlSesionPago: crear una sesión de pago 3D Secure con una pasarela de pagos.
+	Recibe una solicitud POST con los datos del seguro y pago.
+	Construye un XML con todos los datos necesarios para el procesamiento de pago:
+		Datos de la tarjeta (número, CVV, fecha vencimiento, titular)
+		Monto y número de meses sin intereses (MSI)
+		Datos del cliente (email, teléfono).
+	Se comunica con una pasarela de pagos externa usando REST Template.
+	Procesa la respuesta:
+		Si es exitosa (2xx): extrae el código de autorización y actualiza el seguro
+		Si falla: captura el error y registra la transacción fallida
+
+planesPago: Recibe un BIN de tarjeta, consulta un servicio externo que devuelve XML con planes 
+	de pago, lo transforma a JSON, extrae los elementos de planes y responde al cliente.
+
+validacionCuentaFinanciera: recibe un objeto con datos de seguro y número de tarjeta, consulta un
+	servicio externo para validar la tarjeta y obtener datos del banco, actualiza el objeto seguro 
+	con esos datos, y lo devuelve como respuesta.
+
+validateCard: recibe un número de tarjeta, consulta un servicio externo para validar y obtener 
+	información de la cuenta/tarjeta, y devuelve esos datos en un objeto CardInfo.
+	
+checkMSI: recibe el BIN de una tarjeta, consulta un servicio externo para verificar los planes de meses
+	sin intereses disponibles, y devuelve esa lista (o vacío si falla).
+
+
+°°°°°° CatalogosAutosController °°°°°°
+
+Intentan hacer que las consultas se guarden como en cache.
+Nunca se llama a la capa de servicio si no a un repository para hacer consultas a nuestra db.
+
+RequestMapping: Obtiene las marca de los autos.
+
+getModelos: Obtiene los modelos de determinada marca.
+
+getSubMarcas: Obtiene los submarcas de determinada marca y modelo.
+
+getDescripciones: Obtiene los descripciones de determinada marca, modelo y subarca.
+
+
+Controllers/Autos/ahorra/Uber ---------------------------------------
+
+°°°°°° CotizacionChoferPrivadoControlador °°°°°°
+
+cotizacionGnp: Recibe datos de un cliente y su vehículo, construye una solicitud XML para el sistema
+	 de GNP, procesa la respuesta y devuelve una cotización detallada en formato JSON.
+
+
+Controllers/Autos/general ---------------------------------------
+
+°°°°°° BancosController °°°°°°
+
+No se llama ningún método de la capa de servicio.
+
+bancos: devuelve un json hardcodeado, al parecer el nombre de bancos.
+
+datoBancario: devuelve un json hardcodeado, al parecer es un listado de tipos de cuentas/tarjetas.
+
+°°°°°° ImpresionController °°°°°°
+
+imprimirPoliza: recibe un número de póliza, llama a un servicio externo de impresión con XML, y 
+	devuelve la URL del PDF de esa póliza (o error si no existe).
+
+Controllers/Autos/go ---------------------------------------
+
+°°°°°° CotizacionAutosAllGoController °°°°°°
+
+cotizacionGnp:recibe los datos del cliente y vehículo, calcula distintas cotizaciones de seguro GNP, 
+	registra el proceso y devuelve la información completa al cliente.
+	Hay varios métodos que son llamados aquí y viven en esta misma clase.
+
+°°°°°° CotizacionEmisionGo °°°°°°
+
+nodoCotizacion: Usado para probar el método de 'cotizacionGnp' de la clase 'CotizacionAutosAllGoController'
+	pero usando otros datos cambiados intencionamnete para el objeto 'agente'.
+	También se usa para probar otro método que vive en esta clase, también se llama 'cotizacionGnp'.
+	
+°°°°°° PagoControllerGo °°°°°°
+
+pago3d: Tomar la cotización existente (idCotizacion).
+	Llamar a un servicio externo para obtener el número de póliza (NUM_POLIZA).
+	Guardar logs del request/response y actualizar el objeto seguro con el número de póliza.
+	Resumen: solo emisión de póliza, no procesamiento de pagos.
+
+Controllers/Autos/quotation ---------------------------------------
+
+°°°°°° AbstracQuotationController °°°°°°
+
+quotation: Llama al servicio de cotización y mete toda la infromacion relevante en el objeto seguro.
+
+
+Controllers/catalogs/ ---------------------------------------
+
+°°°°°° CatalogControllerV4 °°°°°°
+
+getMarcasAutos: Dvuelve las marcas de acuerdo al tipo de vehículo: auto, moto u otro. De manera optima
+	porque cachea anteriores respuestas.
+
+getModelos: Dvuelve las modelos de acuerdo a la marca y tipo de vehículo: auto, moto u otro. 
+	De manera optima porque cachea anteriores respuestas.
+
+getSubMarcas: Por alguna extraña razón llama al método getModels.
+
+getDescripciones: 
+
+
+
+
 
 
 
@@ -552,6 +687,9 @@ primaNeta: es el costo puro del seguro, sin impuestos ni cargos.
 primaTotal: la suma de todos los conceptos: prima neta + impuestos + derechos + recargos.
 
 MSI: meses sin intereses.
+
+Pasarela de pagos externa es como un proceso de doble autenticación.
+
 
 ENDPOINTS
 

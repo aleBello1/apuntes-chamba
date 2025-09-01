@@ -46,23 +46,6 @@ info.build.group=com.miempresa
 
 CONFIGURACIONES EN LOS APPLICATION
 
-spring.config.import=valor
-	- valores:
-		- configserver:url -> para importar configuraciones externas desde un servidor de 
-			configuración centralizado. 
-			Es como importar otro application.yaml o application.properties, pero desde un 
-			servidor remoto.
-			Las configuraciones remotas sobrescriben las locales. ****
-			La aplicación FALLARÁ al iniciar si el Config Server no está disponible. ***
-		- file:./local-overrides.yaml -> para importar un archivo de configuración local 
-			adicional que sobrescribe o complementa las configuraciones principales. 
-			Es de buena practica crear un .gitignore que ignore este archivo.
-	Si se tuviera un remoto y un local, el último archivo importado sobrescribe a los anteriores. ****
-	Ventajas: Seguridad centralizada para datos sensibles.	
-	- Optional: La aplicación puede iniciar aunque el Config Server no esté disponible o no se 
-		encuentre el archivo local.
-		Se coloca entre el = y la palabra configserver o file, según sea el caso.
-
 spring.main.allow-circular-references=true -> Para permitir referencias circulares entre beans.
 	Una referencia circular sucede cuando dos o más beans dependen entre sí directamente o de 
 	manera indirecta. Pe supongamos que la clase ServiceA inyecta a ServiceB y la clase ServiceB inyecta 	a ServiceA, esto provoca una referencia circular. Esto crea un ciclo que, por defecto, en Spring 	Boot 2.6 en adelante se considera un error.
@@ -96,6 +79,9 @@ spring.datasource.test-while-idle=true -> Indica cuándo ejecutar la consulta de
 spring.datasource.hikari.maximum-pool-size=n -> Controla el tamaño máximo del pool de conexiones.
 	el valor por defecto es: 10.
 	Si lo pones muy alto, puedes sobrecargar la base de datos.
+
+
+
 
 
 ///////////////////////////////////////////AVANZADO//////
