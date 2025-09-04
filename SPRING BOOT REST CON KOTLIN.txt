@@ -392,3 +392,183 @@ clavePrincipal:
     clave2: valor2
     claveN: valorN 
 
+
+
+/////////////////////////MONGODB CON SPRING BOOT////////////////////////////////////////
+
+
+TEORIA PARA SPIRNG DATA MONGODB
+
+Cuando insertas el primer documento en una collection que no existe, MongoDB crea la collection automáticamente en ese momento asi que No hay necesidad de crear collections explícitamente.
+Es por eso que cuando se trabaja con mongoDb no existe la configuración ddl-auto=valor.
+
+
+CONFIGURACIONES CON MONGODB
+
+logging.level.org.springframework.data.mongodb=DEBUG
+logging.level.org.mongodb=DEBUG -> Para ver con detalle las operaciones que se hacen en mongoDb.
+	Equivalente a la instrucción: 'spring.jpa.properties.hibernate.show-sql=true'. *****
+	En los logs se vera información como:
+		Operaciones de find (consultas)
+		Inserts de documentos
+		Updates y modificaciones
+		Delete operations
+		Aggregations y pipelines
+		Conexiones y comandos enviados al servidor MongoDB
+	Estos valores se usan para el perfil de dev por que son bansante detallados para prod se usaría:
+	INFO y WARN para esas dos instrucciones respectivamtne.
+
+logging.level.org.mongodb.driver.cluster=INFO -> Para no mostrar los logs que son de monitoreo del 
+	cluster de MongoDB.
+	Si no se ocultan, a cada rato se mostraran mensajes de MongoDB Driver que hace para verificar el 	estado del servidor.
+	
+spring.data.mongodb.auto-index-creation=true -> crea automáticamente índices definidos con @Indexed en 
+	las collections.
+
+
+CLASES ENTITY CON MONGODB
+
+@Field -> Únicamente sirve para indicar el nombre que tiene el atributo en el campo de la collecion y 
+	no tiene mas configuraciones. ****
+
+@Indexed() -> Sirve para crear índices.
+	- name = "idx_nombre_indice" -> Para darle un nombre al indice.
+	- direction = IndexDirection.DESCENDING -> Indica que el ordenamiento sera descendente.
+
+
+Alternativa a columnDefinition de spring data jpa ------------------------
+
+Cuando se tienen un campo en una tabla con cierto tipo de dato pero en el código se quiere trabajar con 
+ese mismo campo pero con otro tipo de dato, se suele usar la configuración columnDefinition de la anotación
+@Column, pero en mongoDb eso no existe.
+Pe se ha tenido la situación de tener un campo int en una tabla pero en el código se desea trabajar como
+si ese campo fuera de tipo string (varchar).
+
+Para lograr el mismo efecto en con spring data mongoDb se agrega el siguiente código:
+
+data class Extraccion (
+    private var _claveInt: Int = 0
+) {
+
+    var clave: String
+        get() = _claveInt.toString()
+        set(value) { _claveInt = value.toIntOrNull() ?: 0 }
+
+    var marca: String = ""
+
+    var submarca: String = ""
+} -> De esta manera solo un campo (el campo clave) se trata como si fuera string en el código pero en 
+	la tabla es int y los demás atributos se tratan de manera normal.
+	Observese que los campos no se definen en () si no dentro de {}. *********
+
+
+REPOSITORIES CON MONGODB
+
+interface NombreEntidadXRepository : MongoRepository<NombreEntidadX, TipoDatoId> {
+    // Puedes agregar métodos personalizados con query derivada
+    fun findByEmail(email: String): User?
+    fun findByNameContainingIgnoreCase(name: String): List<User>
+} -> Para hacer operaciones CRUD + queries personalizadas sobre la entidad NombreEntidadX.
+	Para que MongoRepository funcione, la clase NombreEntidadX debe ser una clase con la cual tiene 
+	un campo marcado con @Id. ****
+	Spring Data se encarga de detectar todas las interfaces que extienden MongoRepository (o 
+	JpaRepository, CrudRepository, etc.) gracias al mecanismo de repository scanning. Al arrancar 
+	la aplicación, Spring genera un bean automático para esa interface. *****
+
+
+Consultas personalizadas con @Query -----------------------------
+
+@Query(value = "{}", 
+	fields = "{ '_id': 1, 'nombreCampo1': valor, 'nombreCampo2': valor, 'nombreCampoN': valor}")
+fun nombreFuncion(): tipoDatoRetorno
+	Lo malo de usar esta forma es que si o si se consulta la tabla (collection), que envuelve la
+	interace 'MongoRepository'.
+	- fileds -> Sirve para incluir o exluir campos segun sea su valor.
+		Es como ponerlos o no en el select. ****
+		Si no se pone al campo: _id, se incluye automáticamente, pero Si lo pones con 0, lo 
+		excluyes explícitamente. ****
+		Posibles valores:
+		- 1 incluye el campo en la salida de la consulta.
+		- 0 excluye el campo de la salida.
+	- value -> define qué documentos se quieren traer (como un filtro → equivalente al WHERE en SQL).
+		Ejemplos:
+		- value = "{ 'country': 'MX' }" → filtra solo documentos donde country = "MX".
+
+
+Consultas personalizadas con MongoTemplate -----------------------------
+
+El objeto MongoTemplate en Spring Data MongoDB. permiten armar queries dinámicas y hasta cambiar el nombre de la tabla/colección en runtime (similar a entityManager).
+
+°°°°°°°°°° Manera 1 °°°°°°°°°
+
+Manera cuando se hacen operaciones simples.
+
+import org.springframework.data.mongodb.core.query.Query // De este paquete.
+
+*Dentro de un metodo*
+
+val query = Query() -> Crea un objeto query representa la consulta MongoDB que vas a ejecutar con 
+	MongoTemplate.
+
+query.fields().include("nombreCampo1", "nombreCampo2", "nombreCampoN") -> Determina que campos nos queremos
+	traer.
+	Es como el select de sql.
+
+mongoTemplate.find(query, CatalogDto::class.java, collectionName) -> Ejecuta la consulta preparada.
+	Se indica el nombre de la colleccion a la cual se aplicara la consulta y el nombre de la clase que
+	representa tipo de dato que retornara la consulta.
+
+
+°°°°°°°°°° Manera 2 °°°°°°°°°
+
+Se usa cuando necesitas pipeline avanzado, como:
+distinct
+group by
+count
+operaciones de agregación (sum, avg, etc.)
+transformar/renombrar campos
+
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.domain.Sort // De estos pquetes
+
+val aggregation = Aggregation.newAggregation() -> Prepara un consulta.
+	Instrucciones que puede recibir.
+	- Aggregation.group("nombreCampo") -> Agrupa por determinado campo.
+		Cuando se agrupa por múltiples campos, MongoDB los almacena en el objeto llamado '_id'.***
+	- Aggregation.sort(Sort.by(Sort.Direction.DESC/ASC, "nombreCampo")) -> Para ordenar asc o desc por
+		determinado campo.
+	- Aggregation.limit(n) -> Para indicar un limite de resultados.
+	- Aggregation.match() -> Para crear filtros.
+		condiciones:
+		- Criteria.where("marca").`is`(marca)
+        	  .and("activo").`is`(true)
+        	  .and("stock").gt(0) -> Ejemplo de puros ands.
+		- Criteria().orOperator(
+        	 	Criteria.where("categoria").`is`("electronicos"),
+       			Criteria.where("categoria").`is`("electrodomesticos")
+    		  ) -> Ejemplo de puro or.
+
+		Operadores:
+			- .lt(1000) -> Menor que
+        		- .gte(50) -> Mayor o igual que  
+        		- .lte(500) -> Menor o igual que
+        		- .`in`(listOf("A", "B", "C")) -> En una lista
+        		- .ne("null") -> No igual
+        		- .regex("^Nike") -> Expresión regular
+	- Aggregation.count().as("total") -> Para hacer un conteo.
+	- Aggregation.project() -> Transforma la estructura de salida.
+		Metodos que encadenan a esta instrucción: 
+		- .and("nombreCampo").as("nuevoNombreCampo") -> Renombra determinado campo
+		- .andExclude("campo") -> Para Excluir campo.
+    		- .andInclude("campo") -> Para Incluir campo
+		- .andExpression("precio * cantidad").as("total") -> Hacer operaciones con los campos.
+
+val results = mongoTemplate.aggregate(
+    aggregation,
+    nombreCollection,
+    nombreClaseX::class.java
+).mappedResults -> Ejecuta una consulta de agregación.
+
+
+
