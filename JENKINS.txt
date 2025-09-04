@@ -1,0 +1,30 @@
+El proceso para la integración de un nuevo pipeline debe ser exclusiva por los administradores de 
+Jenkins para evitar modificaciones no autorizadas dentro de la plataforma.
+
+
+INTERFAZ GRAFICA DE USUARIO
+
+Crear un nuevo pipeline -------------------------------------
+
+crear una nueva carpeta donde se especifique a qué area va dirigido el nuevo pipeline: (las áreas serian:
+	backend, frontend, etc). en apartado izq -> nueva tarea -> asignar nombre -> elegir folder -> 
+	asginar diplay name y description -> apply
+
+Crea un pipiline: Ingresar a determinada carpeta -> apartado izq -> new item -> asignar nombre (el nombre
+	del proyecto) -> multibranch (porque queremos el despliegue en dev y prod) -> ok.
+	Asignar nombre (igualmente el nombre del proyecto) -> indicar donde vive el repositorio (si
+	git hub, bitBucket, etc)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
