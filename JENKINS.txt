@@ -13,7 +13,25 @@ crear una nueva carpeta donde se especifique a qué area va dirigido el nuevo pi
 Crea un pipiline: Ingresar a determinada carpeta -> apartado izq -> new item -> asignar nombre (el nombre
 	del proyecto) -> multibranch (porque queremos el despliegue en dev y prod) -> ok.
 	Asignar nombre (igualmente el nombre del proyecto) -> indicar donde vive el repositorio (si
-	git hub, bitBucket, etc)
+	git hub, bitBucket, etc).
+		Bitbucket:
+		- Se debe crear un server para bitbucket.
+		- Después de crearlo, en este selector se deberá elegir el ultimo. ***
+	seleccionar las credenciales -> asginar el owner (el nombre de usuario del repo) -> asignar el 
+	nombre del repositorio. En un apartado mas abajo buscar: 'Build Configuration' -> mode: by 
+	JenkisFile -> apply and save.
+
+Crear un servser para bitbucket: en la parte sup der -> click engrane -> system configuration -> system
+	-> irse hasta el apartado bitbucket endpoints -> click en añadir -> bitbucket cloud (no se le 
+	configurara nada) -> apply -> save.
+	Esta configuración debería ser suficiente pero si no lo es, entonces hacer la siguiente 
+	configuración. Sabemos que esta configuración no fue suficiente si al regresar al paso de: 'crear
+	un pipeline' al momento de intentar seleccionar un server, no aparece uno nuevo. ***
+	*Igualmente en system configuration -> system* -> irse hasta el apartado bitbucket endpoints -> 
+	click en añadir -> bitbucket cloud -> asginar el nombre del dueño del repositorio (o compañía 
+	dueña del repositorio) -> url del dueño del repositorio	(pe: https://bitbucket.org/nombreCompañia)
+	-> server versión: data center v8.x (and later), tener palomeado las opciones: call can merge
+	y call changes api -> apply -> save.
 
 
 
