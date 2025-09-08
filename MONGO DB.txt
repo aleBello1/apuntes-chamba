@@ -1,0 +1,57 @@
+
+////////////////////////////////////////////MONGO DB ATLAS//////////////////////////////////////////////
+
+
+MongoDB Atlas es la plataforma en la nube oficial de MongoDB.
+Es un servicio administrado (Database as a Service, DBaaS) que te permite crear, desplegar, escalar y administrar bases de datos MongoDB sin tener que instalar ni configurar servidores por tu cuenta.
+
+Características principales:
+Multi-nube: Puedes desplegar tus clústeres en AWS, Google Cloud o Azure.
+
+Crear un proyecto: parte sup izq: Project -> new Project
+	- Editar datos de un proyecto: parte sup izq: Project -> seleccionar determinado proyecto -> a lado
+		estarán 3 puntos -> Project settings.
+
+Configuración para desarrollo ------------------------------
+
+
+°°°°°°°°°°° Configuración en la GUI de atlas °°°°°°°°°°°°°°
+
+Configuración de red para desarrollo: En apartado izq 'Network Access' -> editar la conecction y colocar
+	el valor: 0.0.0.0/0 (esto es para permitir acceso desde cualquier parte, por eso es para 	desarrollo).
+
+Obtener el string connection: apartado izq 'clusters' -> connect -> drivers -> seleccionar lenguaje de 
+	programación.
+
+
+°°°°°°°°°°° Configuración en Spring boot °°°°°°°°°°°°°°
+
+*En application.proerties*
+MONGO_USER=usuario
+MONGO_PASS=password
+MONGO_CLUSTER=nombreCluster
+
+spring.data.mongodb.uri=mongodb+srv://${MONGO_USER}:${MONGO_PASS}@cluster0.ekgbkw6.mongodb.net/?retryWrites=true&w=majority&appName=${MONGO_CLUSTER}
+spring.data.mongodb.database=nombeDb -> Configuración para poder conectarse con la db que vive en mongo
+	db atlas.
+	Se recuerda que posiblemente del connection string, los caracteres entre '@' y '/?' pudiesen 
+	variar. ****
+
+
+°°°°°°°°°°° Configuración en Navicat (opcional) °°°°°°°°°°°°°°
+
+Explicación para conectarse.
+
+Configuración el menú general:
+	Connection Name: lo que quieras.
+	Type: Replica Set.
+	SRV record: ✔️ mantenlo marcado.
+	Host: Del conecction string (mongodb+srv://), es lo que esta después del '@' y antes de: '/?'.
+	Authentication: Password.
+	Authentication Database: pon admin (al parecer siempre será este valor)
+	User Name / Password: los de Atlas.
+
+Configuración el menú general:
+	Activa Use SSL.
+	Marcar Allow invalid certificates (para que no falle por certificados).
+
