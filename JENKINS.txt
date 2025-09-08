@@ -10,7 +10,7 @@ crear una nueva carpeta donde se especifique a qué area va dirigido el nuevo pi
 	backend, frontend, etc). en apartado izq -> nueva tarea -> asignar nombre -> elegir folder -> 
 	asginar diplay name y description -> apply
 
-Crea un pipiline: Ingresar a determinada carpeta -> apartado izq -> new item -> asignar nombre (el nombre
+Crea un pipeline: Ingresar a determinada carpeta -> apartado izq -> new item -> asignar nombre (el nombre
 	del proyecto) -> multibranch (porque queremos el despliegue en dev y prod) -> ok.
 	Asignar nombre (igualmente el nombre del proyecto) -> indicar donde vive el repositorio (si
 	git hub, bitBucket, etc).
@@ -32,6 +32,24 @@ Crear un servser para bitbucket: en la parte sup der -> click engrane -> system 
 	dueña del repositorio) -> url del dueño del repositorio	(pe: https://bitbucket.org/nombreCompañia)
 	-> server versión: data center v8.x (and later), tener palomeado las opciones: call can merge
 	y call changes api -> apply -> save.
+
+Crear un webhook para un repositorio en bitbucket: Ir a determinado repositorio -> apartado izq reposiroty
+	settings -> webhooks -> add webhook -> en title: nombre del repositorio, url: conformado por
+	[url donde vive la instania de jenkins][evento a ejecutar] -> Status: active -> El el apartdo de 
+	triggers, en la columna de repository: palomear push, en la columna issue se queda vacio, en la 	columna de pull request palomear create, update, comment created, comment updated -> save.
+
+Agregar y configurar el JenkinsFile a nuestro proyecto: Ir a determinado repositorio -> crearemos una nueva
+	rama llamada feature/jenkinsfile -> clonamos el repositorio remoto y nos posicionamos en la rama 	recién creada -> si tiene el archivo bitbucket-pipeline.yml en la raíz del proyecto, lo 	eliminamos -> En la raíz del proyecto cremos el archivo 'Jenkinsfile' (la primera letra en 
+	mayuscula, las demans en minúsculas y no tiene extensión el archivo).
+	Hay aprox 5 variables que se les debe cambiar el valor: 	
+	- BITBUCKET_REPO: Repositorio a donde está alojado el proyecto.
+	- BITBUCKET_CREDENTIALS_ID: Credencial principal del administrador.
+	- credentialsId A1: Nombre de la credencial en Jenkins que apunta a Desarrollo. 
+		En pocas palabras es para poder subir el .jar a cierta instancia de aws en dev.
+	- credentialsId A2: Nombre de la credencial en Jenkins que apunta a producción.
+		En pocas palabras es para poder subir el .jar a cierta instancia de aws en prod.
+	- credentialsId A3: Nombre de la credencial en Jenkins que apunta al pem.
+
 
 
 
