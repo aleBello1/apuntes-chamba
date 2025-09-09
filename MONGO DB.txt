@@ -12,6 +12,12 @@ Crear un proyecto: parte sup izq: Project -> new Project
 	- Editar datos de un proyecto: parte sup izq: Project -> seleccionar determinado proyecto -> a lado
 		estarán 3 puntos -> Project settings.
 
+Ver collections: apartado izq 'clusters' -> browse collections.
+
+Importar collections a mongo db atlas: lo mejor fue usar navicat y ahí solamte arrastrar las collections de 
+	interés.
+
+
 Configuración para desarrollo ------------------------------
 
 

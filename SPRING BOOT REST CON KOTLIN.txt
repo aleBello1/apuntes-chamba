@@ -465,9 +465,7 @@ data class Extraccion (
 REPOSITORIES CON MONGODB
 
 interface NombreEntidadXRepository : MongoRepository<NombreEntidadX, TipoDatoId> {
-    // Puedes agregar métodos personalizados con query derivada
-    fun findByEmail(email: String): User?
-    fun findByNameContainingIgnoreCase(name: String): List<User>
+    // métodos personalizados
 } -> Para hacer operaciones CRUD + queries personalizadas sobre la entidad NombreEntidadX.
 	Para que MongoRepository funcione, la clase NombreEntidadX debe ser una clase con la cual tiene 
 	un campo marcado con @Id. ****
@@ -497,7 +495,7 @@ fun nombreFuncion(): tipoDatoRetorno
 
 Consultas personalizadas con MongoTemplate -----------------------------
 
-El objeto MongoTemplate en Spring Data MongoDB. permiten armar queries dinámicas y hasta cambiar el nombre de la tabla/colección en runtime (similar a entityManager).
+El objeto MongoTemplate en Spring Data MongoDB permite armar queries dinámicas y hasta cambiar el nombre de la tabla/colección en runtime (similar a entityManager).
 
 °°°°°°°°°° Manera 1 °°°°°°°°°
 
@@ -512,11 +510,21 @@ val query = Query() -> Crea un objeto query representa la consulta MongoDB que v
 
 query.fields().include("nombreCampo1", "nombreCampo2", "nombreCampoN") -> Determina que campos nos queremos
 	traer.
-	Es como el select de sql.
+	Es como el select de sql. ***+
 
-mongoTemplate.find(query, CatalogDto::class.java, collectionName) -> Ejecuta la consulta preparada.
+val results = mongoTemplate.find(query, Map::class.java, collectionName) -> Ejecuta la consulta preparada.
 	Se indica el nombre de la colleccion a la cual se aplicara la consulta y el nombre de la clase que
 	representa tipo de dato que retornara la consulta.
+	El nombre de la clase que representa el tio de dato que retonrar la consulta siempre será map,
+	después con ese mapa se mapeara a una clase de interés.
+
+val list: List<NombreClaseDto> = results.map { document ->
+    NombreClaseDto(
+        nombreAtributo1 = document["nombreCampo1"].toString(),
+        nombreAtributo2 = document["nombreCampo2"].toString(),
+	nombreAtributoN = document["nombreCampoN"].toString(),
+    )
+}.toList() -> Manerar de mapear lo que contiene un mapa hacia una clase dto. ****
 
 
 °°°°°°°°°° Manera 2 °°°°°°°°°
@@ -564,11 +572,25 @@ val aggregation = Aggregation.newAggregation() -> Prepara un consulta.
     		- .andInclude("campo") -> Para Incluir campo
 		- .andExpression("precio * cantidad").as("total") -> Hacer operaciones con los campos.
 
+Se supone que el orden de las clausulas: where, select, distinc, group by es indiferente, sin embargo, se 
+tuvieron diversos problemas al usuarlos en un orden culqaquiera. Tomando diversas consultas exitosas se
+determino que el orden correcto para usar esas clausulas es: match (para hacer condiciones como el where),
+group, Project y al final sort. ********
+
 val results = mongoTemplate.aggregate(
     aggregation,
     nombreCollection,
-    nombreClaseX::class.java
+    Map::class.java
 ).mappedResults -> Ejecuta una consulta de agregación.
+	Al igual que la manera anterior, siempre se usa map y ya después se mapea hacia la clase de interés.
+
+val list: List<NombreClaseDto> = results.map { document ->
+    NombreClaseDto(
+        nombreAtributo1 = document["nombreCampo1"].toString(),
+        nombreAtributo2 = document["nombreCampo2"].toString(),
+	nombreAtributoN = document["nombreCampoN"].toString(),
+    )
+}.toList() -> Manerar de mapear lo que contiene un mapa hacia una clase dto. ****
 
 
 
