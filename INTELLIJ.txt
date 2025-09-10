@@ -1,5 +1,21 @@
 
 
+crear Run Configuration's fijos ------------------------------
+
+El botón verde de “Run” solo se activa si intelliJ detecta una clase ejecutable en el archivo actual.
+Por eso solamnete cuando estamos en la clase principal del proyecto vemos el botón de Run, porque ahí 
+IntelliJ detecta el main.
+
+Para poder correr el proyecto sin importar el archivo en el que nos encontremos: Arriba (donde normalmente 
+	aparece el botón verde) -> clic en el menú desplegable -> seleccionar "Edit Configurations" ->
+	presionar + (Add New Configuration) -> Selecciona application -> Name: nombre del proyecto;
+	Main class: seleccionar la clase principal -> Dale Apply y luego OK.
+
+Se pueden crear configuraciones adicionales para cosas como:
+Run con perfiles específicos (--spring.profiles.active=dev).
+Run pruebas unitarias.
+
+
 
 problemas ----------------------------------
 
