@@ -84,6 +84,30 @@ git stash apply -> Para sacar lo del stash más reciente, aplicarlo a el commit 
 git stash clear -> Elimina todos los stashes.
 
 
+TAGS
+
+*eliminar teoría que viene al inicio*
+*reestructura la explicacion de ciertos comandos*
+
+SemVer: Versionado semántico. La convención típica es: 'vMAJOR.MINOR.PATCH'
+	- v → Prefijo opcional para indicar "versión" (no es obligatorio, solo costumbre).
+	- MAJOR (primer número) → Versión mayor. Se incrementa cuando hay cambios incompatibles.
+		Un cambio incompatible es cualquier modificación que hace que el software que dependía de 
+		la versión anterior ya no funcione igual sin ajustes.
+		Ejemplos de cambios incompatibles en una api:
+		- Cambias el nombre de un parámetro obligatorio (customerId → clientId).
+		- Cambias el tipo de dato de un campo en la respuesta (date en string → date en timestamp).
+	- MINOR (segundo número) → Versión menor.MINOR (segundo número) → Versión menor. Se dan cuando 			agregas nuevas funcionalidades que no rompen lo existente.
+		Ejemplos de nuevas funcionalidades en una api:
+		- Nuevos endpoints. Pe antes se tenia GET /users/{id} y ahora se agrega GET /users/{id}/pets
+			entonces lo usuario pueden seguir usuando el primero endpoint con normalidad pero
+			ahora con una funcionalidad extra.
+		- Nuevos parámetros opcionales. Pe antes se tenia GET /orders y ahora se agrega 
+			GET /orders?status=pending, si uno no status, la API sigue respondiendo bien.
+		- Nuevos campos en la respuesta.
+	- PATCH (tercer número) → Corrección de errores.
+		No cambia nada para el cliente (solo arreglos).
+
 
 
 

@@ -81,6 +81,52 @@ spring.datasource.hikari.maximum-pool-size=n -> Controla el tamaño máximo del 
 	Si lo pones muy alto, puedes sobrecargar la base de datos.
 
 
+COMO SE GUARDAN LOS LOGS Y QUE SE GUARDA
+
+Se tiene un try-catch-finally, donde el try comienza cuando se comeinza a interactuar varias veces con un servicio externo.
+	- Contenido del try: Inmediatamente después de la llamada a un servicio externo se coloca un if 
+		que valida si el servicio fallo y si este falla se lanza una excepción o exception 			personalizada con el error que manda el servicio externo, si un servicio nuestro falla se 		puede lanzar una exception o excepción personalizada con un mensaje que describa ese error.
+	- Contenido de los catch: Habra 2 o mas catch: uno para el catch mas genérico (Exception), otros 		para las exceptiones personalizadas (si las hay) y otros para exceptiones mas especificas 		(solo si las hay).
+		En cualquier catch habrá cualquiera de las 3 siguientes instrucciones o las 3: un print
+		para imprimir en la consola y guiarnos sobre mas o menos que fue lo paso, un 				e.printStackTrace() para que en la consola apareza mensajes en rojo y llenar el atributo 		error que esta en el objeto que se envia al fron.
+	- Contenido del finally: se coloca un try-catch.
+		- Contenido del try: se instancia un objeto de logs y se llena con los siguientes datos:
+			el objeto request (que recibimos del fron), el objeto request (que se preparo para
+			el servicio externo), el objeto response (que enviamos al fron), el bojeto response
+			(que nos respondio el servicio externo), la fecha y hora, el atributo error que
+			viene en el objeto respuesta que enviamos al forn, numero de proceso (si aplica),
+			user_id (si aplica, para saber qué usuario causó el evento). Se guarda ese objeto
+			en su respectiva tabla.
+		- Contenido del catch: un print para imprimir 'error al guardar en los logs en el proceso
+			equis', un e.printStackTrace() para que en la consola apareza mensajes en rojo y 
+			llenar el atributo error que esta en el objeto que se envia al fron con el mismo 
+			mensaje que en el print.
+
+Ejemplo para el try:
+
+xmlResCot = helper.connect(xml)
+val jsonObj = toJSONObject(xmlResCot)
+//La aseguradora dentro del XML, en el parametro (etiqueta) return regresa una cadena que es un json
+// entonces se debe verificar si regreso este json
+val responseString = jsonObj.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body")
+    .getJSONObject("ns2:cotizarPolizaResponse").getString("return")
+//si no es un json de respuesta
+if (responseString[0] != '{') {
+    throw Exception(responseString)
+}
+
+Ejemplo para los catch:
+
+} catch (e: Exception) {
+    println("ERROR AL REALIZAR COTIZACION")
+    e.printStackTrace()
+    response.codigoError = quoteCommon.customErrorMessage(e, request, idTipoVehiculo, businessType)
+} catch (e: CustomException) {
+    println("ERROR AL REALIZAR COTIZACION")
+    e.printStackTrace()
+    response.codigoError = "${e.message}"
+} 
+
 
 
 
