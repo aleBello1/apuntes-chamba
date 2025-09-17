@@ -1,3 +1,23 @@
 CREATE TABLE nueva_tabla LIKE tabla_existente; -> Crea una tabla con las mismas columnas, índices y 	restricciones que otra tabla, pero sin registros.
 
 
+CONSULTAS JSON
+
+Son consultas que se aplican a campos que almacenan objetos json.
+
+SELECT * 
+FROM nombreDb.nombreTabla 
+WHERE JSON_UNQUOTE(JSON_EXTRACT(nombreCampoJson, '$.atributoX')) = 'valorX'; -> Devuelve todos los registros
+	donde el campo 'nombreCampoJson' tenga el valor equis en el atributo equis.
+	Si atributoX es un objeto, para acceder a sus atributos seria: '$.objetoX.atributoY'.
+	Si el json es un arreglo, se puede usar array Access para acceder a los elementos: '$[0].atributoX'
+	Una consulta alternativa seria: 
+		SELECT *
+		FROM nombreDb.nombreTabla
+		where nombreCampoJson like '%valorX%';
+	Sin embargo una consulta con like nunca usara los índices y hará un table scan siempre, en cambio
+	la otra consutla convierte un campo en un objeto json y extrae directamente el atributo a buscar
+	para compararlo con el valor buscado, además si la tala tiene índices si los usuara. También 
+	no conviene usar like porque Puede dar falsos positivos (si valorX aparece en otro campo distinto).
+
+

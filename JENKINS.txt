@@ -38,6 +38,22 @@ Crear un webhook para un repositorio en bitbucket: Ir a determinado repositorio 
 	[url donde vive la instania de jenkins][evento a ejecutar] -> Status: active -> El el apartdo de 
 	triggers, en la columna de repository: palomear push, en la columna issue se queda vacio, en la 	columna de pull request palomear create, update, comment created, comment updated -> save.
 
+Crear credenciales en jenkins: Nos dirigimos a Jenkins -> parte sup der 'engrane' -> apartado security -> 	credentials -> En el apartado domain -> dar click sobre cualquier lugar donde diga 'global' ->
+	add credentials.
+	En kind: secret text; scope dejamos el valor por default 'Glocal (Jnekins, nodes, items, all chid,
+	etc)'; en secret: se le asigna la ip a donde ira el .jar, por ejemplo la ip del ec2 donde se 
+	despliega prod; en id es una especie de nombre de variable que se crea y se usa en nuestro 
+	jenkinsfile, esta conformado por un nombre asi: 
+	ssh-[nombreNube]-[nombreServicio]-instance-[nombreProyecto]-[nombreAmbiente]-ip, por ejemplo: 
+	ssh-aws-ec2-instance-ws-clupp-dev-ip.
+
+Agregar credencial de tipo PEM: Nos dirigimos a Jenkins -> parte sup der 'engrane' -> apartado security -> 	credentials -> En el apartado domain -> dar click sobre cualquier lugar donde diga 'global' ->
+	add credentials.
+	En kind: SSH Username with private key; en id es una especie de nombre de variable que se crea y se 	usa en nuestro jenkinsfile, esta conformado por un nombre asi: 
+	ssh-[nombreNube]-[nombreServicio]-[nombreProyecto]-pem por ejemplo: ssh-aws-arm-ws-clupp-pem; en 
+	username se agrega el nombre de la instancia por ejemplo Ubuntu; palomeamos la opción: Enter 	directly e ingresamos la pem.
+	El pem proviene de la instancia de aws. ***
+
 Agregar y configurar el JenkinsFile a nuestro proyecto: Ir a determinado repositorio -> crearemos una nueva
 	rama llamada feature/jenkinsfile -> clonamos el repositorio remoto y nos posicionamos en la rama 	recién creada -> si tiene el archivo bitbucket-pipeline.yml en la raíz del proyecto, lo 	eliminamos -> En la raíz del proyecto cremos el archivo 'Jenkinsfile' (la primera letra en 
 	mayuscula, las demans en minúsculas y no tiene extensión el archivo).
@@ -49,6 +65,12 @@ Agregar y configurar el JenkinsFile a nuestro proyecto: Ir a determinado reposit
 	- credentialsId A2: Nombre de la credencial en Jenkins que apunta a producción.
 		En pocas palabras es para poder subir el .jar a cierta instancia de aws en prod.
 	- credentialsId A3: Nombre de la credencial en Jenkins que apunta al pem.
+	
+Observar el estatus de un despliegue automatico en bitbucket: Ingresar a determinado repositorio -> apartado 	izq 'commits' -> Ir a la rama desde donde se hizo el push (pe develop o master) -> dirigirse al 	commit desde donde se hizo el push (lo común será que sea el utlimo commit) -> apartado izq 'builds'
+	-> click sobre el enlace de Jenkins que aparezca.
+
+
+
 
 
 
