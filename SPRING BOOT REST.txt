@@ -44,6 +44,7 @@ info.build.artifact=mi-aplicacion
 info.build.group=com.miempresa
 
 
+
 CONFIGURACIONES EN LOS APPLICATION
 
 spring.main.allow-circular-references=true -> Para permitir referencias circulares entre beans.
@@ -129,6 +130,42 @@ Ejemplo para los catch:
 
 
 
+MANEJO DE COOKIES
+
+Las cookies son pequeños archivos de texto que los sitios web almacenan en el navegador (Chrome, Firefox, etc.) cuando se visita una página.
+Cada cookie guarda datos específicos y se envía de vuelta al servidor cada vez que se hace una petición.
+
+Los principales usos son:
+Mantener sesiones activas: cuando inicias sesión en un sitio (Facebook, Gmail, etc.), se guarda una cookie con tu ID de sesión, así no tienes que volver a meter tu usuario y contraseña en cada clic
+Recordar preferencias: Guardan configuraciones como idioma, tema oscuro/claro, tamaño de letra, etc.
+Publicidad y personalización: Usadas por Google Ads, Facebook Pixel, etc. para mostrarte anuncios según lo que buscaste o visitaste antes.
+
+*Dentro de un metodo en el controlador*
+public tipoDato nombreMetodo(@CookieValue(value = "NOMBRE_COOKIE", defaultValue = "valorDefecto") String cookieValue) {
+    // contenido controlar
+} -> Manera de atrapar a cierta cookie en el controlador.
+	- @CookieValue(...) -> Para atrapar cookies. 
+		- value = "NOMBRE_COOKIE" -> revisa si la petición trae una cookie con este nombre.
+		- defaultValue = "valorDefecto" -> Si la cookie no existe, utiliza este valor por defecto.
+
+
+
+CONFIGURACIONES PARA SUBIDA DE ARCHIVOS
+
+spring.servlet.multipart.max-file-size=formato -> Establece el tamaño máximo permitido para un archivo 	individual que se puede subir en una solicitud.
+	Formato: número + unidad (B, KB, MB, GB). ***
+	Si un archivo excede el limite, lanza MaxUploadSizeExceededException.
+	Valor por defecto: 1MB  
+
+spring.servlet.multipart.max-request-size=formato -> Establece el tamaño máximo total de toda la solicitud
+	multipart, incluyendo todos los archivos + campos de formulario + headers.
+	Valor por defecto: 10MB 
+
+file.upload-dir=./nombreCarpeta/ -> Crea una carpeta relativo al directorio desde donde ejecutas tu 
+	aplicación Spring Boot.
+	En esta carpeta se almacenaran los archivos que se suban a la app.
+	Esta carpeta NO se crea automáticamente, se debe crear la carpeta manualmente o programáticamente.
+
 
 ///////////////////////////////////////////AVANZADO//////
 
@@ -148,5 +185,120 @@ scheduler.cron=segundo minuto hora díaDelMes mes díaDeLaSemana año(opcional) 
 		* → mes: todos los meses.
 		? → día de la semana: no se especifica (evita conflicto con el día del mes).
 
+Crear el packege llamado Jobs, asignarle el nombre a la clase y anotarla como component de spring.
+
+
+En Jobs/NombreJobJob.java ----------------------------------------
+
+@Scheduled(...)
+public void executeTask() {
+    // contenido
+} -> Crea una tarea.
+	- @Scheduled(...) -> Todos los método se anotan con @Scheduled para especificar la frecuencia de 
+		ejecución.
+		Opciones de @Scheduled:
+		- fixedRate = valorMiliSegundos -> Para que la tarea se ejecute cada cierta cantidad de 			tiempo después de que inica la ejecución de esta tarea.
+			Cuando se arranca la aplicacion se ejecuta la tarea, despues sin esperar a que la
+			tarea termine de ejecutarse, ya estamos esperando fixedRate milisegundos para 				ejecutarse de nuevo y asi sucesivamnete. ****
+			Usado en Tareas que deben ejecutarse a intervalos regulares.
+			si la tarea tarda más que el intervalo, podría solaparse la ejecución. ******
+			Pe inicia la aplicación (segundo 0) -> se ejecuta la tarea (en el segundo 0) pero
+			la tarea le toma 2 segundos -> si fixed vale 5 segundos, entonces la tarea se 
+			ejecuta en el segundo 5 -> de nuevo se ejecutaría en el segundo 10.
+		- fixedDelay = valorMiliSegundos -> Para que la tarea se ejecute cada cierta cantidad de 			tiempo después de que termina la ejecución de esta tarea.
+			Cuando se arranca la aplicacion se ejecuta la tarea, despues del tiempo que le tome
+			a la tarea ejecutarse, se espera fixedDelay milisegundos para ejecutarse de nuevo y 			asi sucesivamnete. ****
+			Usado en Tareas que no deben solaparse. ***********
+			Pe inicia la aplicación (segundo 0) -> se ejecuta la tarea (en el segundo 0) pero
+			la tarea le toma 2 segundos -> si fixed vale 5 segundos, entonces la tarea se 
+			ejecuta en el segundo 7 -> de nuevo se ejecutaría en el segundo 14 (2 sec que le 
+			toma la método ejecutarse mas 5).
+		- cron: Permite especificar una expresión cron (para planificaciones más complejas).
+			Pe para que se ejecute todos los dias a determinada hora, o determinado dia de la 
+			semana a determinada hora, determinado dia del mes a determinada hora, etc. ****
+
+
+/////////////////////////////////////MANEJO DE EXCEPCIONES//////////////////////////////////
+
+
+MANEJAR EXCEPCIONES CON CLASE DTO (MANERA 1)
+
+En controller/ExceptionController.java ---------------------------------
+
+	- WebRequest request -> Se puede hacer que el método reciba este objeto el cual es una interfaz 		proporcionada por Spring que te da acceso a información útil sobre la solicitud HTTP actual.
+		- request.getDescription(false).replace("uri=", ""); -> Devuelve en formato string el nombre
+			completo del enpoint que provoco la exception.
+		- request.getHeader("NombreHeader"); -> Extrae el valor asociado a determinado header en la
+			solicitud.
+		- request.getParameter("paramName"); -> Extrae el valor asociado a determinado parámetro de
+			la solicitud.
+			Solo funciona para query parameters (@RequestParam), no para path variables 
+			(@PathVariable).******
+		- request.getAttribute("nombreAtributoX", nombreAmbito); -> Extrae el valor asociado a 				determinado atributo de la solicitud.
+			Ámbitos:
+			- WebRequest.SCOPE_REQUEST (solo esta solicitud)
+			- WebRequest.SCOPE_SESSION (sesión del usuario)
+			- WebRequest.SCOPE_GLOBAL (contexto global)
+
+CUSTOM EXCEPTIONS
+
+Estas exceptiones personalizadas son usadas especialmente en la capa service.
+En combinación con el tema anterior pueden ser muy poderosas porque mientras que en la capa service se
+lanzan exceptiones personalizadas, en un método controller ya no se envuelve su contenido en un try catch
+si no se atrapa específicamente cierta exception personalizada en método dentro de 'ExceptionController'.
+
+En utils/exceptions/NombreClaseCustomException.java ----------------------
+
+public class NombreClaseCustomException extends NombreClaseException {} -> Crea la clase de excpetion 	personalizada.
+	En spring boot, Lo mas común es heredar de la excepción llamada RuntimeException. ******
+
+*Dentro de la clase*
+
+public NombreClaseCustomException(String message) {
+    super(message);
+} -> Constructor usado para crear la excepción con un mensaje descriptivo.
+	Este constructor se usa cuando el error no proviene de otra excepción, sino que tú mismo lo defines 	como error en tu lógica, es decir, se usa cuando en el código hay algo asi:
+		if(condicion)
+			throw new NombreClaseCustomException("Mensaje personalizado")
+
+public AudioProcessingException(String message, Throwable cause) {
+    super(message, cause);
+} -> Este constructor permite incluir el mensaje + la excepción original que causó el error (cause).
+	Aquí se mantiene la traza original del error pero envuelta en tu excepción personalizada.
+	Esto es útil porque: No pierdes información del error original, Puedes tener un mensaje más claro 	para tu capa de negocio o tu API y se puee generalizar multiples exceptiones.
+	Se usa cuando en el código hay algo asi:
+	} catch (CannotReadException e) {
+            logger.error("No se puede leer el archivo de audio: {}", e.getMessage());
+            throw new AudioProcessingException("Formato de audio no soportado o archivo corrupto", e);
+        } catch (IOException e) {
+            logger.error("Error de E/S al procesar el archivo: {}", e.getMessage());
+            throw new AudioProcessingException("Error al acceder al archivo", e);
+        } catch (TagException e) {
+            logger.warn("Metadatos corruptos o incompletos: {}", e.getMessage());
+            throw new AudioProcessingException("Los metadatos del archivo están corruptos o incompletos", e);
+        } 
+
+
+
+////////////////////////////PROGRAMACION ORIENTADA A ASPECTOS (AOP)/////////////////////////
+
+DEPURACION
+
+
+Librería StopWatch ----------------------------
+
+Librería propia de spring boot.
+Permite medir el tiempo por partes, pe medir el tiempo para la consulta, la eliminación de archivos, etc.),
+asignándole nombre a cada una de estas secciones y mostrando este análisis de una manera elegante en los logs.
+
+StopWatch stopWatch = new StopWatch("Nombre analisis"); -> Crea un stop watch y asigna nombre a la analisis.
+
+stopWatch.start("nombre seccion");
+// codigo
+stopWatch.stop(); -> Cuenta el tiempo para una sección.
+
+stopWatch.prettyPrint() -> Imprime el tiempo de cada seecion junto con el nombre de las secciones.
+
+stopWatch.getTotalTimeMillis() -> Imprime el tiempo total en milisegundos.
 
 

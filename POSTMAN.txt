@@ -1,4 +1,17 @@
 
+DESCARGAR ARCHIVOS
+
+Enviar la petición de manera normal -> en la pestaña de la repsuesta -> parte sup der -> buscar donde
+dice: 'save resonse' -> click en los 3 puntos -> save response to file.
+
+
+COOKIES
+
+Debajo del button send -> presionar el button cookies -> agregar un dominio (localhost, dev, prod, etc) ->
+add cookie -> pasar los siguientes valores: 
+	- NOMBRE_COOKIE=valorCookie; -> Crea una cookie con cierto valor.
+	- Path: /ruta; -> Especifica la ruta del servidor para la cual la cookie debe ser enviada.
+		- / -> Para que la cookie se envie a todas las rutas del dominio especificado.
 
 
 

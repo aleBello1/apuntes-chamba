@@ -430,6 +430,7 @@ CLASES ENTITY CON MONGODB
 
 @Field -> Únicamente sirve para indicar el nombre que tiene el atributo en el campo de la collecion y 
 	no tiene mas configuraciones. ****
+	Nunca apliarselo al campo id porque mongoDb siempre necesita que el campo se llame id para 	identificador primario. ***************
 
 @Indexed() -> Sirve para crear índices.
 	- name = "idx_nombre_indice" -> Para darle un nombre al indice.
