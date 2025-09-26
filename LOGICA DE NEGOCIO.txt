@@ -17,6 +17,8 @@ pick ups: camionetas.
 líneas de negocio: tipo de seguro que una aseguradora ofrece
 	Pe Seguro para vehículos personales, Autos comerciales, Gastos médicos mayores, vida, etc.
 
+prima base: Es el precio del seguro para los datos del vehiculo (TIPO_VEHICULO, ARMADORA, CARROCERIA, VERSION, MODEL, ETC) y paquete seleccionado. **
+
 
 Procesos técnicos ---------------------------------
 
