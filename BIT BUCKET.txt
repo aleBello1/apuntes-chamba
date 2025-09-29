@@ -1,3 +1,0 @@
-
-ver el status de los despliegues para determinado proyecto: Apartado superior -> your work -> recent 
-	repositories -> dar click sobre determinado repositorio -> apartado izq -> pilenes.
