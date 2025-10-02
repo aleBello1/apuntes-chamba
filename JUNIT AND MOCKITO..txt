@@ -1,0 +1,140 @@
+//////////////////////////////////////////////OTROS/////////////////////////////////////////////////
+
+MULTIPART
+
+MockMultipartFile file = new MockMultipartFile(
+    "nombreParametro", 
+    "nombreArchivo.extension", 
+    "Content-Type", 
+    bytes
+); -> Para simular un archivo multipart en pruebas unitarias o de integración, sin 
+	necesidad de subir un archivo real.
+	- "nombreParametro" -> Es lo que el backend va a recibir como clave para acceder al archivo.
+	- Content-Type o MIME type -> Indica el tipo de archivo que estás simulando.
+		Posibles valores
+		- "audio/mpeg" -> MP3
+		- "image/png" -> imágenes PNG
+	- bytes -> Definicion de los bytes que representarán el archivo.
+		Se suele colocar: new byte[n]
+	
+
+
+
+
+
+
+
+param
+
+como correr test de cobertura.
+
+MockedStatic
+
+
+
+
+assertThat ---------------------------------------------------
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+
+°°°°°°°°° Para coleccions °°°°°°°°°°°
+
+assertThat(nombreLista).hasSize(n); -> Verifica tamaño.
+
+assertThat(nombreLista).isEmpty(); -> verifica que este vacio.
+
+assertThat(nombreLista).anySatisfy(...) -> Al menos un elemento de la lista debe cumplir con lo que 
+	está dentro del bloque de comprobación.
+
+assertThat(nombreLista).contains(elemento1, elemento2, elementoN); -> Verifica que esten estos elementos en 	la lista (sin importar orden).
+
+assertThat(nombreLista).containsExactly(elemento1, elemento2, elementoN); -> Verifica que esten estos 
+	elementos en la lista (el orden SI importa).
+
+assertThat(nombreLista).allSatisfy(elemento -> assertThat(elemento).metodoCondicion()); -> Verifica que 
+	todos los elementos cumplan una condición.
+	- isNotEmpty() -> Que no este vacio el elemento.
+
+assertThat(nombreLista).anySatisfy(elemento -> assertThat(elemento).metodoCondicion()); -> Verifica que 
+	algun elementos cumpla una condición.
+	- isEqualTo(valor)
+
+
+°°°°°°°°° Para mapas °°°°°°°°°°°
+
+assertThat(nombreMapa).containsKeys("nombreClave1", "nombreClave2", "nombreClaveN"); -> Verifica que el 
+	mapa contenga estas claves.
+
+assertThat(nombreMapa).containsEntry("nombreClaveX", "valorX"); -> Verifica que el mapa tenga un par 
+	clave-valor en específico.
+
+assertThat(nombreMapa).containsValues(valor1, valor2, valorN); -> Verifica que el 
+	mapa contenga estos valores.
+
+assertThat(nombreLista).anySatisfy(elemento -> { 
+	assertThat(elemento.get("name")).metodoCondicion();
+	assertThat(elemento.get("value")).metodoCondicion();
+}); -> Verifica que algun elemento cumpla una condición.
+
+
+°°°°°°°°° Para strings °°°°°°°°°°°
+
+assertThat(nombreVariableString).startsWith("cadena"); -> Verifica que el string empiece con cierta cadena.
+
+assertThat(nombreVariableString).endsWith("cadena"); -> Verifica que el string termine con cierta cadena.
+
+assertThat(nombreVariableString).contains("cadena"); -> Verifica que el string contenga cierta cadena.
+
+assertThat(nombreVariableString).isEqualTo("cadena"); -> Verifica que el string sea igual a 
+	cierta cadena.
+
+assertThat(nombreVariableString).isEqualToIgnoringCase("cadena"); -> Verifica que el string sea igual a 
+	cierta cadena sin importar que haya diferencias en cuanto a mayúsculas y minúsculas.
+
+
+°°°°°°°°° Para instancias de objetos °°°°°°°°°°°
+
+assertThat(nombreVariableObjetoX)
+    .extracting("nombreAtributo1", "nombreAtributo2", "nombreAtributoN")
+    .containsExactly(valor1, valor2, valorN); -> Verifica que ciertos atributos de un objeto contengan
+		ciertos valores.
+		Donde el atributo1 debe contener el valor 1, el atributo2 debe contener el valor2 y asi
+		sucesivamente.
+
+
+TEST DE METODOS PRIVADOS
+
+No se recomienda crear pruebas unitarias para los métodos privados, ya que normalmente se cubren indirectamente al probar los métodos públicos que los llaman. Sin embargo, si hay manera de probrlos.
+
+
+En las Pruebas unitarias para la capa service -------------------------------
+
+ReflectionTestUtils.invokeMethod(objetoXService, "nombreMetodoPrivado", arg1, arg2, argN); -> Llama a la 	implementación real del método privado.
+	Si por alguna extraña razón se debe testear un método privado, es mas sencillo si este método 
+	ya no manda a llamar a otros métodos privados.
+	Todas las dependencias que usa internamente pueden ser mockeadas, es decir si hay métodos de objetos
+	repository mandándose a llamar dentro del método privado, se puede controlar lo que retorna. ***
+
+
+SPY 
+
+@Spy
+private NombreEntidadXService objetoXServiceSpy; -> Para poder llamar a la implmentacion real de los métodos 	que viven dentro de la clase NombreEntidadX.
+	Todos los métodos del objeto objetoXServiceSpy se ejecutara su implmentacion real por defecto a 	menos que se les indique lo contrario (con doReturn + when)
+
+doReturn(valueReturn).when(objetoXServiceSpy).metodo(args) -> Para que cuando se llame el método de este
+	objeto con estos paremtros devuelva cierto valor.
+	El método real nunca se llama, sin importar qué valor reciba.
+	No se puede aplicar a métodos private solo a métodos public y protected.
+
+
+PRUEBAS DE ARCHIVOS 
+
+@Test
+void testUsingTempDir(@TempDir Path tempDir) throws IOException {} -> La anotación @TempDir Path usa para
+	 crear un directorio temporal automáticamente durante la ejecución de un test.
+	 JUnit se encarga de crear el directorio antes del test y eliminarlo después de que termine.
+	
+	 
