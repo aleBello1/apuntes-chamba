@@ -49,9 +49,15 @@ assertThat(nombreLista).anySatisfy(...) -> Al menos un elemento de la lista debe
 	está dentro del bloque de comprobación.
 
 assertThat(nombreLista).contains(elemento1, elemento2, elementoN); -> Verifica que esten estos elementos en 	la lista (sin importar orden).
+	Pude haber mas elementos en la lista sin que se comprueben su existencia.
 
-assertThat(nombreLista).containsExactly(elemento1, elemento2, elementoN); -> Verifica que esten estos 
-	elementos en la lista (el orden SI importa).
+assertThat(nombreLista).containsExactly(elemento1, elemento2, elementoN); -> Verifica que La lista contenga
+	solo esos elementos y en ese orden.
+	NO Pude haber mas elementos en la lista sin que se comprueben su existencia.
+
+assertThat(nombreLista).containsExactlyInAnyOrder(elemento1, elemento2, elementoN); -> Verifica que La
+	lista contenga solo esos elementos y no importa el orden en el que vengan.
+	NO Pude haber mas elementos en la lista sin que se comprueben su existencia.
 
 assertThat(nombreLista).allSatisfy(elemento -> assertThat(elemento).metodoCondicion()); -> Verifica que 
 	todos los elementos cumplan una condición.
@@ -102,6 +108,39 @@ assertThat(nombreVariableObjetoX)
 		ciertos valores.
 		Donde el atributo1 debe contener el valor 1, el atributo2 debe contener el valor2 y asi
 		sucesivamente.
+
+
+°°°°°°°°° Para excepciones °°°°°°°°°°°
+
+||||| Manera 1 ||||||
+
+Throwable thrown = catchThrowable(() -> {
+    objetoService.nombreMetodo();
+}); -> Ejecuta el cuerpo de la lambda y Almacena en una variable la exception que arroja dicho cuerpo.
+
+assertThat(thrown).isInstanceOf(NombreClaseException.class); -> Verifica si la exception es de esa
+	clase.
+	Pe, de throw new RuntimeException("Wrapper exception"), la exception seria RuntimeException.
+
+assertThat(thrown).hasCauseInstanceOf(NombreClaseException.class); -> Verifica si la exception de cuasa 
+	es de esa clase.
+	Pe, de throw new RuntimeException("Wrapper exception", new IOException("File error")), la exception
+	de causa seria IOException.
+
+assertThat(thrown).hasMessage("mensaje"); -> Verifica que el mensaje de la excepción sea exactamente
+	este.
+
+assertThat(thrown).hasMessageContaining("texto"); -> Verifica que el mensaje de la excepción contenga esto.
+
+assertThat(thrown).hasMessageStartingWith("texto"); -> Verifica que el mensaje empieza con algo.
+
+assertThat(thrown).hasMessageEndingWith("texto"); -> Verifica que el mensaje termine con algo
+
+assertThat(thrown).hasNoCause(); -> Verificar que no tenga causa
+
+
+||||| Manera 2 ||||||
+
 
 
 TEST DE METODOS PRIVADOS

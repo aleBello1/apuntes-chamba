@@ -42,6 +42,25 @@ git flow feature finish nombreRama -> Fusiona (merge) la rama feature/nombreRama
 En este momento deberemos hacer el git push.
 
 
+°°°°°°° Deshacer el merge y conservar la rama feature °°°°°°°
+
+Esta teoría solo aplica si aun no se ha dado el push.
+
+git reset --hard HEAD~1 -> Esto elimina el merge commit, dejando develop justo como estaba antes del finish.
+	Este comando se ejecuta en la rama develop.
+
+git reflog -> Muestra el historial de acciones.
+	La diferencian con git log, es que este comando muestra commits relacionados con ramas o commits que 
+	ya fueron eliminados.
+	Incluye cosas como: Cambios de rama, Commits que se eliminaron con reset --hard y Merges.
+
+Con este comando buscar el hash anterior*** a algo como:
+<hash>  HEAD@{1}: checkout: moving from feature/nombreRama to develop
+
+git checkout -b feature/nombreRama <hash> -> Para recrear cierta rama. 
+
+
+
 ramas realese ---------------------------------------------
 
 pendiente de investigar a detalle
