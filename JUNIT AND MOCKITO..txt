@@ -20,16 +20,23 @@ MockMultipartFile file = new MockMultipartFile(
 
 
 
+mockear métodos estáticos ---------------------------------------------
 
+MockedStatic es una clase de Mockito que se usa para mockear métodos estáticos. Normalmente, Mockito solo 
+puede mockear métodos de instancias (objetos), pero cuando quieres controlar el comportamiento de un método
+static, necesitas usar MockedStatic.
 
+try( MockedStatic<NombreClaseX> mocked = mockStatic(NombreClaseX.class) ) {...} -> Esto crea un mock para 	todos los métodos estáticos de cierta clase.
+	Esto se instancia en un bloque try-with-resources para asegurar que el mock estático se cierre 	automáticamente al final, evitando que el comportamiento mockeado afecte otros tests. El paso
+	when y then van dentro de este try. ***
 
+mocked.when(() -> NombreClaseX.metodoY(...)).thenReturn(valorZ); -> cuando se llame a 	NombreClaseX.metodoY(...) con ciertos argumentos, devolvera cierto valor.
 
-param
+mocked.when(() -> NombreClaseX.metodoY(...))
+                    .thenThrow(new NombreException("metadata corrupted")); -> cuando se llame a 	NombreClaseX.metodoY(...) con ciertos argumentos, devolvera cierta exception.
 
-como correr test de cobertura.
-
-MockedStatic
-
+mocked.verify(() -> NombreClaseX.metodoEstatico(args), times(n)); -> Verificacion a llamadas de metodos 
+	estaticos.
 
 
 
@@ -141,6 +148,22 @@ assertThat(thrown).hasNoCause(); -> Verificar que no tenga causa
 
 ||||| Manera 2 ||||||
 
+assertThatThrownBy(() -> objetoService.nombreMetodo()) -> Ejecuta el cuerpo de la lambda, se espera que el
+	metodo lance una exception.
+
+*Metodos cadena del metodo anterior* 
+
+.isInstanceOf(NombreClaseException.class) -> verifica que la excepción lanzada sea de 
+	cierto tipo.
+
+.isExactlyInstanceOf(NombreClaseException.class) -> Verifica que sea exactamente ese tipo, sin subclases.
+
+.isInstanceOfAny(Class<?>... types) -> Permite varios tipos posibles.
+
+.hasMessage(String message) → Mensaje exacto.
+
+.hasMessageContaining("cadena") -> Esto comprueba que el mensaje de la excepción contenga la cadena 	especificada.
+	No requiere que sea exactamente igual, solo que incluya esa frase.
 
 
 TEST DE METODOS PRIVADOS
@@ -159,6 +182,7 @@ ReflectionTestUtils.invokeMethod(objetoXService, "nombreMetodoPrivado", arg1, ar
 
 SPY 
 
+*Donde se declaran los atributos*
 @Spy
 private NombreEntidadXService objetoXServiceSpy; -> Para poder llamar a la implmentacion real de los métodos 	que viven dentro de la clase NombreEntidadX.
 	Todos los métodos del objeto objetoXServiceSpy se ejecutara su implmentacion real por defecto a 	menos que se les indique lo contrario (con doReturn + when)

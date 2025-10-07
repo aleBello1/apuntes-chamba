@@ -63,7 +63,9 @@ git checkout -b feature/nombreRama <hash> -> Para recrear cierta rama.
 
 ramas realese ---------------------------------------------
 
-pendiente de investigar a detalle
+git pull origin master
+git checkout develop
+git pull origin develop -> Antes de iniciar un release, siempre se ejecutan estas instrucciones para tener 	la versión más reciente.
 
 git flow release start vx.y.z -> Crea una rama de release llamada release/vx.y.z, Prepara una nueva 
 	versión para producción, Permite realizar últimas pruebas y ajustes antes del lanzamiento, 
@@ -74,9 +76,13 @@ git flow release start vx.y.z -> Crea una rama de release llamada release/vx.y.z
 	es: 'v1.0.0'.
 	Para cambios pequeños se incrementa en uno a zeta.
 	
-Para proyectos en spring boot, nos dirigimos al application-default, cambiar el perfil a prod y hacer commit.
-Antes de ejecutar el siguiente comando, cambiarse a master y hacer pull para tener actualizada esa rama.
-Después regresar a nuestro realese y terminarlo. *****
+Cuando terminas el release (git flow release finish vx.y.z), Git Flow hace dos merges automáticos:
+release → master
+release → develop
+Eso significa que todos los cambios que hiciste en la rama release también se aplican en develop. Por lo
+que, apuntar a prod en el application.yaml dentro de la rama realese no seria recomendado porque en la 
+rama develop se quedaría apuntando a prod y bien podría hacerse el cambio de vovler a apuntar a dev en el
+application.yaml pero implicaría hacer otro commit. 
 
 git flow release finish vx.y.z -> Fusiona la rama de release en main (master), Crea un tag con el nombre 
 	de la versión, Borra la rama release/vx.y.z localmente.
@@ -85,7 +91,7 @@ git flow release finish vx.y.z -> Fusiona la rama de release en main (master), C
 	segundo es para el tag (este se puede quedar con el valor por default, que seria el que 
 	utilizamos al crear el realese (vx.y.z)).
 
-En este momento deberemos hacer el git push.
+En este momento deberemos apuntar a prod y despues hacer el git push. ***
 
 
 

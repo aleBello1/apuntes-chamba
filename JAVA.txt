@@ -15,5 +15,8 @@ Files.deleteIfExists(tempFile); -> Elimina cierto archivo temporal solo si este 
 
 Files.createFile(Path path) → crea un archivo vacío en la ruta especificada.
 	La extensión depende completamente del nombre que le des en el Path.
+	Falla si ya existe
 
-createDirectory(Path path) → crea un directorio en la ruta especificada.
+Files.createDirectory(Path path) → crea un directorio en la ruta especificada.
+	Falla si ya existe.
+

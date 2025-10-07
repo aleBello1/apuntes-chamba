@@ -1,0 +1,7 @@
+
+
+@JsonProperty("NombreAtributoX")
+private tipoDato nombreAtributoX; -> Para Al serializar el objeto Java a JSON, el atributo nombreAtributoX 
+	se representará en el JSON con el nombre "NombreAtributoX".
+	Al deserializar JSON a objeto Java, si el JSON contiene "NombreAtributoX", su valor se asignará al
+	atributo nombreAtributoX.

@@ -29,6 +29,10 @@ Hay dos jar en la nube: dev y prod
 Los nuevos cambios se suben a dev y lo testean los de qa.
 Si pasan las pruebas se suben los cambios de dev a prod.
 
+cuando se haga cuadre de precios:
+siempre nos deben mandar datos para hacer la cotización.
+
+
 Negocios -------------------------------------------
 
 ahorra: el negocio principal.
