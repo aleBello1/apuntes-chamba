@@ -1,3 +1,7 @@
+sacar el xml de esta póliza: Buscar el de producción cierto registro con base al idCotizacion.
+De ahí extrar todo el valor en el campo request aseguradora y del valor en el campo response aseguradora 
+solo extraer la parte del XML.
+
 
 
 
