@@ -1,0 +1,60 @@
+////////////////////////////////////////////ENVIAR PETICIONES /////////////////////////////////////////////
+
+
+
+ maximum-pool-size: 20 -> Se configura esto en nuestro backend para permitir que multiples hilos puedan
+	consumir al mismo tiempo cierto proceso.
+
+
+PETICIONES ASINCRONAS
+
+Liberia aiohttp: cliente HTTP asíncrono que permite hacer peticiones sin bloquear el hilo principal.
+Librería asyncio: biblioteca estándar de Python para programación asíncrona, permite correr muchas tareas a 
+la vez sin bloquear el flujo del programa.
+
+Crear promsas o tareas asíncronas --------------------------------------------
+
+Se crea una promesa y dentron esta se define la petición que se ejecutara multiples veces y de manera
+concurrente (en paralelo).
+
+async def nombre_funcion_X(par1, par2, parN):
+    # n instrucciones ->  Ejemplo de como crear una promosea o tarea asíncrona.
+	Esta función devuelve un objeto awaitable (una corutina que aún no se ejecuta). 
+	Si esta fucnion se asigna a una variable o se mete a una lista, no se ejecutara aun, si no hasta
+	que se le aplique un await o se envuelva en asyncio.create_task(). 
+
+*Dentro de la promesa*
+
+
+Preparar la ejecución de multples peticiones asíncronas ----------------------------------------
+
+if __name__ == "__main__":
+    asyncio.run(main()) -> ejecuta una sola corutina.
+	Esto se hace porque esta corrutina lanzara otras corutinas internas.
+
+async def main():
+    # n instrucciones -> Se crea un main asíncrono, debebido a que solo dentro de una función asíncrona 	se puede usar await.
+
+*En el main*
+async with aiohttp.ClientSession() as session: 
+    # N instrucciones -> Esto crea una instancia de aioHttop que se abre dentro del bloque with y dentro 
+	de él se puede reutilizar el mismo objeto para usar un pool de conexiones TCP abiertas (para no 
+	abrir/cerrar una por cada request) (el cual sirve para mandar multiples peticiones http de amnera 
+	asincrona con el mismo objeto) y cuando terminen (termine el blqoue witch) esas peticiones se 
+	cierran de forma segura.
+	En resumen Dentro del bloque async with, se puedes enviar múltiples peticiones concurrentes.
+
+*En el main*
+*Dentro del with anterior*
+promiseList = [nombre_funcion_X(valor1,valor2,valorN, elemento) for elemento in listaY] -> Ejemeplo de como
+	crear una lista de promesas que aun no se ejecutan 
+
+*En el main*
+*Dentro del with anterior*
+resultados = await asyncio.gather(*promiseList) -> Ejecuta concurrentemente todos las promesas que reciba.
+	El await aplicado en esta función Espera a que todas las promesas terminen y devuelve sus resultados
+	en una lista, en el mismo orden que la lista de entrada.
+	Esta función no recibe una lista como tal, sino varios argumentos separados. Entonces si quisiéramos
+	pasarle una lista, la tendríamos que desampaquetar asi: función(*lista) ***********
+
+
