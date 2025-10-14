@@ -17,13 +17,49 @@ Crear promsas o tareas asíncronas --------------------------------------------
 Se crea una promesa y dentron esta se define la petición que se ejecutara multiples veces y de manera
 concurrente (en paralelo).
 
-async def nombre_funcion_X(par1, par2, parN):
+async def nombre_funcion_X(session, par1, par2, parN):
     # n instrucciones ->  Ejemplo de como crear una promosea o tarea asíncrona.
 	Esta función devuelve un objeto awaitable (una corutina que aún no se ejecuta). 
 	Si esta fucnion se asigna a una variable o se mete a una lista, no se ejecutara aun, si no hasta
 	que se le aplique un await o se envuelva en asyncio.create_task(). 
+	El objeto 'session' es una instancia de ClientSession (se ve mas adelante).
 
 *Dentro de la promesa*
+try:
+    async with session.nombreMetodoHttp(urlCotizacion) as response:
+        # instrucciones
+except asyncio.TimeoutError as err:
+    # instrucciones
+except aiohttp.ClientError as err:
+    # instrucciones
+except Exception as err:
+    # instrucciones -> Envía una petición asíncrona.
+	Devuelve un objeto (response) de tipo ClientResponse.
+	Se Captura a TimeoutError si el servidor tarda mucho en responder y se captura a ClientError para 
+	capturar multiples errores al hacer la petición y se Captura a Exception para capturar cualquier 	error inesperado. ***
+	- json=payload -> Para mandar datos en la petición.
+
+
+°°°°°°°°° Codigo dentro del async with anterior °°°°°°°°°°°°°°
+
+response.status -> Contiene el código HTTP que devolvió el servidor.
+	No lanza ninguna excepción.
+
+response.raise_for_status() -> Verifica que el código de status http no sea malo (4xx o 5xx), por que 
+	si lo es, lanazara una exception de tipo: 'ClientResponseError', pero si es un código bueno 
+	continua con la ejecución del código.
+	No se usa para determinar el código http exacto, solo lanza la exception o no. **
+
+data = await response.json() -> Extrae el cuerpo de la respuesta de manera asíncrona.
+	Devuelve un dict de Python.
+	Si al intentar extraer el cuerpo de la respuesta no es un json valido se lanzara la exception 
+	'ContentTypeError'.
+
+dataText = await respuesta.text() -> Lee el cuerpo de la respuesta HTTP como texto plano (string).
+	 
+nombreAtributX = data.get("nombreAtributX", valorDefecto) -> Intenta extraer el valor asociado al atributo
+	nombreAtributX de la respuesta, si el atriubot no existe devuelve el valor por defecto.
+
 
 
 Preparar la ejecución de multples peticiones asíncronas ----------------------------------------
