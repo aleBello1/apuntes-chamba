@@ -2,6 +2,9 @@
 
 MULTIPART
 
+
+En Pruebas unitarias -------------------------------------
+
 MockMultipartFile file = new MockMultipartFile(
     "nombreParametro", 
     "nombreArchivo.extension", 
@@ -16,7 +19,53 @@ MockMultipartFile file = new MockMultipartFile(
 		- "image/png" -> imágenes PNG
 	- bytes -> Definicion de los bytes que representarán el archivo.
 		Se suele colocar: new byte[n]
-	
+
+MvcResult result = mockMvc.perform(multipart(BASE_URL + DETECT_TYPE)
+                .file(file)) -> Manda una petición multipart/form-data, que es el tipo de petición 			usada para subir archivos.
+		Por defecto petición POST. **
+
+En Pruebas de integracion -------------------------------------
+
+
+°°°°°°° Crear archiovso para mandarlos °°°°°°°°°°
+
+ByteArrayResource file = new ByteArrayResource(new byte[n]) {
+    @Override
+    public String getFilename() {
+        return "nombreArchivo.extension";
+    }
+}; -> Crea un archivo con determinada longitud de archivo, nombre de archivo y extensión.
+
+
+°°°°°°° Preparar y Mandar la solicitud °°°°°°°°°°
+
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.MULTIPART_FORM_DATA); -> Crea los headers y establece que se mandara un 
+	multpart form data.
+
+MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+body.add("file", file); -> Mete el archivo en el cuerpo de la solicitud.
+	- body.add("nombreParam", valor); -> Si la url necesitara un request param, se envia con este 
+		body. ****
+
+HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers); -> Crea una
+	petición conformada por la request y headers.
+
+ResponseEntity<tipoDatoRetorno> response = restTemplate.exchange(
+        url,
+        HttpMethod.POST,
+        requestEntity,
+        tipoDatoRetorno.class
+); -> Manda la petición post con un archivo.
+	Si la url necesitara un path variable, se envia concatenando la url. En reqeust param cambia. ***
+
+
+
+
+
+
+
+
 
 
 
