@@ -1,4 +1,0 @@
-Ver en una pagina web los servicios backend que se están consumiendo: estando en la pagina web dar click
-	derecho -> inspeccionar -> apartado network -> seleccionar el tag llamado: 'Fetch/XHR' -> en la 
-	columna name se listaran el nombre de los servicios que se están usando -> dar click en alguno
-	para ver el endpoint.
