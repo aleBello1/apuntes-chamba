@@ -1,4 +1,39 @@
-////////////////////////////////////////////ENVIAR PETICIONES /////////////////////////////////////////////
+
+////////////////////////////////////////////ENVIAR PETICIONES////////////////////////////////////////////
 
 
+PETICIONES 
+
+import requests → librería para hacer peticiones HTTP (GET, POST, PUT, DELETE, etc.).
+
+response = requests.nombre_metodo_http(url) -> Realiza cierta petición http a cierta url.
+	Lanzara la exception: 'exceptions.ConnectionError' si no se pudo conectar al servidor o lanzara la
+	exception: 'exceptions.Timeout' si el servidor tarda demasiado en responder.
+	Esta instrucción también debe indicarse que atrapara a la exception: 'exceptions.RequestException' 
+	para cualquier otro error inesperado.
+	- timeout=n -> Si el servidor no responde en 3 segundos, se lanza una excepción 				'requests.exceptions.Timeout'
+		Si no defines timeout, No hay límite de espera. Eso significa que el programa puede quedarse 		colgado indefinidamente.
+	- headers = {
+              "nombre-encabezado1": "valor1",
+              "nombre-encabezado2": "valor2",
+              "nombre-encabezadoN": "valorN",
+          }
+	  headers=headers -> Para mandar encabezados en la petición.
+	- params = {
+              "nombreParametro1": "valor1",
+              "nombreParametro2": "valor2",
+              "nombreParametroN": "valorN",
+          }
+	  params=params -> Para mandar parámetros en la petición.
+		sirve exclusivamente para query-params y no para path variables. **
+		Para path variables seria con f-strings o con format. ***
+
+response.raise_for_status() -> Lanza la exception: 'exceptions.HTTPError' si el servidor responde con un 
+	código HTTP de error (4xx o 5xx).
+
+response.status_code -> Ver código HTTP.
+
+data = response.json() -> Convertire de json a diccionario el cuerpo de la respuesta de la petición.
+
+data = response.text -> Convertire de json a texto el cuerpo de la respuesta de la petición.
 
