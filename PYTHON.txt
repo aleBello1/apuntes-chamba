@@ -1,4 +1,46 @@
 
+
+
+//////////////////////////////////////////MONGODB////////////////////////////////////////////
+
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
+
+MONGO_URI = "mongodb://localhost:27017/"
+client = MongoClient(MONGO_URI) -> Realiza la conexión con mongoDb.
+	Lanza la exception 'ConnectionFailure' cuando no se puede establecer conexión con 
+	el servidor
+	- serverSelectionTimeoutMS=n_milisegundos -> Si MongoDB no responde en este tiempo, 
+		se lanza el error 'ServerSelectionTimeoutError'. Esta exception hereda de
+		ConnectionFailure
+
+DB_NAME = "nombre_db"
+db = client[DB_NAME] -> Acceder a determinada base de datos.
+
+
+Métodos para una data base --------------------------------
+
+db.list_collection_names() -> Lista los nombres de todas las colecciones en la base de datos
+
+db.create_collection("name_colection") -> Crea una nueva colección con el nombre dado.
+
+db.drop_collection("name_colection") -> Elimina una colección.
+
+nombreObjetoCollection = db.collection_name ó
+nombreObjetoCollection = db['collection_name'] -> Obtiene una colección específica.
+
+
+Métodos para una collection --------------------------------
+
+nombreObjetoCollection.insert_one({"nombreCampo1": "valor1", "nombreCampo2": "valor2", 
+	"nombreCampoN": "valorN"}) -> Inserta un documento.
+
+results = todos.insert_many(listaDiccionarios) -> Para insertar multiples registros.
+	Devuelve una lista con los _id generados para cada documento.
+
+
+
+
 ////////////////////////////////////////////ENVIAR PETICIONES////////////////////////////////////////////
 
 
