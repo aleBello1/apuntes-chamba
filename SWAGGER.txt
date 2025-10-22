@@ -1,0 +1,269 @@
+
+
+SWAGGER
+
+
+Incluir o excluir ciertos paquetes o clases de spring doc ------------------------
+
+°°°°°°°°°°°° Desde el archivo application.properties °°°°°°°°°°°°°°
+
+springdoc.paths-to-exclude=/api/nombreGrupo1/**, /api/nombreGrupo2/**, /api/nombreGrupoN/** -> Para excluir 	ciertos grupo de endpoints de la documentacion.
+
+springdoc.packages-to-exlude=com.miempresa.api.publica -> Indica la ruta del paquete que 
+		contiene los endpoints que queremos exluir de la documentacion.
+
+
+
+
+
+
+
+
+Utilizando anotaciones y una clase de configuracion ----------------------------------
+
+°°°°°°°° Manera 1 °°°°°°°
+
+Esta forma ya esta algo obsoleta y al paraer solo permite la configuraion general de la api.
+
+*En la clase principal del proyecto*
+@OpenAPIDefinition(
+    info = @Info(title = "Mi API", version = "1.0", description = "Descripción de la API")
+) -> Agrega ciertos metadatos a la api (a toda la api y no a un endpoint en especifico).
+
+°°°°°°°° Manera 2 °°°°°°°
+
+Crear el package config/ y crear la clase OpenApiConfig.
+Utilizando esta clase se puede configurar todo desde aquí.
+
+@Configuration
+public class OpenApiConfig {...} -> Para configurar swagger.
+
+*Dentro de la clase*
+@Bean
+public OpenAPI customOpenAPI() {
+    return new OpenAPI()
+            .info(new Info()
+                    .title("API name")
+                    .version("vx.y.z")
+                    .description("descripion")
+                    .license(new License().name("Apache 2.0").url("http://springdoc.org"))
+                    .contact(new Contact()
+                           .name("Alejandro Granados")
+                           .email("alejandro.magb@gmail.com")
+                           .url("https://github.com/aledelorbe"))
+            ) 
+} -> Para agregar información general de la api.
+	- title: nombre de la API.
+	- version: versión de la api.
+	- description: descripción general de la API (se muestra en Swagger UI)
+	- license: información legal sobre la API.
+		- name: nombre del hipervinculo.
+		- url: enlace que nos lleva a la doc.
+
+Utilizando anotaciones y configurar cada clase individualmente ----------------------------------
+
+@Api(tags = ["nombreTag"], description = "description")
+public class NombreClaseController {...] -> Mete a todos los endpoints que esten dentro de este controlador
+	en un grupo y les asigna un nombre y description.
+
+@Operation(summary = "resumen")
+*sobre un metodo controlador* -> un título breve que describe lo que hace el endpoint.
+	- description = "description" -> Descripción más detallada de lo que hace el endpoint.
+	- responses -> documenta que codigos http devuelve este endpoint y su significado.
+		Sintaxis:
+		responses = {
+       			@ApiResponse(responseCode = "codigoHttp1", description = "meaning1"),
+        		@ApiResponse(responseCode = "codigoHttp2", description = "meaning2"),
+			@ApiResponse(responseCode = "codigoHttpN", description = "meaningN"),
+   		}
+
+@NombreMetodoHttpMapping("/ruta/nombreEndpoint", produces = ["mime1", "mime2", "mimeN"])
+*sobre un metodo controlador* -> 
+	- Mime -> Indica el Content-Type de las posibles respuestas.
+		- "application/json" -> Indicar que este enpoint devuelve un objeto json.
+		- "text/plain" -> Indicar que este enpoint devuelve un xml.
+		- "application/xml" -> Indicar que este enpoint devuelve un xml.
+
+@Hidden
+*sobre un clase controladora* ó
+*sobre un metodo controlador* -> Si se usa a nivel clase, Toda la clase queda oculta de la documentación 	Swagger es decir: Ninguno de sus endpoints aparece en Swagger UI.
+	Si se usa a nivel método, el método no aparece en Swagger UI
+
+y muchísimos otras anotaciones.
+
+
+
+
+
+Utilizando un archivo .yaml ----------------------------------
+
+*En application.properties*
+springdoc.swagger-ui.url=/openapi.yaml -> Le dice a Swagger UI que no genere la documentacion 	
+	automáticamente desde nuestro código, sino que use un archivo YAML externo como fuente del 
+	esquema OpenAPI.
+	Provocara que tampoco funcionen instrucciones de configuración de swagger pe no funcionaran	
+	instrucciones como: springdoc.packages-to-exlude, ni springdoc.paths-to-exclude, etc. Si se 
+	quieren utilizar estas instrucciones y modificar los metadatos de la app se deberán usar 
+	anotaciones de swagger. ****
+
+En la ruta src/main/resources/static crear un archivo llamado 'openapi.yaml'.
+
+°°°°°°°°°° Dentro de openapi.yaml °°°°°°°°°°°
+
+Las configuraciones dentro de una opción deben seguir cierta identación (como python). Una
+identacion esta conformada por dos espacios. ***
+
+openapi: x.y.z -> Indica la versión del estándar OpenAPI (anteriormente Swagger) que se esta
+	utilizando. 
+	Este valor es obligatorio y su valor afecta directamente a: La sintaxis disponible 
+	(cómo se definen endpoints, schemas, seguridad, etc.).
+	- 3.1.1 -> El supuesto valor mas estable en julio de 2025.
+
+info: -> Para configurar a toda la api en general y no a un endpoint en especifico.
+	Configuraciones para esta opcion:
+	- title: nombre -> Indica nombre de la api.
+	- description: desc -> Da un descripción a la api.
+	- version: vx.y.z -> Indica la versión de la api.
+	- contact:
+    	     name: Alejandro Granados
+             email: alejandro.magb@gmail.com
+             url: https://github.com/aledelorbe -> Para definir datos de contacto del 
+		autor.
+
+servers: -> Indica la url donde se encuntra la api.
+	Se pueden tener diferentes url's: desarrollo, producción, etc.
+	Swagger UI creara un selector que permite elegir entre los diferentes servidores. **
+	- - url: http://localhost:numPuerto
+    	    description: desc -> Define una url y una descripcion para cierto servidor.
+		Asi es la sintaxis, a la opcion url se le antepone ese guion. ***
+
+tags:
+  - name: nombreGrupo
+    description: description -> Para crear un grupo al cual podemos incluir multiples endpoints.
+	Esta opción se coloca en el nivel mas alto y antes de la opción paths.
+	
+paths: -> Utilizado para definir todos los endpoints que tiene la api.
+	Configuraciones para esta opcion:
+	- /rutaBase/endpointX/{posibleParmetro}: -> Define determinado endpoint.
+		Configuraciones para esta opcion:
+		- nombreMetodoHttp: -> 
+			Configuraciones para esta opcion:
+			- tags:
+        		  - nombreGrupo -> Para incluir este endpoint a cierto grupo.
+				El grupo previamente se debió haber creado.
+			- summary: sum -> Se coloca un resumen breve de la operación. 
+				Se muestra en interfaces como Swagger UI o Redoc como el 
+				título de cada operación.
+				La longitud recomendada es de 5 a 10 palabras.
+			- description: desc -> Explicación más detallada (opcional pero 
+				recomendable). 
+			- parameters: -> Para definr los posibles parámetros (queryParams, pathVariables,
+				datos en los headers o datos en las cookies) de este endpoint.
+				Configuraciones para esta opcion:
+				- - name: nombreParametro -> Para indicar el nombre del parámetro tal 
+					como lo espera la API.
+					Asi es la sintaxis con el guion anterior a esta opción. **
+				- in: valor -> Indica el tipo de parámetro.
+					- query -> Indica que este parámetro es un queryParam.
+					- path -> Indica que es un path variable.
+					- header -> Indica que el parámetro se envía en los headers HTTP.
+					- cookie -> Indica que el parámetro se envía en las cookies.
+				- required: true -> Indica que el parámetro es obligatorio.
+				- required: false -> Indica que el parámetro es opcional
+				- schema:
+            			    type: tipoDato -> Para indicar el tipo de dato del query param.
+			- responses: -> Para colocar todas las posibles respuestas que 
+				puede retornar ese endpoint.
+				Configuraciones para esta opcion:
+				- 'codigoRespuesta': -> Indica que este endpoint puede 
+					retornar este codigo de respuesta.
+					Configuraciones para esta opcion:
+					- description: desc -> breve explicación de lo que 
+						significa esa respuesta.
+					- **Todas las opciones de content**.
+			- requestBody: -> Define qué el servidor espera recibir datos en el 
+				cuerpo (body) de una solicitud HTTP.
+				Configuraciones para esta opcion:
+				- required: true -> Este body es obligatorio. Si no se 
+					incluye, será un error.
+				- **Todas las opciones de content**.
+					
+- content: -> Define el tipo de conenido del cuerpo de la respuesta o cuerpo de la solicitud
+	(un txt, objeto json o xml).
+	Solo se usa, si este codigo de respuesta retorna un objeto en la respuesta o si
+	la peticion necesita un objeto json en la solicitud ***
+	Configuraciones para esta opcion:
+	- application/json: -> Indica que el cuerpo de la respuesta o cuerpo de la solicitud
+		es un objeto json.
+		Configuraciones para esta opcion:
+		- schema -> Usado para indicar el schema del objeto que viene en la 
+			respuesta o solicitud.
+			Configuraciones para esta opcion:
+			- type: array -> Usado opcionalmente para indicar que el cuerpo de 
+				la respuesta contendra un arreglo de objetos.
+			- type: object -> Para indicar que el cuerpo de la respuesta o 
+				solicitud es un objeto.
+			- items:
+                  	      $ref: '#/components/schemas/NombreSchema' -> Indica que el 
+					cuerpo de la respuesta o cuerpo de solicitud tiene 
+					cierto schema. 
+					Este schema se define en la opcion 'components'
+	- multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary -> El multipart indica que el cuerpo de la respuesta o cuerpo 
+			de la solicitud es un archivo, se pone type: string + format: binary para
+			indicarle a Swagger que es un archivo binario y mostrar un botón para 
+			subir un archivo.
+
+components: -> Sección principal donde se definen elementos reutilizables como esquemas, 
+	parámetros, respuestas, etc.
+	Configuraciones para esta opcion:
+	- schemas: -> Seccion donde se definen los esquemas de datos (estructuras de objetos
+		JSON).
+		Configuraciones para esta opcion:
+		- NombreSchemaY: Crea un schema. 
+			Para mandarlo a llamar en algun otro lado seria con:
+				'#/components/schemas/NombreSchemaY'
+			- type: object
+      			  properties:
+        		  	nombreAtributo1:
+          			type: nombreTipoDato1
+				nombreAtributo2:
+          			type: nombreTipoDato2
+        		  	nombreAtributoN:
+          			type: nombreTipoDatoN -> Define un schema para un objeto
+					json.
+					Posibles valores para la opcion type: string, 
+					number, integer, boolean. 
+					Dependientemete del valor
+					que tome type se puede combinar con configuraciones
+					adicionales: 
+					string con: format (date, dat-time, email, uuid, uri,
+					hotname, ipv4, ipv6, password, binry, byte), pattern
+					(expresión regular que debe cumplir.), minLength, 
+					maxLength, example: valor; number con: format (float,
+					double), minimum, maximum, example: valor; integer 
+					con format (int64, int32); con array: minItems, 
+					maxItems, uniqueItems: true.
+				Posibles configuraciones adicionales para la opcion 
+				type: object son: properties, required, 
+				additionalProperties: false (impide que se agreguen campos 
+				no definidos).
+			- required:
+  			  	- nombreAtributo1
+				- nombreAtributo2
+				- nombreAtributoN -> Configuracion opcional. Esta sección 
+					indica que estos campos son obligatorios.
+					Esta opcion tiene sentido ocuparla cuando se define
+					un schema usado de entrada o solicitudes ya que le 
+					estás diciendo a los consumidores de tu API: "Para 
+					que tu solicitud sea válida, debes incluir estos 
+					campos obligatoriamente en el JSON que envías". ***
+					Si se ocupa cuando no es un schema de entrada diria	
+					que ciertos campos siempre están presentes en la 
+					respuesta del servidor.*
+
