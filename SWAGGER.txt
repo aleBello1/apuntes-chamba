@@ -97,6 +97,9 @@ y muchísimos otras anotaciones.
 
 Utilizando un archivo .yaml ----------------------------------
 
+Esta es la mejor manera porque es una solución universal, es decir, si el dia de mañana se cambia
+de tecnologías el backend, solo se pasaría tal cual este archivo. ***
+
 *En application.properties*
 springdoc.swagger-ui.url=/openapi.yaml -> Le dice a Swagger UI que no genere la documentacion 	
 	automáticamente desde nuestro código, sino que use un archivo YAML externo como fuente del 
@@ -133,6 +136,8 @@ info: -> Para configurar a toda la api en general y no a un endpoint en especifi
 servers: -> Indica la url donde se encuntra la api.
 	Se pueden tener diferentes url's: desarrollo, producción, etc.
 	Swagger UI creara un selector que permite elegir entre los diferentes servidores. **
+	Es importante que este bien escrito porque es lo que utiliza swagger para hacer las 
+	peticiones.
 	- - url: http://localhost:numPuerto
     	    description: desc -> Define una url y una descripcion para cierto servidor.
 		Asi es la sintaxis, a la opcion url se le antepone ese guion. ***
@@ -149,7 +154,7 @@ paths: -> Utilizado para definir todos los endpoints que tiene la api.
 		- nombreMetodoHttp: -> 
 			Configuraciones para esta opcion:
 			- tags:
-        		  - nombreGrupo -> Para incluir este endpoint a cierto grupo.
+        		  - - nombreGrupo -> Para incluir este endpoint a cierto grupo.
 				El grupo previamente se debió haber creado.
 			- summary: sum -> Se coloca un resumen breve de la operación. 
 				Se muestra en interfaces como Swagger UI o Redoc como el 

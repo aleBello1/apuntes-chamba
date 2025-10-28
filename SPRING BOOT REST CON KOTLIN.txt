@@ -13,11 +13,13 @@ data class NombreClaseX(
 	Es nullable (Long? = null) porque inicialmente no tiene valor, y solo la base de 
 	datos lo asignará.
 	Es mutable (var) para que JPA pueda asignar el valor al guardar.
+	Es indispensable que los atributos se declaren con var, porque si se hace con val no se podrá
+	cambiar el valor después. ****+
 
-Lo malo de kotlin es que para instanciar objetos de clases entity es necesario pasarle valores a todos
-los atributos, incluyendo al id aunque este lo genere automáticamente jpa, lo común es asignarle el 0.
-U otra alternativa es usar named arguments, cuando se instancie un objeto se debe especificar a que atributo
-va cada valor y en este caso se omitiría el nombre del atributo id.
+Lo malo de kotlin es que para instanciar objetos de clases 'data class' es necesario pasarle valores a 
+todos los atributos, incluyendo al atributo 'id' aunque este lo genere automáticamente jpa antes de hacer
+un insert, lo común es asignarle el 0. Otra alternativa es usar named arguments, el cual consiste en que cuando se instancie un objeto se debe especificar a que atributo va cada valor y en este caso se omitiría 
+el nombre del atributo id.
 
 val objetoX = NombreClaseX(
     nombreAtributo1 = valor1,
@@ -592,6 +594,45 @@ val list: List<NombreClaseDto> = results.map { document ->
 	nombreAtributoN = document["nombreCampoN"].toString(),
     )
 }.toList() -> Manerar de mapear lo que contiene un mapa hacia una clase dto. ****
+
+
+//////////////////////////////////////////CLIENTES//////////////////////////////////////////
+
+
+°°°°° Métodos de JSONArray °°°°°°°
+
+arregloJson = objetoJson.getJSONArray("nombreClave") -> Accede a determinado atributo o clave del 
+	objeto json y su valor asociado lo convierte un array de objetos json.
+	Si el atributo no contiene o no representa un array de objetos json el método fallara. ***
+
+objetoJson.getTipoDatoY("nombreClaveX") -> Accede a determinado atributo o clave del objeto json y su
+	valor asociado lo convierte a una variable con determinado tipo de dato.
+	Si no encuentra el atributo o no es un valor casteable lanzara null pointer exception *****
+
+
+°°°°° Métodos de JSONObject °°°°°°°
+
+objetoJson = JSONObject(response.body) -> Convierte un json string a un objeto json.
+
+val objetoJsonY = objetoJsonX.getJSONObject("nombreAtributo") -> Accede a determinado atributo o clave 
+	del objeto json y extrae su contenido como un objeto json.
+	El método fallara si el valor asociado a la clave no es un objeto json. **
+
+val nombreAtributoJson/nombreObjetoJson/nombreArregloJson = objetoJsonX.get("nombreAtributo") -> Accede a
+	determinado atributo o clave del objeto json y extrae su contenido. 
+	Cuando extrae su contenido NO castea el valor a ningún tipo de dato, ni lo convierte a un objeto
+	json o arreglo json. ******
+	Este método se usa para hacer validaciones pe se tuvo una situación en la que un atributo json
+	a veces contenia un arreglo de objetos pero otra veces contenia un string. ******
+
+
+
+
+
+
+
+
+
 
 
 
