@@ -1,0 +1,17 @@
+
+
+Instalacion  (windows home) ---------------------------
+
+wsl.exe --list --online -> Para enumerar las distribuciones disponibles.
+	Al menos asi funciono el comando en Windows 11.
+
+wsl.exe --install <Distro> -> Instalar determinada distribución.
+	Después reiniciar la compu para ver los cambios.
+	Al menos asi funciono el comando en Windows 11.
+
+wsl --status -> ver si necesita instalar algo mas o todo ok.
+
+wsl.exe --install --no-distribution -> Para habilitar la "Plataforma de máquina virtual".
+	Sabemos que es necesario instalar este porque el comando de status lo pidió.
+
+wsl --list --verbose
