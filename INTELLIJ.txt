@@ -1,0 +1,5 @@
+
+
+Cuando un despliegue no funciona, antes de generar un nuevo .jar "manualmente" se deben quitar la
+carpetas: .ebextensions y los archivos: Procfile y buildspec.yml porque es una forma de limpiar la construcción del proyecto y evitar que configuraciones viejas interfieran con el nuevo 
+despliegue. *****+
