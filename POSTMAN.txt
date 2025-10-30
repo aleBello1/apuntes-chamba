@@ -1,7 +1,0 @@
-
-
-Ver el equivalente en código de cualquier petición que construyas: crear una petición -> configurar 
-	la petición -> en la parte derecha de la gui de postman hay un logo de código y que justamente se
-	llama code, al darle click se mostrara como se envia la petición.
-	Dentro de esa pestaña habrá un especie de selector que nos permitirá seleccionar como se hace la 
-	petición con curl o con multiples lenguajes.
