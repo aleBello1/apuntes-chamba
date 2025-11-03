@@ -1,0 +1,161 @@
+
+
+Optimizacion de dockerfile ------------------------------------
+
+°°°°°° Microservicios con spring boot °°°°°°°°°°
+
+copy ./pom.xml /app
+copy ./nombreMicroservicioX/.mvn ./.mvn
+copy ./nombreMicroservicioX/mvnw .
+run chmod +x ./mvnw
+copy ./nombreMicroservicioX/pom.xml . -> Copia el pom del proyecto principal al espacio de 
+	trabajo principal, copia el pom del microservicio al espacio de trabajao del proyecto
+	del microservicio y copia todo lo que tiene que ver con maven y su propio wrapper
+	al proyecto del microservicio.
+	Ademas le da permisos de ejecucion al wrapper por que se puede este permiso al pasar el archivo
+	de Windows a Linux.
+	
+copy ./nombreMicroservicioX/src ./src 
+run ./mvnw clean package -DskipTests -> Copia el codigo fuente del microservicio al espacio
+	de trabajo del microservicio y genera el jar.
+	En VM de Linux, los comandos se ejecutan como: ./nombreComando y en VM de Windows se ejeuctan
+	como: .\nombreComando
+
+from nombreImagen:version.x.x.x
+workdir /app
+copy --from=builder /app/nombreMicroservicioX/target/nombreMicroservicioX-snapshot.jar . ->
+	Crea un nueva etapa y define el espacio de trabajo, de la anterior etapa toma
+	el .jar y pegalo en el espacio de trabajo de esta otra etapa.
+
+export numPuerto
+entrypoint ["java", "-jar", "nombreMicroservicioX-0.0.1-SNAPSHOT.jar"] -> Levanta el jar en el 
+	contendor cuando se corra el contenedor.
+	Se puede utilizar entrypoint ó cmd, ya dependera si queremos ingresar al contenedor
+	o no, considerese que es mas seguro usar entrypoint para que nadie accese al 
+	contenedor. ***
+	En si, porr defecto Maven genera el nombre del jar como: <artifactId>-<version>.jar. Opcionalmente,
+	para personalizar este nombre nos metemos al pom.xml y dentro de la etiqueta build colocamos:
+		<finalName>mi-api</finalName>
+
+
+
+
+COMANDOS DE DOCKER 
+
+Imagenes ------------------------------------------
+
+docker image prune -> Eliminar todas las imágenes dangling que no estan asociadas a ningun contenedor.
+	Una imagen “dangling” es aquella que no tiene nombre ni etiqueta asociada.
+	- docker image prune -a -> Eliminar todas las imágenes dangling que no estan asociadas a 
+		ningun contenedor.
+
+docker rmi <idImagen_o_nombreImagen> -> Eliminar una imagen específica que no esta asociada
+	a un contenedor.
+	Si se usa el nombre de la imagen se debe colocar ':nombreTag' pero si no se coloca se entiende que
+	el que se desea eliminar es el que tiene el tag 'latest'. *****
+	- docker rmi <idImagen_o_nombreImagen1> <idImagen_o_nombreImagen2> 
+		<idImagen_o_nombreImagenN> -> Eliminar varias imágenes a la vez las cuales
+			no estan asociadas a ningun contenedor.
+
+Contenedores ---------------------------------------
+
+	- docker ps -s -> Muestra los contenedores en ejecución actual en el sistema Docker con su 
+		respectivo RW: tamaño de datos que has escrito en el contenedor y Virtual: tamaño 
+		total del contenedor incluyendo la imagen base.
+
+docker restart <nombre_o_id_del_contenedor> -> Para Reiniciar un contenedor que está corriendo.
+
+docker logs nombreContendor_o_idContenedor -> Muestra todos los logs de un contendor hasta
+	el momento en que se ejecuta este comando.
+	Estos logs, son los mismo que vemos en nuestra terminal cuando levantamos la aplicación
+	en nuestro local. *********
+	- docker logs -f nombreContendor_o_idContenedor -> Muestra los logs en tiempo real 
+		("follow") de un contenedor. Veremos tanto los logs anteriores a nuestra conexión como
+		los logs que ocurran después de nuestra conexión. **
+		No permite interactuar con el contenedor, asi que si salimos de esta 
+		sesion el contenedor no se detendra.
+
+docker attach nombreContendor_o_idContenedor -> Conecta ó engancha nuestra terminal al proceso 
+	principal de un contenedor.
+	El proceso principal de un contenedor que almacena una app mostrara los logs de la app (entonces 	en este caso, este comando seria igual que haber usado el comando docker logs pero con la 	diferencia de que usar docker logs es nadamas como para ver el proceso principal en modo 
+	lectura mientras que con este comando podremos interactuar con el proceso principal, entonces 
+	se corre el riesgo de matar el proceso por accidente).
+	El proceso principal de un contenedor que almacena una db mostrara los logs de su respectivo 
+	demonio.
+	En resumen, este comando no se usara 
+	
+
+redes --------------------------------------
+
+docker run -d --name nombreContenedor --network nombreRed -p <PUERTO_HOST>:<PUERTO_CONTENEDOR> 
+	idImagen -> Crea y corre un contenedor en segundo plano a partir de una imagen, le asigna 
+		un nombre al contenedor y le asigna una red al contenedor.
+		Comunmente el nombre del contenedor sera igual al nombre del microservicio.**
+
+
+
+
+
+DOCKERIZAR LA BASE DE DATOS 
+
+MongoDb ------------------------------------
+
+Buscar en docker hub, la imagen oficial de mongoDb.
+
+docker pull mongodb/mongodb-community-server:7.0-ubi8 -> Baja la imagen de mongoDb.
+
+docker run -d -p puertoLocal:27017 --name nombreContainer --network nombreRed 
+	nombreImagenMongoDb:nombreTag -> Crea un contenedor a partir de cierta imagen de mondoDb, le
+		asigna un nombre al contenedor, indica el puerto interno en el que trabaja mongoDb 
+		(27017), indica el puerto en nuestra maquina local, corre el contenedor en segundo 
+		plano y le asigna una red.
+	- -e MONGODB_INITDB_ROOT_USERNAME_FILE=username -> Opcional para indicar el nombre de usuario.
+	- -e MONGODB_INITDB_ROOT_PASSWORD_FILE=password -> Opcional para indicar el password de usuario.
+
+Desde el mongoDb compass de nuestra maquina local, podemos agregar un nueva conexion y conectarnos al mongoDb de ese contenedor. 
+Verifica el puerto de nuestra maquina local que utiliza el contenedor con la db con docker ps.
+
+*En mongoDb compass*
+name: asginarle el nombre del contenedor.
+Advaced connection options
+	- host: localhost:puertoLocal -> El puerto será el puerto local que usamos en el comando 
+		para la creación del contenedor (comando anterior).
+
+
+Hacer que un contenedor se conecte con la db de otro contenedor --------------------
+
+
+°°°°°°°°°°°° Spring boot °°°°°°°°°°°°
+
+*Caso: mongoDb*
+spring.data.mongodb.host=nombreContenedorDb -> En este momento, el hostname puede valer 'localhost' ó
+	'host.docker.internal', se debe cambiar por 'nombreContenedorDb', todos los demas valores 
+	para la configuracion con la db se dejan como esten en se momento.
+
+
+
+
+
+
+
+
+///////////////////////////////////IMPLEMENTACION//////////////////////////////////////////
+
+BACKEND
+
+Spring boot -------------------------------
+
+°°°°°°°°°°°° Con puros comandos °°°°°°°°°°°°
+
+
+1. Crear una red y corroborar su existencia.
+2. Bajar la imagen o imágenes para la db. Corroborar su existencia.
+3. Crear el contenedor o contenedores que almacenan la o las db's y meterlas a la red.
+4. Modificar el código fuente del proyecto o proyectos para que se puedan conectar con la db de los
+	contenedores.
+5. Integrar el dockerfile al proyecto y adecuarla a la arquitectura del proyecto.
+6. Correr el Dockerfile con el comando build (crear la imagen). Corroborar su existencia.
+7. Crear el contenedor para la app con base a la imagen. Corroborar su existencia.
+8. Usando postman probar la app, si algo sale mal meterse a los logs de la app.
+
+
