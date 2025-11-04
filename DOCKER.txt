@@ -82,7 +82,17 @@ docker attach nombreContendor_o_idContenedor -> Conecta ó engancha nuestra term
 	se corre el riesgo de matar el proceso por accidente).
 	El proceso principal de un contenedor que almacena una db mostrara los logs de su respectivo 
 	demonio.
-	En resumen, este comando no se usara 
+	En resumen, este comando no es común usuarlo porque puede matar al proceso principal que corre
+	dentro del contenedor, y solo se ususaria si es necesario interactuar con dicho proceso. **
+
+docker exec -it nombreContendor_o_idContenedor bash -> Para conectarse al sistema operativo del 
+	contenedor y abrir una terminal. 
+	En si, Docker exec ejecuta un comando dentro de un contenedor y no reemplaza a algún comando
+	como Docker run, entonces con Docker exec no importa si en el Docker file se uso cmd o entrypoint
+	al final del archivo, porque con este comando siempre nos podremos conectar al SO del contenedor
+	y abrir una terminal.
+	- exit -> Para salir de la terminal.
+
 	
 
 redes --------------------------------------
@@ -93,7 +103,33 @@ docker run -d --name nombreContenedor --network nombreRed -p <PUERTO_HOST>:<PUER
 		Comunmente el nombre del contenedor sera igual al nombre del microservicio.**
 
 
+Persistencia de los datos en el contenedor --------------------
 
+docker run ... -> Con este comando, por defecto Docker crea un volumen anonimo (un volumen sin nombre)
+	y se lo asigna al contenedor.
+	- -v nombreVolumen:rutaGuardado -> Para que el contenedor use cierto volumen y 
+		respalde los datos de determinada ruta.
+		La 'rutaGuardado' es una ruta dentro del contenedor el cual contiene
+		lo que queremos almacenar en el volumen.
+		- /var/lib/mysql -> Ruta donde se encuentran las db's que almacena mysql.
+		- /var/lib/postgresql/data -> Ruta donde se encuentran las db's que 
+			almacena postgresql.
+		- /data/db -> Ruta donde se encuentran las db's que almacena mongoDb.
+	El siguiente comando es opcional pero puede ir acompañado con volumenes.
+	- --restart=valorOpcion 
+		- always -> Si Docker se reinicia (por ejemplo, después de apagar/prender tu 
+			PC), el contenedor mi-app se vuelve a iniciar automáticamente.
+			Si el contenedor se detiene por error, también se reinicia.
+			Si tú mismo lo detienes con docker stop, también se reiniciará 
+			automáticamente (a menos que lo elimines con docker rm o cambies su 
+			política de restart).
+		- no (por defecto) -> No se reinicia nunca automáticamente.
+		- on-failure -> Se reinicia solo si el contenedor falla (sale con código 
+			distinto de 0).
+		- unless-stopped -> Igual que always, pero NO si tú lo detuviste manualmente.
+
+docker system df -v -> Devuelve el Tamaño aproximado de todos los volúmenes, contenedores e 
+	imágenes.
 
 
 DOCKERIZAR LA BASE DE DATOS 
@@ -150,12 +186,13 @@ Spring boot -------------------------------
 
 1. Crear una red y corroborar su existencia.
 2. Bajar la imagen o imágenes para la db. Corroborar su existencia.
-3. Crear el contenedor o contenedores que almacenan la o las db's y meterlas a la red.
+3. Crear el contenedor o contenedores que almacenan la o las db's y meterlas a la red. A cada uno de 
+	estos contenedores se le asigna un volumen.
 4. Modificar el código fuente del proyecto o proyectos para que se puedan conectar con la db de los
 	contenedores.
 5. Integrar el dockerfile al proyecto y adecuarla a la arquitectura del proyecto.
 6. Correr el Dockerfile con el comando build (crear la imagen). Corroborar su existencia.
-7. Crear el contenedor para la app con base a la imagen. Corroborar su existencia.
+7. Crear los contenedores para la app con base a la imagen. Corroborar su existencia.
 8. Usando postman probar la app, si algo sale mal meterse a los logs de la app.
 
 
