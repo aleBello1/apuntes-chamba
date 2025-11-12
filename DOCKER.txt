@@ -97,10 +97,35 @@ docker exec -it nombreContendor_o_idContenedor bash -> Para conectarse al sistem
 
 redes --------------------------------------
 
+Tipos de redes:
+	- bridge: Es el tipo de red normal porque este se usa cuando todos los servicios viven en el
+		mismo host y solo se comunican entre ellos. *
+	- host: Para que las contenedores estén en la misma red que la maquina host.
+	- none: El contenedor o contenedores estarán completamente aislados sin poder
+		comunicarse con nadie, es decir, no tendrá acceso a internet ni se podrá comunicar con
+		otro contenedor.
+	- overlay: crea una red virtual entre múltiples hosts Docker (máquinas distintas).
+		Es usado principalmente con Docker Swarm o Docker Compose en modo swarm.
+		Los contenedores que estén en la misma red overlay, pueden comunicarse sin importar si
+		están en hosts distintos.
+	- macvlan: Para que cada contenedor reciba su propia dirección IP y MAC de la red del host.
+		Así los contenedores aparecerán en la red local con su propia IP.
+		Usado típicamente cuando se necesita que los contenedores sean accesibles como 
+		dispositivos reales en tu red (por ejemplo, servidores NAS, impresoras virtuales, 			servicios legacy o IoT).
+
+docker network create nombreRed -> crea una red.
+	Una red con Docker te sirve para conectar varios contenedores entre sí de forma 
+	segura y controlada, como si estuvieran en la misma red privada.
+	Los contenedores se comunican por su nombre.
+	Puedes separar entornos (producción, pruebas, desarrollo) en redes distintas.
+	Este comportamiento se debe a que por defecto este comando crea una red de tipo bridge. **
+
 docker run -d --name nombreContenedor --network nombreRed -p <PUERTO_HOST>:<PUERTO_CONTENEDOR> 
 	idImagen -> Crea y corre un contenedor en segundo plano a partir de una imagen, le asigna 
 		un nombre al contenedor y le asigna una red al contenedor.
 		Comunmente el nombre del contenedor sera igual al nombre del microservicio.**
+
+*quitar la teoría del tipo de red que viene por ahi*
 
 
 Persistencia de los datos en el contenedor --------------------
@@ -169,8 +194,42 @@ spring.data.mongodb.host=nombreContenedorDb -> En este momento, el hostname pued
 	para la configuracion con la db se dejan como esten en se momento.
 
 
+POSIBLES ERRORES
+
+Cosas que se revisan ante posibles errores.
+
+1. El Docker no esta iniciado. Verifciar que este corriendo con:
+	docker compose version
+2. El puerto que expone a la aplicación tiene que tener el mismo valor que el puerto que abrimos del 
+contenedor y que exponemos al crear el contendor, es decir, en 3 lugares tiene que haber el mismo valor.
+	*application-perfil*		*dockerfile*            *Docker-compose o comando run*
+	 server.port=valorX      ->      expose valorX      ->   ports:
+     								 - "puertoLocal:valorX"
 
 
+DOCKER COMPOSE
+
+Instrucciones dentro del docker-compose.yaml --------------------
+
+version: "x.x" -> Indica la version del esquema del formato YAML, no a la versión de Docker en sí.
+	Las versiones 2.x ya están obsoletas, las versiones 3.x son antiguas pero aun estables y 
+	actualmente lo mas nuevo es ya no especificar ninguna versión porque el formato se define 
+	automáticamente.
+
+networks: -> Para crear objetos con configuraciones de red.
+	Configuraciones para esta opcion:
+	- nombreObjetoRedX: -> Crea un objeto con configuraciones de red.
+		Configuraciones para el tipo de red bridge ------------------
+		- name: nombreRed -> Para indicar el nombre de esta red.
+		- driver: nombreTipoRed -> Para indicar el tipo de red.
+		- external: true -> Para decirle a Docker Compose que use una red que ya 
+			existe porque seguramente fue creada anteriormente con el comando docker créate
+			network.
+		- driver_opts:
+     			com.docker.network.bridge.enable_ip_masquerade: "false" -> Para Aislar la red (sin 				acceso a Internet).
+				Esto deja la red cerrada al exterior, asi que los contenedores se podrán
+				comunicar entre si pero no tendrán internet.
+			
 
 
 
