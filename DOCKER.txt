@@ -233,6 +233,17 @@ networks: -> Para crear objetos con configuraciones de red.
 
 
 
+		- build: -> Equivalente al comando build. Para construir una imagen con base
+			al contenido de un docker file.
+			Si la imagen ya existe, no la vuelve a crear.
+			Configuraciones para esta opcion:
+			- context: ruta -> Para indicar al ruta del contexto.
+				Se pondria como valor './' para indicar que el contexto es
+				la ruta actual del docker compose (el cual esta en la raiz
+				del proyecto principal/padre). ***
+			- dockerfile: ruta/Dockerfile -> Para indicar la ubicacion y el nombre 
+				del dockerfile.
+
 
 ///////////////////////////////////IMPLEMENTACION//////////////////////////////////////////
 
