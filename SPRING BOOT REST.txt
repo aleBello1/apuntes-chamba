@@ -1,0 +1,45 @@
+
+
+
+HABILITAR EL CORS
+
+Un cliente (pe js vanilla, react, angular, etc) y Spring Boot corren en puertos 
+distintos. Esto hace necesario habilitar CORS (Cross-Origin Resource Sharing).
+
+En el pacakge principal crear el paquete config/ y dentro la clase de configuracion, la cual se 
+encargara de habilitar el cors.
+
+En WebConfig.java  --------------------------------------
+
+@Configuration
+public class WebConfig {
+    @Bean
+    WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:numPuertoCliente")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowCredentials(true);
+            }
+        };
+    }
+} -> Habilita el cors.
+	Para que la API permitá llamadas desde cualquier origen, con cualquier método, con cualquier 	header, y enviando credenciales.
+	- .addMapping("/**") -> Aplicar la configuración a todas las rutas de tu API.
+	- .allowedOrigins("*") -> Permite cualquier origen (cualquier dominio) lance peticiones
+		a la api.
+		En produccion, lo ideal es usar .allowedOrigins("http://localhost:numPuertoCliente") 		para especificar el dominio del fron que consumirá nuestra api. **
+		No se permite tener .allowedOrigins("*") y .allowCredentials(true) al mismo tiempo. ***
+	- .allowedOriginPatterns("*") -> Permite cualquier origen (cualquier dominio) lance peticiones
+		a la api.
+		La diferencia con allowedOrigins("*") es que esta configuración si permite
+		usar allowCredentials(true). ***
+	- .allowedMethods("*") -> Permite todos los métodos http.
+	- .allowedHeaders("*") -> Permite que el navegador envíe cualquier header: Authorization,
+		Content-Type, X-Custom, Etc.
+	- .allowCredentials(true) -> Permite que el navegador envíe: Cookies, Authorization Bearer, 		Tokens, Headers con credenciales, Sessions.
+
+
+

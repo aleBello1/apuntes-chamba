@@ -1,0 +1,88 @@
+
+
+Comandos para el docker-compose.yaml --------------------
+
+docker compose rm -> Elimina todos los contendores detenidos y declarados en el docker
+	compose.
+	No eliminara los volúmenes, redes ni imagenes asociados a los contenedores. *****
+	- -v -> Los mismo pero también Elmina los volumenes declarados en el docker compose.
+
+
+
+COMANDOS DE DOCKER 
+
+Imagenes ------------------------------------------
+
+docker image prune -> Eliminar todas las imágenes dangling que no estan asociadas a ningun 
+	contenedor.
+	Una imagen “dangling” es aquella que no tiene nombre ni etiqueta asociada.
+	- docker image prune -a -> Eliminar todas las imágenes que no estan 
+		asociadas a ningun contenedor aunque estas tengan nombre y/o tag. ***
+
+
+Contenedores ---------------------------------------
+
+docker exec -it nombreContendor_o_idContenedor bash -> Para conectarse al sistema operativo 
+	del contenedor y abrir una terminal. 
+	En si, Docker exec ejecuta un comando dentro de un contenedor y no reemplaza a 
+	algún comando como Docker run, entonces con Docker exec no importa si en el Docker 
+	file se uso cmd o entrypoint al final del archivo, porque con este comando siempre 
+	nos podremos conectar al SO del contenedor y abrir una terminal.
+	- exit -> Para salir de la terminal.
+	- docker exec -it calorie-counter sh -> Igualito al otro comando, solo que este se usa sobre
+		imágenes alpine.
+
+
+COMPROBAR FUNCIONAMIENTO DEL SWAGGER
+
+docker exec -it nombreContendor_o_idContenedor wget -qO- 
+	http://localhost:numPuertoExpositor/swagger-ui/index.html -> Para comprobar si el swagger 		dentro del contenedor funciona.
+
+Al intentar acceder al swagger desde nuestra maquina local colocando en el navegador: 
+	http://localhost:numPuertoExpositor/swagger-ui/index.html
+Puede que se muestre un error así: "No se puede acceder a este sitio web. Es posible que la pagina 
+web este temporalmente inactiva o que se haya trasladado definitivamente a otra dirección. ERR_UNSAFE_PORT".
+De este mensaje de error lo importante es la parte que dice: 'ERR_UNSAFE_PORT'
+esto provoca que cualquier navegador bloquee la petición porque considera el puerto inseguro, de hecho
+lanzar cualquier petición desde al navegador hacia la api no funcionara. *****
+
+En postman sí funcionara porque NO aplica restricciones de seguridad de navegador. ***
+
+La solución será cambiar el puerto, los puertos seguros son: 8080, 8081, 3000, 3001, 5000, 5001,
+7000, 9000.
+
+
+
+POSIBLES ERRORES
+
+Cosas que se revisan ante posibles errores.
+
+1. El Docker no esta iniciado. Verifciar que este corriendo con:
+	docker compose version
+
+Spring boot -------------------------------
+
+1. El puerto que expone a la aplicación tiene que tener el mismo valor que el puerto que 
+abrimos del contenedor, que exponemos al crear el contendor y en el swagger es decir, en al 
+menos 4 lugares tiene que haber el mismo valor.
+	*application-perfil*	       *dockerfile*           *Docker-compose o comando run*
+	 server.port=valorX      ->    expose valorX      ->  ports:			    
+     								- "puertoLocal:valorX"
+	    *En openapi.yaml* 
+	->  servers:
+ 	      - url: http://localhost:8081
+
+
+
+
+DOCKERIZAR LA BASE DE DATOS 
+
+Persistencia de los datos en el contenedor --------------------
+
+docker volume prune -> Para eliminar todos los volúmenes no utilizados y que sean anonimos.
+	- docker volume prune -a -> Para eliminar todos los volúmenes no utilizados y que 
+		sean anónimos o que tengan nombre.
+
+
+
+
