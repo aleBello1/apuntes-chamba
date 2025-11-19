@@ -2,6 +2,15 @@
 
 Comandos para el docker-compose.yaml --------------------
 
+docker-compose up -> Corre el archivo docker compose.
+	El archivo debe estar en nuestra ruta actual.
+	- -d -> Para correrlo en segundo plano.
+	- --build -> Para forzar que los build dentro del docker compose se reconstruyan
+		aunque estos ya existan.
+		Esto se usa cuando se hace un cambio en el docker file o en la app y por
+		tanto necesitamos que se reconstruya la imagen definida en el 
+		dockerfile. ********
+
 docker compose rm -> Elimina todos los contendores detenidos y declarados en el docker
 	compose.
 	No eliminara los volúmenes, redes ni imagenes asociados a los contenedores. *****
@@ -85,4 +94,88 @@ docker volume prune -> Para eliminar todos los volúmenes no utilizados y que se
 
 
 
+
+
+
+
+
+
+
+
+redes --------------------------------------
+
+docker network rm nombre_de_la_red -> Elimina una red especifica.
+
+docker network prune -> Eliminar todas las redes NO utilizadas
+
+
+
+
+MongoDb ------------------------------------
+
+Desde el mongoDb compass de nuestra maquina local, podemos agregar un nueva conexion y 
+conectarnos al mongoDb de ese contenedor. 
+Verificar el puerto que utiliza el contenedor con la db en nuestra maquina local con docker 
+ps.
+
+
+
+
+
+
+Optimizacion de dockerfile ------------------------------------
+
+°°°°°° Microservicios con spring boot °°°°°°°°°°
+
+from nombreImagen:version.x.x.x
+workdir /app
+copy --from=builder /app/nombreMicroservicioX/target/nombreMicroservicioX-0.0.1-SNAPSHOT.jar . ->
+	Crea un nueva etapa y define el espacio de trabajo, de la anterior etapa toma
+	el .jar y pegalo en el espacio de trabajo de esta otra etapa.
+
+expose numPuerto
+entrypoint ["java", "-jar", "nombreMicroservicioX-0.0.1-SNAPSHOT.jar"] -> Levanta el jar en 
+	el contendor cuando se corra el contenedor.
+	Se puede utilizar entrypoint ó cmd, ya dependera si queremos ingresar al contenedor
+	o no, considerese que es mas seguro usar entrypoint para que nadie accese al 
+	contenedor. ***
+	En si, por defecto Maven genera el nombre del jar como: <artifactId>-<version>.jar. 
+	Opcionalmente, para personalizar este nombre nos metemos al pom.xml y dentro de la 
+	etiqueta build colocamos:
+		<finalName>mi-api</finalName>
+
+
+
+
+
+BACKEND
+
+Spring boot -------------------------------
+
+°°°°°°°°°°°° Con Docker compose °°°°°°°°°°°°
+
+1. Opcional. Haber creado todo con comandos.
+2. Crear el Docker file y crear la imagen para corroborar que no tiene errores.
+3. Crear el archivo .env, agregarlo al gitignore y modificar el código fuente para que funcione
+	con las variables de ambiente. Asegurarse que sigue funciona en local sin Docker.
+4. Crear el Docker compose e intentar levantarlo para ver si hay errores.
+
+
+
+
+
+
+
+
+Instrucciones dentro del docker-compose.yaml --------------------
+
+		- depends_on:
+			Configuraciones para esta opcion:
+			- - nombreContendor -> En teoria todos los contenedores se intentaran
+				levantar al mismo tiempo pero hay contenedores como pe
+				aquellos que contiene una parte de la app que, para que
+				se levanten correctamente debe existir primero los 
+				contendores con las dbs. 
+				Esta configuracion indica que no se debe levantar este 
+				contendor hasta que ya este levantado otro contenedor. ***
 
