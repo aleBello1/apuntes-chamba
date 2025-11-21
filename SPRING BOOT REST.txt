@@ -43,3 +43,40 @@ public class WebConfig {
 
 
 
+
+/////AVANZADO////
+
+METODOS DE FABRICA
+
+Un método de fábrica pertenece a la clase, no al objeto.
+
+public class NombreClaseDto {
+
+    private tipoDato atributo1;
+    private tipoDato atributo2;
+    private tipoDato atributoN;
+
+    public static NombreClaseDto from(NombreClaseEntidad objetoEntidad) {
+        NombreClaseDto dto = new NombreClaseDto();
+        dto.setAtributo1(objetoEntidad.getAtributo1());
+        dto.setAtrito2(objetoEntidad.getAtributo2());
+        dto.setAtritoM(objetoEntidad.getAtributoM());
+        return dto;
+    }
+} -> El método statico se encarga de convertir un objeto entidad a objeto DTO.
+	En este escenario, la clase dto tiene menos atributos que la clase entity y en escencia
+	todos los atributos que tiene el dto los tiene la entity. ***
+
+NombreClaseEntity objetoEntityDb = ... ; // Se obtiene al objeto entity de la db.
+NombreClaseDto objetoDto = NombreClaseDto.from(objetoEntityDb); -> Para convertir un solo objeto
+	entidad a objeto DTO.
+
+List<NombreClaseDto> arrayDtos =
+        objetosEntityDb.stream()
+               .map(NombreClaseDto::from)
+               .toList(); -> Para convertir una lista de objetos entidad a una lista de objetos DTO.
+
+
+
+
+
