@@ -59,8 +59,8 @@ public class NombreClaseDto {
     public static NombreClaseDto from(NombreClaseEntidad objetoEntidad) {
         NombreClaseDto dto = new NombreClaseDto();
         dto.setAtributo1(objetoEntidad.getAtributo1());
-        dto.setAtrito2(objetoEntidad.getAtributo2());
-        dto.setAtritoM(objetoEntidad.getAtributoM());
+        dto.setAtributo2(objetoEntidad.getAtributo2());
+        dto.setAtributoM(objetoEntidad.getAtributoM());
         return dto;
     }
 } -> El método statico se encarga de convertir un objeto entidad a objeto DTO.
@@ -76,7 +76,59 @@ List<NombreClaseDto> arrayDtos =
                .map(NombreClaseDto::from)
                .toList(); -> Para convertir una lista de objetos entidad a una lista de objetos DTO.
 
+///////////////////////////////////////SPRING SECURITY///////////////////////////////////////////
 
+
+*Dentro de Configuracion de reglas de seguridad en los endpoint -----------------------------*
+
+°°°°°°°°°° Opcional: Permitir el acceso a swagger °°°°°°°°°°°
+
+Para que Spring Security no bloquee Swagger (Swagger UI, OpenAPI y sus endpoints), debes permitir explícitamente las rutas de Swagger en tu configuración de seguridad.
+
+.requestMatchers(
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/api-docs/**"
+            ).permitAll() -> Permitir el acceso a swagger y permitir la lectura del archivo 
+		/openapi.yaml.
+
+
+
+
+
+
+@PersistenceContext
+private EntityManager em; -> Inyecta un objeto EntityManager.
+	Esta instancia contiene el contexto de persistencia actual (normalmente el de la 
+	transacción en curso).
+	Administra el ciclo de vida de las entidades, Sabe cuándo un objeto está:
+		transient (creado pero no persistido)
+		managed (el objeto ya se encuentra en su memoria)
+		detached (liberado del contexto)
+		removed (marcado para borrarse)
+	Mantiene en memoria las entidades que se han cargado y maniupalado durante la 
+	transacción ** Cuando estás dentro de una transacción, cualquier entidad que: se recupera 
+	con findById, getOne, find, o una query, etc ó se guarda con save, ó se modificas,
+	queda administrada por el EntityManager.
+	Si se modifica algo y luego haces un findById, JPA NO vuelve a la base de datos, sino que
+	toma el objeto que está en memoria.
+
+em.flush() -> Todos los insert, update o delete pendientes se realizaran en este momento. 
+
+em.refresh(objetoEntity); -> Trae determinado objeto de la db.
+	A primera instancia pareciera que hace lo mismo que findById, solo que si se hace
+	findById NO se consultara el objeto de la base de datos, si no se traera el bojeto de la 
+	memoria de entity (Persistence Context).
+	Es usual usar las instrucción flush y refresh en conjunto, cuando se actualiza un objeto
+	en la db y se necesita consultar luego luego ese mimso objeto. ***********
+	Se tenia el caso de tener la relación uno a muchos entre usuarios y notas, donde a notas
+	se actualizaban los datos pero adicionalmente casi hasta que el objeto estuviera en la 
+	db se seteaba el campo updateAt entonces se necesitaba insertar inmediatamente la 	actualización de la nota y vovler a traer el objeto de la db para obtener el valor que se 
+	asignaba a dicho campo. *
+
+
+que otros métodos hay similares??
 
 
 
