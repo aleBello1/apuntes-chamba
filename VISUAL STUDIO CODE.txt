@@ -1,0 +1,3 @@
+ctr + shift + f: Busca una palabra en todo el espacio de trabajo.
+
+ctrol + f12: Se mete a la implementación del proyecto.
