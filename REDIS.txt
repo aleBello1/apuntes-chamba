@@ -1,0 +1,93 @@
+
+/////////////////////REDIS
+
+Redis permite guardar información en varias estructuras de datos, y cada una tiene usos específicos.
+
+1. String (clave–valor simple)
+2. Hash (tipo objeto / mapa)
+3. List (lista ordenada, tipo cola o pila)
+4. Set (conjunto sin duplicados). Útil para listas sin valores repetidos: etiquetas, roles, seguidores…
+5. Sorted Set (Set ordenado con puntuación)
+6. Streams (colas/logs persistentes)
+7. Bitmaps (manipulación de bits)
+8. HyperLogLog (conteo aproximado de elementos únicos)
+9. Geospatial (coordenadas GPS)
+10. JSON (si usas Redis Stack)
+
+
+Cache por clave compuesta (STRING) ------------------------------
+
+Claves: En Redis, una clave (key) es simplemente el nombre con el que guardas un valor.
+Es común crear el nombre de una clave del caché usando los parámetros por los cuales se hace la consulta, para que cada combinación tenga su propio resultado almacenado.
+
+Clave compuesta: Es una clave formada por los valores de los parámetros usados en la consulta, combinados para identificar de manera única el resultado cacheado.
+Pe si siempre se hacen consultas asi:
+	select *
+	vehículos
+	where marca=:marca and modelo=:modelo and submarca=:submarca
+Entonces algunso de los nombres de las claves compuestas serán: 'marca-modelo-submarca', es decir, habrá claves asi: 'nissan-2017-jetta', 'chevrolet-2019-aveo', 'ford-2014-vento', etc.
+Si tenemos otras consultas con una cantidad diferente de parámetros, pe asi:
+	select *
+	vehículos
+	where marca=:marca and modelo=:modelo 
+Entonces se deben generar otras claves compuestas pe 'nissan-2017', 'chevrolet-2019', 'ford-2014', etc. No importando que se dupliquen datos, porque esto nos permite generar un sistema de cache,
+es decir, cada combinación de parámetros tendra su propio caché. Esto es normal y esperado en un sistema de caché.
+Redis está hecho para guardar millones de claves sin problema. ****
+
+
+COMANDOS
+
+keys * -> Muestra todas las claves guardadas.
+
+get nombreKey -> Ver el valor de una key.
+
+INFO memory -> Para ver el tamaño de la base de datos en Redis.
+	used_memory -> Memoria real usada en bytes (sin formatear).
+	used_memory_human -> Lo mismo pero en KB/MB/GB, fácil de leer.
+
+DEL <clave> -> Eliminar determinada clave.
+	- DEL key1 key2 key3 -> Eliminar varias claves.
+
+FLUSHDB -> Eliminar TODAS las claves de la base actual.
+
+redis-cli SAVE -> Genera un backup.
+	Esto bloquea el servidor brevemente mientras guarda el snapshot. ****
+
+redis-cli BGSAVE -> Genera un backup.
+	Esto inicia un proceso en segundo plano que genera dump.rdb.	
+	El respaldo se guarda en /var/lib/redis/dump.rdb.
+
+TTL key -> Muestra la cantidad de Segundos restantes de una llave.
+
+
+LOGICA DE IMPLEMENTACION
+
+Cache Aside (Cache-aside pattern): patrón estándar para usar Redis como caché. Consiste en la siguiente lógica: 
+1. La app consulta Redis
+2. Si existe → lo regresas (cache hit)
+3. Si NO existe → vas a la db (cache miss)
+4. Guardas el resultado en Redis (con TTL)
+5. Regresas la respuesta.
+
+¿Cuánto tiempo de expiración darle? Lo que dure el dato sin volverse obsoleto.
+Sin embargo:
+Casos típicos
+Tipo de dato		TTL recomendado
+Catálogos, listas, 	1 hora – 24 horas
+configuraciones
+Información de usuario	5 minutos – 1 hora
+Tokens o sesiones	15 min – 1 hora
+Resultados de consultas 5 minutos
+pesadas	30 segundos 
+Contadores, métricas	10 – 60 segundos
+Datos casi estáticos	1 día
+
+Si alguien vuelve a consultar ese dato… ¿debo actualizar el TTL?
+Hay dos patrones:
+Hard TTL: Es un ttl fijo, es decir, no se renueva. Se debe ocupar si el dato puede quedar un 
+	poco viejo. Ej: catálogos, productos, precios, datos informativos.
+	Bueno para datos que sí pueden volverse viejos
+Sliding TTL: Se renueva en cada consulta. Se debe ocupar Si el dato solo debe expirar cuando ya 	nadie lo usa.
+	Útil para sesiones
+	Útil para datos que no deben expirar si se usan mucho
+	Típico en autenticación

@@ -1,0 +1,30 @@
+redes --------------------------------------
+
+docker network inspect nombreRed -> Muestra información de cierta red.
+	De los mas importante que se puede ver aqui, es que se puede ver el nombre de todos los
+	contenedores que están en esta red.
+
+
+
+DOCKERIZAR LA BASE DE DATOS  
+
+redis ------------------------------------
+
+Buscar en docker hub, la imagen oficial de redis.
+
+docker pull redis:alpine3.22 -> Baja la imagen de redis.
+
+docker run -d -p puertoLocal:6379 --name nombreContainer --network nombreRed 
+	nombreImagenRedis:nombreTag -> Crea un contenedor a partir de cierta imagen de 
+		redis, le asigna un nombre al contenedor, indica el puerto interno en el 
+		que trabaja redis (6379), indica el puerto en nuestra maquina local, 
+		corre el contenedor en segundo plano y le asigna una red.
+
+Redis es nativo de Linux, al momento no hay manera de instalar una interfaz grafica en Windows
+que nos permita conectarnos e interactuar con la db de redis.
+Sin embargo hay varias maneras de interactuar con la db.
+	1. Entrando al contenedor.
+	2. Usando el cliente de redis llamado redis cli (solo disponible en Linux y mac)
+	3. Hacer un programa que interactue con la db.
+
+docker exec -it nombreContainer redis-cli -> Para conectarse al cliente de redis.
