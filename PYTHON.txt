@@ -7,8 +7,7 @@ import asyncio
 import aiohttp
 
 sem = asyncio.Semaphore(n) -> Crea un controlador de concurrencia.
-	Es opcional usarlo ya que se usa solo cuando selimitar cuántas tareas pueden ejecutarse 
-	al mismo tiempo.
+	Es opcional usarlo ya que se usa solo cuando se desea limitar cuántas tareas pueden 	ejecutarse al mismo tiempo.
 	Si no se usa esta instrucción, entonces cuando se haga await asyncio.gather(lista), todas
 	las peticiones de esa lista se intentaran hacer al mismo tiempo.
 	El Semaphore debe definirse una sola vez, antes de crear tus tareas y debe estar accesible 
@@ -16,7 +15,7 @@ sem = asyncio.Semaphore(n) -> Crea un controlador de concurrencia.
 	tareas o como variable global).
 
 async with sem:
-    # instrucciones -> Para dar entrada una tarea solo si el semáforo tiene lugar libre.
+    # instrucciones -> Para dar entrada a una tarea solo si el semáforo tiene lugar libre.
 	Se coloca donde sea conveniente, por ejemplo antes de llamar a un enpoint, porque si
 	se lanzan demasiadas peticiones a un enpoint se puede morir. **
 

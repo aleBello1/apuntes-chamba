@@ -1,0 +1,18 @@
+/////////////////////////////////INTERFAZ GRAFICA DE USUARIO////////////////////////////////
+
+Configurar una db (cluster) para desarrollo: Viene la explicación en el repositorio de:
+	apuntes java/spring boot rest/mongo atlas.
+
+Obtener el string connection: Viene la explicación en el repositorio de:
+	apuntes java/spring boot rest/mongo atlas.
+	Solo se explica como hacerlo para java pero puede dar una idea de como obtenerlo para
+	otros lenguajes.
+
+Restaurar db (cluster) gratuito: Cuando se contrata una db gratuita, tiene una fecha de caducidad
+	pero se puede restaurar.
+	En apartado izq database -> apartado izq clusters -> en la parte central de la 
+	pantalla: apartado cluster0 -> en los 3 puntos.
+
+Conectarse desde navicat a la db (cluster): Viene la explicación en el repositorio de:
+	apuntes java/spring boot rest/mongo atlas.
+
