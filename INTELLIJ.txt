@@ -1,0 +1,11 @@
+
+
+VARIABLES DE AMBIENTE
+
+Por defecto, spring boot solamente lee variables de ambiente del sistema operativo, no de 
+archivos .env.
+Sin embargo, mediante el ide que se este utilizando se pueden cargar las variables de
+ambiente de un archivo .env
+
+En el menú Run → Edit Configurations → Environment variables → buscar y cargar el archivo 
+.env.

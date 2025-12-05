@@ -28,3 +28,94 @@ Sin embargo hay varias maneras de interactuar con la db.
 	3. Hacer un programa que interactue con la db.
 
 docker exec -it nombreContainer redis-cli -> Para conectarse al cliente de redis.
+
+
+Mysql ------------------------------------
+
+Desde el mysql workbench de nuestra maquina local, podemos agregar un nueva conxion y 
+conectarnos al mysql de ese contenedor. 
+En hostname se debe poner el localhost.
+En el puerto será el puerto que expone al contenedor (del comando run, el valor de: puertoLocal).
+
+
+
+
+DOCKER COMPOSE
+
+Instrucciones dentro del docker-compose.yaml --------------------
+
+		- environment: 
+			Configuraciones para esta opcion:				
+			- NOMBRE_VAR_AMBIENTE_1: valor1
+			- NOMBRE_VAR_AMBIENTE_2: valor2
+			- NOMBRE_VAR_AMBIENTE_N: valorN	-> Para especificar que variables de
+				ambiente se ocupara y que valor se les asignara. 
+				Esta forma se suele utilizar para configurar los valores de
+				las variables de ambiente que ya vienen integradas en la 
+				imagen pe cuando el contenedor contendra una db y hay que 
+				configurar username, dbname y el password. *****
+				- NOMBRE_VAR_AMBIENTE_N: ${NOMBRE_VAR_AMBIENTE_N} -> Manera de 
+					inyectar un valor de una variable de ambiente proveniente
+					del archivo .env.
+					En si, esta forma se puede utilizar en cualquier parte del
+					Docker compose, sin embargo, es mas usual ocuparla aquí.
+					NO es necesario indicarle a Docker Compose la existencia del 
+					archivo .env porque Docker compose por defecto busca el 
+					archivo .env con el nombre .env en la misma ruta donde se 
+					encuentra el Docker compose.
+					
+Comandos para el docker-compose.yaml --------------------
+
+docker-compose up -> Corre el archivo docker compose.
+	El archivo debe estar en nuestra ruta actual.
+	- -d -> Para correrlo en segundo plano.
+	- --build -> Para forzar que los build dentro del docker compose se reconstruyan
+		aunque estos ya existan.
+		Esto se usa cuando se hace un cambio en el docker file o en la app y por
+		tanto necesitamos que se reconstruya la imagen definida en el 
+		dockerfile. ********
+	- --env-file nombreArchivo.env -> Si no se usa esta opción, este comando por defecto buscara
+		un archivo llamado .env en la misma ruta que el archivo Docker-compose.yaml y lo 
+		cargara para poder usar sus variables dentro del mismo Docker compose.
+		Esto se usa para tener diferentes archivos .env, pe uno por cada ambiente. *****
+
+
+
+
+
+
+
+Hacer que un contenedor se conecte con la db de otro contenedor --------------------
+
+°°°°°°°°°°°° Spring boot °°°°°°°°°°°°
+
+Se debera cambiar el nombre del host en la propiedad que contiene la url de conexion con el 
+gestor de base de datos al nombre de contendor el cual contiene el gestor de base de datos
+de interes.
+
+|||||| Caso: La db esta en un contenedor que usa mysql |||||||
+
+*En aplication.properties*
+spring.datasource.url=jdbc:nombreDbrms://hostName:puertoContenedor/nombreDb ->
+	En este momento, el hostname puede valer 'localhost' ó 'host.docker.internal', se
+	debe cambiar por 'nombreContenedorDbrms', todos los demas valores de esta cadena
+	se dejan como esten en se momento.
+
+
+
+Persistencia de los datos en el contenedor --------------------
+
+- -v nombreVolumen:rutaGuardado -> Para que el contenedor use cierto volumen y 
+		respalde los datos de determinada ruta.
+		La 'rutaGuardado' es una ruta dentro del contenedor el cual contiene
+		lo que queremos almacenar en el volumen.
+		- /var/lib/mysql -> Ruta donde se encuentran las db's que almacena mysql.
+		- /var/lib/postgresql/data -> Ruta donde se encuentran las db's que 
+			almacena postgresql.
+		- /data/db -> Ruta donde se encuentran las db's que almacena mongoDb.
+		- /data -> Ruta donde se encuentran las db's que almacena redis.
+
+
+
+
+
