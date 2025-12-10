@@ -119,3 +119,82 @@ Persistencia de los datos en el contenedor --------------------
 
 
 
+
+Optimizacion de dockerfile ------------------------------------
+
+°°°°°° Microservicios con spring boot °°°°°°°°°°
+
+Sirve para optimizar el docker file en tiempo y ejecucion.
+En este escenario se supone que se creo microservicios con la forma modular y que el contexto
+(el que se define con el comando build) se definio en la raiz del proyecto principal.
+
+Se recuerda que cada mircroservicio debe tener su propio Docker file pero que todos los
+microservicios comparten el mismo Docker compose. ***
+
+
+
+
+
+
+DOCKER COMPOSE
+
+Instrucciones dentro del docker-compose.yaml --------------------
+
+		Configuraciones que solo usan los contenedores con partes de la app --------
+		°°°°°°°° cuando se necesita esperar a otro contenedor que 
+			almacena otra parte de la app °°°°°°°°°°°°
+		*En el servicio que va a esperar*
+		- depends_on:
+      		      - nombre-servicio: -> Para indicar que se debe esperar a que se levante
+				otro contenedor para levantar este contenedor.
+				Observese que a esta opción no lleva '-'.
+				- condition: tipoContion:
+					Configuraciones para esta opcion:
+					- service_started (por defecto) - Solo espera que el 							contenedor exista.
+					- service_healthy - Espera a que el test dentro de 							healthcheck pase.
+		*En el servicio que debe estar levantado antes*
+		- healthcheck: 
+			Configuraciones para esta opción:
+			- disable: false -> ACTIVA el healthcheck.
+			- test: [comando] -> Comando que verifica si el proceso de interés dentro
+				del contenedor está saludable (esta listo)
+			- interval: ns -> Cada cuánto tiempo se ejecuta el test.
+			- timeout: xs -> Tiempo máximo que espera en recibir la respuesta al 
+				test.
+			- retries: y -> Cuántas veces reintentar el test antes de marcar como 
+				"unhealthy".
+			- start_period: zs -> Es el tiempo que Docker espera antes de hacer la 
+				primera verificación de salud.
+			
+
+
+
+
+CREACION DE IMAGENES
+
+Instrucciones dentro de dockerfile --------------------------
+
+FROM nombreImagen:version.x.x.x -> Indica que usaremos cierta imagen.
+	- openjdk:versionJdk.x.x.x -> Utilizar cierta imagen con cierta versión de jdk.
+		Supuestamente esta deprecated y en su lugar ocupar otras imágenes.
+	- eclipse-temurin:17-jdk -> La distribución oficial de OpenJDK creada por la 
+		Fundación Eclipse (proyecto Temurin).
+		Es una de las más recomendadas para producción.
+		Tiene el arranquen de spring boot muy rápido, parcheos muy frecuentes y 
+		performance excelente.
+		El peso es relativamente grande pero tiene gran estabilidad. **
+	- amazoncorretto:17 -> Distribución de OpenJDK mantenida por Amazon, certificada por 
+		ellos, optimizada para AWS.
+		Ideal para: Apps que corren en AWS, Quienes quieren soporte de Amazon y 			Producción con alta confiabilidad.
+		El peso es similar al de temurin, es de arranque rápido.
+	- amazoncorretto:17-alpine -> La misma distribución Amazon Corretto, pero montada sobre 
+		Alpine Linux, que usa una imagen mas pequeña.
+		Performance lento y arranque de la app muy lenta. 
+		No se debe usar en proyectos de mircroservicios.
+
+En Linux, todas las aplicaciones necesitan una biblioteca estándar del sistema que implementa funciones como: manejo de memoria, hilos, archivos, sockets (red), DNS, criptografía y
+syscalls.
+GNU C Library (glibc): Es la versión estándar, completa, rápida***, súper probada y con décadas 
+de optimización.
+Musl C Library (musl libc): La usa solo Alpine Linux. Es: más liviana, más simple, más segura en
+algunos casos, pero menos optimizada y con compatibilidad limitada.
