@@ -1,0 +1,117 @@
+
+
+Consumir microservicio -------------------------
+
+°°°°°°°°°°° En NombreModeloXClientRest °°°°°°°°°°°°°°°°
+
+@FeignClient(name = "nombreMicroservicoAConsumir", url = "urlValor")
+public interface NombreModeloXClientRest {} -> Crea un interface del servicio externo que se 
+	consumira.
+	Posibles valores para la url:
+	- http://localhost:puertoServicioExterno -> Si el microservicio a consumir y el 			microservicio donde se escribe este código ambos estan en nuestra maquina local, 		en la url el tipo de host vale: 'localhost' y el puerto sera el puerto que 
+		expone el servicio externo a consumir.
+	- http://host.internal.docker:puertoServicioExterno -> Si el microservicio a consumir 			esta en nuestra maquina local y el microservicio donde se escribe este codigo 
+		esta en un contenedor, en la url el tipo de host vale: 'host.internal.docker'.
+	- http://nombreContenedor:puertoInternoContenedor -> Si el microservicio a consumir y 
+		el microservicio donde se escribe este código ambos estan en contenedores (cada 
+		microservicio en un contenedor), en la url el tipo de host vale: 				'nombreContenedor' y el puerto es el puerto interno del contenedor.
+
+
+
+°°°°°°°°° En una clase service implementadora °°°°°°°°°°°°°
+
+*Donde se escriben los atributos de clase*
+@Autowired
+private NombreModeloXClientRest client; 
+
+Dentro del metodos del service se manda a llamar los metodos del client (estos metodos
+no se les define su implementacion, solo se llaman).
+
+try {
+    client.nombreMetodoControlador();
+} catch (FeignException.CodigoStatusHttp1 e) {
+    // instructions
+} catch (FeignException.CodigoStatusHttp2 e) {
+    // instructions
+} catch (FeignException.CodigoStatusHttpN e) {
+    // instructions
+} catch (FeignException e) {
+    throw new RuntimeException("Error communicating with nombre-microservicio-2 service", e);
+} -> Si hay algun problema en los metodos del servicio del mcsv 1 al intentar consumir el 
+	microservicio 2, se lanzara una excepcion llamada 'FeignException'. **** 
+	Entonces cuando el servicio externo lanza un código de status http diferente a exitoso,
+	FeignException puede capturar algunos de los códigos de status de http errones mas
+	comunes pe badRequest, unathorize, forbidden, notfound, errorInternal, etc y manejar de 
+	diferente forma cada uno de estos escenarios.
+	Métodos de FeignException:
+	- e.status() -> Contiene el código de status http exacto que devuelve el servicio 
+		externo.
+	- e.contentUTF8() -> Regresa el body de respuesta como String.
+	- e.getMessage() -> Description del error.
+	- e.request() -> Obtienes el request que Feign intentó ejecutar.
+
+
+*quitarlo de spring boot rest y moverlo para aca*
+SPRING BOOT ACTUATOR
+
+Sirve para monitorizar, inspeccionar y gestionar tu aplicación Spring Boot en tiempo de 
+ejecución.
+En pocas palabras: te da endpoints listos para ver el estado interno de la aplicacion sin tener que crear código adicional. 
+Muy útil para hacerle saber a un orquestador (Docker, Kubernetes, ECS) cuando una aplication ya 
+se levanto por completo. *****
+
+ulr's de spring actuator:
+	- /actuator/health → Define el estado de la app (si está UP, DOWN, etc.).
+	- /actuator/metrics → Se ven métricas (Uso de CPU, memoria, requests por segundo, etc.)
+	- /actuator/env → Muestra todas las propiedades que tiene cargadas tu aplicación 
+		incluyendo: Propiedades de application, variables definidas en Docker o 
+		Kubernetes, propiedades pasadas por comando al generar el jar y perfiles 
+		activos.
+	- /actuator/beans → lista de beans cargados.
+	- /actuator/mappings → Muestra todos los endpoints registrados en Spring y ver el 
+		método http maneja cada endpoint.
+	- /actuator/info → sirve para exponer información “general” de la aplicación.
+		Solo devuelve información que fue configurada en algún application.
+	- y muchos más.
+
+Actuator genera datos que pueden consumir sistemas de monitoreo.
+Ejemplos:
+Prometheus: Consume /actuator/prometheus para métricas de CPU, RAM, requests, etc.
+Spring Boot Admin: Aplicación que muestra todos tus microservicios y sus métricas.
+
+Incorporación y configuración -----------------------------
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency> -> Agrega spring actuator al proyecto.
+
+*En application.properties*
+
+management.endpoints.web.exposure.include=valor -> Define que endpoints de spring actuator se 
+	pueden consumir.
+	Por defecto, Spring Boot solo expone health e info. Eso quiere decir que si no 
+	configuras nada, solo esos dos estarán accesibles.
+	- * -> Para que se puedan consumir todos.
+		No es recomendable en producción porque puede mostrar información sensible. ****
+	- nombreEndpoint1,nombreEndpoint2,nombreEndpointN -> Para que se pueden consumir solo 
+		endpoints específicos.
+	También existe la configuración opuesta, el llamado exlude.
+
+management.endpoint.health.show-details=always -> Sirve para que el endpoint de health de mas 
+	detalles pe si La base de datos está disponible, si la app Puede conectarse al broker 
+	de mensajería (Kafka, RabbitMQ, etc.), si se pudo conectar con el servidor externo 
+	donde se traen otras configuraciones(la opción spring.config.import=valor) 
+	Configuración opcional.
+
+Configurar información para /actuator/info ------------------------
+
+*En application.properties*
+
+info.app.name=MiAplicacion
+info.app.version=1.2.3
+info.app.description=Servicio de catálogo de autos
+
+info.build.time=2025-08-26T10:00:00Z
+info.build.artifact=mi-aplicacion
+info.build.group=com.miempresa
