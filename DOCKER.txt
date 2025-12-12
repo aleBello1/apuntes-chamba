@@ -191,6 +191,10 @@ FROM nombreImagen:version.x.x.x -> Indica que usaremos cierta imagen.
 		Alpine Linux, que usa una imagen mas pequeña.
 		Performance lento y arranque de la app muy lenta. 
 		No se debe usar en proyectos de mircroservicios.
+	- eclipse-temurin:17-jdk -> Usa glibc, trae todo lo necesario para compilar y de 
+		excelente rendimiento, el jar se compone muy rápido.
+		De las mejores imágenes para construir el jar. *************
+
 
 En Linux, todas las aplicaciones necesitan una biblioteca estándar del sistema que implementa funciones como: manejo de memoria, hilos, archivos, sockets (red), DNS, criptografía y
 syscalls.
