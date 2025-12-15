@@ -202,3 +202,25 @@ GNU C Library (glibc): Es la versión estándar, completa, rápida***, súper pr
 de optimización.
 Musl C Library (musl libc): La usa solo Alpine Linux. Es: más liviana, más simple, más segura en
 algunos casos, pero menos optimizada y con compatibilidad limitada.
+
+
+
+/////////////////////////////////////DESPLIEGUE PRODUCCION/////////////////////////////////////
+
+Hay dos maneras de desplegar los contenedores: 
+1. De forma manual ó auto-administrados (nosotros administramos e instalamos todo lo relacionado 
+a docker también debemos llevar a cabo nosotros mismos la seguridad de los contenedores entre otras coasas).
+Tiene la ventaja de que tenemos mas control y libertar sobre todo lo que puede hacerse pero 
+la desventaja que tenemos que tener actualizado todo siempre para no tener vulnerabilidades y 
+que en un futuro no nos ataquen.
+2- ocupar un servicio en la nube que administre los contenedores.
+Tiene la ventaja de que se garantiza una seguridad siempre pero la desventaja es tener menos
+control.
+
+
+AUTO-ADMINISTRADO
+
+La idea es: crear las imágenes necesarias para nuestro proyecto, subirlas a Docker hub, en la 
+maquina remota bajar esas imágenes y crear los contenedores.
+
+
