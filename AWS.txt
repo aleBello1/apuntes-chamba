@@ -1,0 +1,118 @@
+//////////////////////////////////////////TEORIA///////////////////////////////////////////
+
+checar precios: En la pantalla principal de aws buscar el apartado 'precios'.
+	- Ver servicios gratuitos: Click en el apartado 'capa gratuita'.
+
+si se dejan prendidos los servicios, se estarán consumiendo los creditos.
+
+AMI: Amazon machine image. Contiene la configuración de sfotware (SO y aplicaciones)
+necesaria para lanzar la instancia.
+
+
+ZONAS Y REGIONES
+
+El precio de los recursos sí cambia según la región (zona) que elijas. Algunas regiones
+suelen tener precios más bajos que otras.
+
+AWS fija distintos precios por región según:
+Costos locales de infraestructura y energía
+Demanda de clientes en esa región
+Costos de operación y logística.
+
+us-east-1 (Virginia) frecuentemente tiene precios más bajos. **************
+
+
+AMAZON RELATIONAL DATABASE SERVICE (RDS)
+
+Sirve para almcenar nuestras db relaciones como PostgreSQL, MySQL, etc.
+
+
+ELASTIC COMPUTE CLOUD (EC2)
+
+Es como una vps pero en la nube y de amazon.
+
+Crear una maquina virtual ---------------------------------------------
+
+En los servicios -> buscar el servicio EC2 -> apartado instances (maquina virtual) -> se debe presionar 'lancuh intace' pero antes asegurarse que se tiene seleccionada la zona mas barata del momento.
+
+Seleccionar un SO para la instancia: Dar un nombre a la instancia (esto es opcional) -> Elegir
+	un SO linux (preferentemente el de amazon) -> Despues elegir específicamente una que 
+	una que sea AMI (no elegir alguna que diga server) (Tambien asegurarse que la que se 	elgia diga: apto para la capa gratuita).
+
+Seleccionar el tipo de instancia: Seleccionar alguno apto para la capa gratuita y el que 
+	tenga mas ram.
+
+Configurar la red: Cada zona tiene su propia red conocida como: virtual private cloud (vpc) y 
+	también tiene subredes que vendrían a ser las subzonas.
+	Se debe habilitar la ip publica para que se pueda acceder a la maquina virtual desde
+	fuera, por defcto solo se habilita un solo puerto, el puerto 22 el cual permite
+	las conexiónes remotas mediante ssh. ****
+	Le damos click en editar -> en subred va sin preferencias -> crear un grupo de seguridad
+	-> add security group role -> tipo: tcp personalizado -> numPuertoApp (aquí ponemos cada 	puerto que queremos sea consumible desde afuera, pe si tenemos dos microservicios y uno 	corre en el puerto 5000 y otro en el 8001, abrimos estos dos puertos para que sean 	consumibles desde afuera) -> tipo origen: caulqueir lugar (obvio desde cualquier lugar
+	que tenga la contraseña pem).
+	Las reglas de seguridad de entrada sirven cuando un alguien quiere consumir algo del 
+	ec2 y las reglas de seguridad de salida sirven cuando el ec2 quiere consumir algo de 
+	afuera. ***
+
+Crear par de claves: launch instance -> create a new key -> asignar nombre a las claves -> 
+	tipo de par de llaves: rsa -> formato de archivo de clave: .pem -> crear par de claves.
+	Se descaragara el archivo.
+	
+Crear instancia:  launch instance -> view intances -> *esperar a que se termine de configurar 
+	y levantar la maquina virtual* -> connect 
+	-> apartado rdp client -> download remote -> get password -> subir contraseña (que 
+	previamente habiamos descargado) -> descrypt password -> copiar password y pegarlo 
+	en el software que se descargo.
+	-Apagar la maquina virtual: se debe apagar la computadora vitual como normalmente
+		se haria (no cerrar la pestaña si no apagarla maquina). Ir al apartado
+		instances -> seleccionar la maquina virtual -> actions -> instance
+		state -> stop instance (para que no consuma creditos). El detenimiento no
+		es inmediato hay que esperar unos minutos. *************
+
+
+opcional: crear y configurar vpc ------------------------------
+
+En los servicios: VPC -> Lanzar asistente VPC -> apartado izq: VPC con una sola subred
+publica -> seleccionar -> bloque de CIDR ipv6: sin bloque de cidr -> dar un nombre en 
+nombre VPC -> zona de disponibilidad: elegir el primero ->  crear VPC.
+
+Asociar instancias al VPC: Irse a las intancias -> lanzar instancias x2 -> dar nombre 
+en nombre y etiquetas -> un partado inicio rapido: windows -> en configuraciones de red
+dar click en editar -> vpc obligatorio: sleccionar la vpc que creamos -> en sured tambien
+-> asignar automaticamente: habilitar -> dar nombre en nombre del guro de seguridad, 
+copiarlo y pegarlo como prefijo al nombre de descripcion (dejando la fecha) -> apartado
+par de claves: crear nuevo par de claves -> apartaod derecho -> numero de instancias: 2 
+-> lanzar instancias
+
+
+Conectarse a la maquina remota (por ssh) ------------------------
+
+Hay varias maneras pero Desde Windows la mejor opción es utilizando putty.
+En la pagina de aws poner en el buscador putty para mostrar la documentación de como conectarse
+a la maquina remota usando putty.
+
+
+
+
+
+
+
+DYNAMO DB
+
+Sirve para almcenar nuestras db no relaciones 
+
+
+ELASTIC CONTAINER SERVICE (ECS)
+
+Servicio para desplegar contendores.
+
+
+*Cambiar este nombre*
+////////////////////////////////////////////JAVA////////////////////////////////////////////
+*por*
+/////////////////////////////IMPLEMENTACION DEL DESPLIGUE DE SPRING BOOT////////////////////////
+
+
+
+
+
