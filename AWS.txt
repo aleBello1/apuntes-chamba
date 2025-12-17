@@ -97,17 +97,32 @@ Ver estado de las instancias: Entrar al servicio ec2 -> apartado izq: panel de e
 		dns de ipv4 publica (con estas dos direcciones podemos conectarnos a la 			instancia tanto a la terminal asi como lanzar peticiones utsando 
 		postman***************), etc.
 	- apartado seguridad: Veremos que reglas de entrada y salida tiene esa instancia.
+
+Editar reglas de seguridad de una instancia: Entrar al servicio ec2 -> apartado izq: panel de 	ec2 -> instancias en ejecución -> seleccionar determinada instancia -> apartado 
+	seguridad -> click sobre grupos de seguridad.
+	- apartado reglas de entrada -> editar reglas de entrada.
+	- apartado reglas de salida -> editar reglas de salida.
+
 	
 
 Conectarse a la maquina remota (por ssh) ------------------------
+
+°°°°°°°°°° Utilizndo Windows °°°°°°°°°°
 
 Hay varias maneras pero Desde Windows la mejor opción es utilizando putty.
 En la pagina de aws poner en el buscador putty para mostrar la documentación de como conectarse
 a la maquina remota usando putty.
 
 Entrar al servicio ec2 -> apartado izq: panel de ec2 -> instancias en ejecución -> seleccionar
-	determinada instancia -> buscar y presionar el button conectar -> 
+	determinada instancia -> buscar y presionar el button conectar -> *en un futuro mejorar
+	esta parte *
 
+°°°°°°°°°° Utilizando Linux °°°°°°°°°°
+
+Hay varias maneras y una de ellas seria usando una mv con Oracle box que simule una terminal
+de Linux.
+Otra manera es buscando en Windows a wsl (estará instalado si usamos Docker porque Docker lo
+usa forsozamente).
 
 
 Opcional: Preparación e instalación de Docker -----------------------
@@ -124,8 +139,8 @@ los comandos para instalar Docker compose en una maquina virutal 'Linux standalo
 
 *Desde la terminal local*
 scp -i /ruta/nombreArhivoPem.pem rutaMHost/nombreArchivo.entenxion 
-	instance-user-name@instance-public-dns-name rutaMV/nombreArchivo.entenxion -> Para 
-		copiar un archivo desde la maquina local y pegarlo en la maquina remota.
+	instance-user-name@instance-public-dns-name rutaMV/ -> Para copiar un archivo desde 
+		la maquina local y pegarlo en la maquina remota.
 		La idea es copiar y pegar el archivo Docker compose. *
 	- instance-user-name: Es el nombre algun usuario dentro de una instancia EC2.
 		Por defecto siempre se creara un usuario llamado 'ec2-user'.
