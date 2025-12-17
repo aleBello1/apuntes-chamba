@@ -72,6 +72,10 @@ Crear instancia:  launch instance -> view intances -> *esperar a que se termine 
 
 opcional: crear y configurar vpc ------------------------------
 
+Editar la vpc de una instancia: Entrar al servicio ec2 -> apartado izq: panel de ec2 -> 
+	grupos de seguridad -> dar click sobre una vpc para poder configuar las reglas de 
+	entrada y salida.
+
 En los servicios: VPC -> Lanzar asistente VPC -> apartado izq: VPC con una sola subred
 publica -> seleccionar -> bloque de CIDR ipv6: sin bloque de cidr -> dar un nombre en 
 nombre VPC -> zona de disponibilidad: elegir el primero ->  crear VPC.
@@ -83,7 +87,17 @@ dar click en editar -> vpc obligatorio: sleccionar la vpc que creamos -> en sure
 copiarlo y pegarlo como prefijo al nombre de descripcion (dejando la fecha) -> apartado
 par de claves: crear nuevo par de claves -> apartaod derecho -> numero de instancias: 2 
 -> lanzar instancias
+ 
+Otras configuraciones ---------------------------------------
 
+Ver estado de las instancias: Entrar al servicio ec2 -> apartado izq: panel de ec2 -> instancias
+	en ejecución.
+	Si se selecciona determinada instancia
+	- apartado detalles -> veremos ciertos detalles de la instancia: dirección ipv4 publica,
+		dns de ipv4 publica (con estas dos direcciones podemos conectarnos a la 			instancia tanto a la terminal asi como lanzar peticiones utsando 
+		postman***************), etc.
+	- apartado seguridad: Veremos que reglas de entrada y salida tiene esa instancia.
+	
 
 Conectarse a la maquina remota (por ssh) ------------------------
 
@@ -91,10 +105,47 @@ Hay varias maneras pero Desde Windows la mejor opción es utilizando putty.
 En la pagina de aws poner en el buscador putty para mostrar la documentación de como conectarse
 a la maquina remota usando putty.
 
+Entrar al servicio ec2 -> apartado izq: panel de ec2 -> instancias en ejecución -> seleccionar
+	determinada instancia -> buscar y presionar el button conectar -> 
 
 
 
+Opcional: Preparación e instalación de Docker -----------------------
 
+Al conectarnos a la MV deberemos actualizar todos los paquetes con: sudo yum update -y
+
+sudo amazon-linux-extras install Docker ó
+sudo yum install Docker -> Instala Docker en la MV.
+
+sudo service Docker start -> Levanta el servicio de Docker.
+
+Después instalamos Docker compose, para ello buscar en la pagina oficial de Docker compose
+los comandos para instalar Docker compose en una maquina virutal 'Linux standalone binary'.
+
+*Desde la terminal local*
+scp -i /ruta/nombreArhivoPem.pem rutaMHost/nombreArchivo.entenxion 
+	instance-user-name@instance-public-dns-name rutaMV/nombreArchivo.entenxion -> Para 
+		copiar un archivo desde la maquina local y pegarlo en la maquina remota.
+		La idea es copiar y pegar el archivo Docker compose. *
+	- instance-user-name: Es el nombre algun usuario dentro de una instancia EC2.
+		Por defecto siempre se creara un usuario llamado 'ec2-user'.
+	- instance-public-dns-name: Entrar al detalle de una EC2 y en donde diga 'DNS de ipv4
+		publica'.
+
+Con esto ya podriamos correr el Docker compose sin problemas. Todos los comandos de Docker se 
+deben usar con sudo. *
+Pudiese darse el caso de que al usar los comandos se nos arrje el mensaje: 'out of memory' el 
+cual implica que estamos al borde de ocupar toda la memoria ram que tiene disponible nuestra
+instancia y por tanto ya no obtendremos resultados en nuestros comandos. En ese caso la solución
+seria usar un escalamiento horizontal.
+
+*En la maquina vi4rtual*
+free -> Nos muestra una tabla donde se ve la memoria ram* total ocupada y disponible.
+	Conforme se van levantando los contenedores van ocupando mas y mas meoria, para 
+	monitorear la memoria se ocupa este comando.
+
+Para probar con postman que los microservicios, servicios o apps están corriendo usarimos 
+como hostname la dns publica y el puerto pertinente: 'dns-publica:puertoApp'.***
 
 
 DYNAMO DB
