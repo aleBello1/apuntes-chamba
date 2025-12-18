@@ -63,11 +63,6 @@ Crear instancia:  launch instance -> view intances -> *esperar a que se termine 
 	-> apartado rdp client -> download remote -> get password -> subir contraseña (que 
 	previamente habiamos descargado) -> descrypt password -> copiar password y pegarlo 
 	en el software que se descargo.
-	-Apagar la maquina virtual: se debe apagar la computadora vitual como normalmente
-		se haria (no cerrar la pestaña si no apagarla maquina). Ir al apartado
-		instances -> seleccionar la maquina virtual -> actions -> instance
-		state -> stop instance (para que no consuma creditos). El detenimiento no
-		es inmediato hay que esperar unos minutos. *************
 
 
 opcional: crear y configurar vpc ------------------------------
@@ -103,7 +98,13 @@ Editar reglas de seguridad de una instancia: Entrar al servicio ec2 -> apartado 
 	- apartado reglas de entrada -> editar reglas de entrada.
 	- apartado reglas de salida -> editar reglas de salida.
 
-	
+Apagar/Detener la maquina virtual: se debe apagar la computadora vitual como normalmente
+	se haria (no cerrar la pestaña si no apagarla maquina). 
+	Entrar al servicio ec2 -> apartado izq: panel de ec2 -> instancias en ejecución -> 	seleccionar determinata MV -> actions -> instance state -> 
+	- stop instance (para que no consuma creditos). El detenimiento no es inmediato hay 
+		que esperar unos minutos. *************
+	- finish instance -> Para eliminar la instancia.
+
 
 Conectarse a la maquina remota (por ssh) ------------------------
 
@@ -162,6 +163,12 @@ free -> Nos muestra una tabla donde se ve la memoria ram* total ocupada y dispon
 Para probar con postman que los microservicios, servicios o apps están corriendo usarimos 
 como hostname la dns publica y el puerto pertinente: 'dns-publica:puertoApp'.***
 
+Si un Docker compose originalmente estaba conformado por 4 contenedores y por espacio en memoria
+se necesita poner 2 contenedores en una mv y los otros 2 contenedores en la otra mv se puede hacer pero en la instrucción depends_on se quitara los contenedores de los cuales depende.
+
+Se recuerda que, los contenedores que almacenan db puede estar en la instancia pero una mejor
+opción seria utilizar un servicio de db en la nube como dinamoDd, rds, mongoDb atlas, etc.
+
 
 DYNAMO DB
 
@@ -171,6 +178,9 @@ Sirve para almcenar nuestras db no relaciones
 ELASTIC CONTAINER SERVICE (ECS)
 
 Servicio para desplegar contendores.
+No tenemos que instalar nada porque ya viene todo lo eceario para trabajar.
+Este servicio no se encuentra en la capa gratuita asi que si o si cobrara.
+
 
 
 *Cambiar este nombre*
