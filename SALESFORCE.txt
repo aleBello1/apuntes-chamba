@@ -27,12 +27,7 @@ Ver los metadatos que definen la estructura de una aplicación: Ir a determinada
 
 
 
-LIGHNING APP BUILDER
 
-Sirve para crear elementos visuales en una pagina.
-
-En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> 
 
 
 
@@ -62,3 +57,58 @@ Buscar aplicación recién instalada:  En la parte sup derecha buscar el logo de
 	opción setup -> busque y seleccione Installed Packages (Paquetes instalados) ->
 	clic en el nombre del paquete que ha instalado. Será el mismo del de la página de 
 	descarga de AppExchange -> clic en View Component
+
+
+/////////////////////////////////DESARROLLO SIN CODIGO//////////////////////////////////
+
+LIGHNING APP BUILDER
+
+Sirve para crear elementos visuales en una pagina, esta herramientas es muy similar a lo que 
+haría un desarrollador front end.
+
+Crear elementos visuales en determinada pagina: En la parte sup derecha buscar el logo de 	settings -> opción setup -> buscar y seleccionar lighning app builder -> darle click 
+	en edit sobre determinada pagina.
+
+
+/////////////////////////////////DESARROLLO CON CODIGO//////////////////////////////////
+
+A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de programación que puede usar, por ejemplo:
+	- El marco Lightning Web Components: un marco de trabajo de desarrollo de interfaz 
+		de usuario basada en JavaScript.
+	- Apex: lenguaje de programación creado por Salesforce con una sintaxis similar a Java.
+	- Node.js: Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha 
+		diseñado para desarrollar aplicaciones de red ampliables.
+
+
+COMPONENTS WEB LIGHNING
+
+Desarrollo para dispositivos de escritorio y móviles basado en componentes para el desarrollo
+de interfaces de usuario
+
+Code builder: entorno de desarrollo integrado de preferencia de Salesforce que puede utilizar para desarrollar, depurar y probar código en su organización.
+
+
+APEX
+
+lenguaje de programación orientado a los objetos y con parámetros de asignación rigurosa que permite a los desarrolladores de Salesforce agregar lógica empresarial a eventos del sistema, como clics de botón y actualizaciones, a los registros relacionados.
+
+*Dentro de una clase y donde se declaran atributos*
+@InvocableVariable
+tipoDato nombreAtributo; -> Para que este atributo pueda enviar datos al flujo.
+
+*En la clase main*
+@InvocableMethod
+public static tipoDato nombreMetodo() {} -> Para que el método pueda invocarse en forma de 
+	acción en el flujo.
+
+
+NODEJS
+
+Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha diseñado para 
+desarrollar aplicaciones de red ampliables. 
+
+force:project:create -> Para crear un proyecto nuevo.
+
+
+
+
