@@ -6,8 +6,37 @@ Objetos: son tablas en la base de datos de Salesforce que almacenan un tipo de i
 
 Trailhead Playground: Entorno seguro donde puede practicar las habilidades que está adquiriendo antes de aplicarlas en su trabajo real.
 
+Data Cloud es un motor de datos de hiperescala.
+
+mgranados@curious-fox-vn8yxn.com
 
 //////////////////////////////
+
+
+Crear nuevo Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
+	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas) ->
+	clic en Create Playground (Crear Playground). El Playground puede tardar unos minutos
+	en crearse.
+
+Abrir determinado Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
+	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas)
+	-> iniciar.
+
+Ver los metadatos que definen la estructura de una aplicación: Ir a determinada app -> 
+	apartado properties -> selccionar alguna propiedad -> apartado details.
+
+
+
+LIGHNING APP BUILDER
+
+Sirve para crear elementos visuales en una pagina.
+
+En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> 
+
+
+
+AREA DE SETUP
 
 Agregar un campo a determinado objeto: En la parte sup derecha buscar el logo de settings -> 
 	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
@@ -19,5 +48,17 @@ Comprobar la creación del campo nuevo para un objeto: En App Launcher (Iniciado
 	aplicación) -> buscar dreamhouse -> click sobre determinad objeto ->
 	seleccionar un registro -> apartado details -> buscar el campo recién creado.
 
+Ver el esquema de una aplicacion: En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> Buscar en el lateral schema builder y dar click ahí.
 
-	
+
+APPEXCHANGE
+
+Las aplicaciones de Salesforce Labs son gratuitas y son de código abierto. Puede personalizarlas según necesite y mirar bajo el capó para ver cómo funcionan.
+
+https://appexchange.salesforce.com/
+
+Buscar aplicación recién instalada:  En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> busque y seleccione Installed Packages (Paquetes instalados) ->
+	clic en el nombre del paquete que ha instalado. Será el mismo del de la página de 
+	descarga de AppExchange -> clic en View Component
