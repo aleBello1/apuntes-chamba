@@ -9,3 +9,17 @@ ambiente de un archivo .env
 
 En el menú Run → Edit Configurations → Environment variables → buscar y cargar el archivo 
 .env.
+
+
+
+
+
+Agregar o modificar un shortcut: presionar ctrl + alt + S -> apartado keymaps -> escribir en
+	el buscador el nombre del shortcut a editar -> click der sobre el shortcut -> add 
+	keyboard shortcut.
+	Esto se uso porque se tenia una lap donde para comentar multiples linea de código se
+	tenia que usar el carácter '/' pero del teclado numerico, asi que se modifico
+	y de paso se modificaron otros atajos para tener intelliJ lo mas parecedo a vsc. ****
+	- add selection for next occurrence: alt + j por ctrl + d.
+	- close tab: ctrl + f4 por ctrl + w.
+	- comment with line comment: ctrl + / (este carácter del teclado numerico) por ctrl + 7

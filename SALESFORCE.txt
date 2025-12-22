@@ -3,6 +3,30 @@
 Aplicación: conjunto de objetos, campos y otras funciones para cubrir un proceso empresarial.
 
 Objetos: son tablas en la base de datos de Salesforce que almacenan un tipo de información en particular.
+	Tipos de objetos:
+	- Objetos estándar: son objetos que están incluidos en Salesforce. 
+	- Objetos personalizados son objetos que se crean para almacenar información 
+		 específica de su empresa o sector.
+
+Tipos de campo:
+- Sistema: campos de solo lectura que ofrecen información sobre el sistema como, por ejemplo, 
+	la fecha de creación del registro o la fecha de la última modificación.
+- Nombre: Todos los registros necesitan nombres para poder distinguirlos.
+- personalizado. Cuando se crea un campo personalizado, al nombre del campo se le agrega el 
+	postfijo para identificarlo: __c.
+
+Tipos de datos:
+- Casilla: los campos de casilla son perfectos para los campos que requieren un simple 
+	"sí" o "no".
+- Date y DateTime.
+- Formula: contiene un valor que se calcula automáticamente en función de una fórmula que 
+	usted crea.
+
+Tipos de relaciones:
+- relaciones de búsqueda. Es como una relación de uno a muchos pero en si se usa cuando desde
+	un objeto queremos buscar los registros que tiene asociados.
+- relación principal-detalle. Es similar a una relación uno a uno, pero se hace mucho incapia 
+	en que el objeto detalle depende totalmente del objeto principal.
 
 organización: entornos para crear u ejecutar aplicaciones de Salesforce. Pe el trailehead
 	Playground es un tipo de organización.
@@ -14,9 +38,12 @@ Data Cloud es un motor de datos de hiperescala.
 mgranados@curious-fox-vn8yxn.com
 
 
+
 Recuperar metadatos de Salesforce en el proyecto local: Salesforce Platform proporciona la API 
 	de metadatos para ayudarle a recuperar e implementar metadatos de varios tipos entre 
 	entornos de desarrollo, de prueba y de producción. 
+
+Aplicaciones de ejemplo: github.com/trailheadapps
 
 
 //////////////////////////////
@@ -34,7 +61,7 @@ Abrir determinado Trailhead Playground: Haga clic en su fotografía de perfil en
 Ver los metadatos que definen la estructura de una aplicación: Ir a determinada app -> 
 	apartado properties -> selccionar alguna propiedad -> apartado details.
 
-Restablecer la ontraseña ra su organización de trailhead playgroud: La integración entre 
+Restablecer la contraseña para su organización de trailhead playgroud: La integración entre 
 	Trailhead y la organización de Playground hace que la contraseña predeterminada sea 
 	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de 
 	Trailhead, por ejemplo desde herramientas de desarrollador, como Salesforce CLI y
@@ -59,12 +86,18 @@ AREA DE SETUP
 Crear un objeto personalizado:  
 	- Desde un archivo csv: En la parte sup derecha buscar el logo de settings -> 
 		opción setup -> click apartado object manager -> click sobre créate ->      
-		Seleccione Custom Object from Spreadsheet -> subir Excel.                                           
+		Seleccione Custom Object from Spreadsheet -> subir Excel.    
+	- Desde la plataforma de Salesforce: En la parte sup derecha buscar el logo de 
+		settings -> opción setup -> click apartado object manager -> click sobre 			créate -> custom object -> rellenar label y plural label con el nombre
+		de interés (los campos Object Name (Nombre de objeto) y Record Name (Nombre 
+		del registro) se rellenan automáticamente.) -> save -> modificar tab style
+		al gusto -> next -> next -> save.                              
 
 Agregar un campo a determinado objeto: En la parte sup derecha buscar el logo de settings -> 
 	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
 	apartado izq field and relationships -> new -> seleccionar el tipo de dato del campo
-	-> sig -> asginar el nombre del campo y su id -> next -> next -> save.
+	-> sig -> asginar el nombre del campo, su id y su description -> opcionalmente marcar
+	si es obligatorio o no (required) -> next -> next -> save.
 
 Comprobar la creación del campo nuevo para un objeto: En App Launcher (Iniciador de aplicación) 
 	(Iniciador de 
@@ -78,9 +111,22 @@ Ver todos los registros de un objeto: Ir a inicio -> buscar y seleccionar detemr
 	- Para editar uno de los registros: se da click sobre determinado registro.
 
 Crear una aplicación a un objeto: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> buscar y seleccionar app mana ger -> new lighning app -> asignar los
+	opción setup -> buscar y seleccionar app manager -> new lighning app -> asignar los
 	metadatos de la app -> estándar -> next -> next -> seleccionar el perfil system 
 	administrator -> finish.
+
+Crear un registro: En el inicio de aplicación -> buscar determinada app -> En los apartados
+	estará determinado objeto -> new -> rellenar el registro.
+
+crear una relación de búsqueda: En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
+	click en el apartado izq fields and relationships -> new -> lookup Relanship -> next
+	-> elegir la tabla con la que se va a relacionar -> puro next.
+
+crear una relación principal - detalle: En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
+	click en el apartado izq fields and relationships -> new -> master-detail relationship
+	-> next -> elegir la tabla con la que se va a relacionar -> puro next.
 
 
 APPEXCHANGE
@@ -134,6 +180,25 @@ Crear un nuevo proyecto de Salesforce y conectarlo a su organización de Trailhe
 
 Para desarrollar con ápex, de acuerdo a la doc oficial, se recomienda tener vsc y la extensión
 Salesforce Extension Pack (expanded). *
+
+sf org login web -d -a nombreOrganizacion -> Para autenticarte en una organización de 
+	Salesforce desde el navegador y configurarla con roles especiales dentro del CLI.
+
+sf project deploy start -> Sirve para desplegar (deploy) el metadata de tu proyecto local 
+	hacia una organización de Salesforce usando Salesforce CLI.
+	Toma el contenido del proyecto Salesforce (normalmente la carpeta force-app/) y lo 
+	envía a una org destino (scratch org, sandbox o producción).
+
+.forceignore -> Para decirle a Salesforce CLI qué archivos o carpetas NO debe incluir cuando 
+	haces operaciones como deploy, retrieve o convert de metadata.
+
+sf apex generate class --name nombreClase --output-dir force-app/main/default/clases -> Para 
+	crear una clase de ápex.
+	Esto crear dos archivos: uno con extensión .cls y otro con extencion .cls-meta.xml
+	en la ruta force-app/main/default.
+
+Crear un script anonimo: es código de Apex que no se almacena en los metadatos, pero puede 	compilarse y ejecutarse.
+	Crear un archivo con extensión .apex en la carpeta: scripts/ápex
 
 *Dentro de una clase y donde se declaran atributos*
 @InvocableVariable
