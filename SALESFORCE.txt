@@ -96,8 +96,9 @@ Crear un objeto personalizado:
 		del registro) se rellenan automáticamente.) -> save -> modificar tab style
 		al gusto -> next -> next -> save.        
 		- Si se palomea la opción: 'Launch New Custom Tab Wizard after saving this 
-			custom object' significa que Salesforce automáticamente crear una 
-			pestaña (Custom Tab) para ese objeto.     
+			custom object' significa que Salesforce automáticamente creara una 
+			pestaña (Custom Tab) para ese objeto en determinadas aplicaciones que 
+			eligamos. 
 
 Agregar un campo a determinado objeto: En la parte sup derecha buscar el logo de settings -> 
 	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
@@ -134,6 +135,12 @@ crear una relación principal - detalle: En la parte sup derecha buscar el logo 
 Relacionar dos registros: En App Launcher (Iniciador de aplicación) -> buscar y seleccionar
 	sales -> buscar en los apartados a determinado objeto -> click sobre determinado
 	registro -> apartado related -> new 
+
+Activar el seguimiento de noticias en tiempo real para un objeto: En la parte sup derecha 
+	buscar el logo de settings -> en la búsqueda escribir Feed Tracking (Seguimiento de 
+	noticias en tiempo real) -> seleccionar determinado objeto -> palomear Enable Feed 
+	Tracking (Activar el seguimiento de noticias en tiempo real) -> seleccionar determinados
+	campos -> save.
 
 
 SCHEMA BUILDER
