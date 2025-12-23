@@ -49,6 +49,23 @@ Recuperar metadatos de Salesforce en el proyecto local: Salesforce Platform prop
 Aplicaciones de ejemplo: github.com/trailheadapps
 
 
+VISTAS DE LISTA
+
+Crear vistas de lista: En el Iniciador de aplicación -> encuentre y seleccione dterminada
+	aplicación -> seleccionar determinado objeto -> presionar el button en forma de 	engrane -> new -> asignar el nombre a la lista -> save.
+
+Agregar filtro: Presionar el logo de filtro -> add filter.
+
+Para cambiar los usuario que puede ver la lista: presionar el button en forma de engrane -> 
+	sharing settings -> hacer cambio -> save.
+
+personalizar una vista de lista: presionar el button en forma de engrane -> seleccionar select
+	fields to display -> seleccionar que campos estarán visibles.
+
+Crear un grafico de vista de lista: 
+
+
+
 //////////////////////////////
 
 
@@ -114,11 +131,6 @@ Comprobar la creación del campo nuevo para un objeto: En App Launcher (Iniciado
 Ver todos los registros de un objeto: Ir a inicio -> buscar y seleccionar detemrinado objeto.
 	- Para editar uno de los registros: se da click sobre determinado registro.
 
-Crear una aplicación a un objeto: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> buscar y seleccionar app manager -> new lighning app -> asignar los
-	metadatos de la app -> estándar -> next -> next -> seleccionar el perfil system 
-	administrator -> finish.
-
 Crear un registro: En el inicio de aplicación -> buscar determinada app -> En los apartados
 	estará determinado objeto -> new -> rellenar el registro.
 
@@ -141,6 +153,14 @@ Activar el seguimiento de noticias en tiempo real para un objeto: En la parte su
 	noticias en tiempo real) -> seleccionar determinado objeto -> palomear Enable Feed 
 	Tracking (Activar el seguimiento de noticias en tiempo real) -> seleccionar determinados
 	campos -> save.
+
+
+APP LIGHTNING / APP MANAGER
+
+Crear una aplicación: En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> buscar y seleccionar app manager -> new lighning app -> asignar los
+	metadatos de la app -> estándar -> next -> next -> En elememtos de navegación se
+	dben poner todos los objetos de interés para que aparezcan como apartados en esa app -> 	seleccionar el perfil system administrator -> finish.
 
 
 SCHEMA BUILDER
