@@ -179,6 +179,39 @@ Crear una aplicación: En la parte sup derecha buscar el logo de settings ->
 	metadatos de la app -> estándar -> next -> next -> En elememtos de navegación se
 	dben poner todos los objetos de interés para que aparezcan como apartados en esa app -> 	seleccionar el perfil system administrator -> finish.
 
+Crear una página de registro Lightning personalizada -----------------------------
+
+Por pagina de registro se refiere a la pagina que se abre para añadir un nuevo registro a un
+objeto.
+
+Crear una pagina personalizada: En la parte sup derecha buscar el logo de settings -> opción 
+	setup -> Object Manager -> Seleccionar determinado objeto -> apartado izq Lightning 
+	Record Pages -> new -> record page -> escribir el nombre de la pagina y el nombre de 
+	determinado objeto -> del apartado izq arrastrar 'record detail' (aquí están todos los 
+	campos) 
+	- Para poder editar los campos: Cuando este componenete este en el lienzo, si lo 
+		seleccionamos, en el lado derecho aparecerá un recuadro que contendrá un 
+		button el cual dira upgrade now, presionarlo -> seleccionar determinado layout 
+		-> finish.
+	Después de editar todo lo que se desee se dará click en save.
+
+Cambiar zoom: en la parte sup viene shrink to view cambiar a 100%.
+
+personalizar listas relacionadas: decidir cómo se muestran los registros hijos (relacionados) 	dentro de un registro padre, es decir, controlar qué información ves, cómo la ves y qué 
+	acciones puedes hacer sobre esos registros relacionados.
+	En la parte sup derecha buscar el logo de settings -> opción setup -> apartado objetc
+	manager -> seleccionar determinado objteo -> apartado izq llamado page layouts -> 	seleccionar determindo layout -> dar click sobre related lists -> arrastrar algún tipo 
+	de elemento hacia el apartado related lists.
+	Tipos de elementos relacionados:
+	- file: Asi los usuarios pueden agregar archivos a un registro y ver una lista de los 
+		archivos asociados con el registro.
+
+Activar la pagina personalizada: En la parte sup derecha buscar el logo de settings -> 
+	opción setup -> apartado home -> en el buscador escribir app builder -> dar click en 
+	edit en determinada pagina -> click en activation -> app, record type, and profile ->
+	assign to apps, recod types, and profiles -> asignar la pagina a determinada
+	application
+
 
 SCHEMA BUILDER
 
@@ -195,6 +228,8 @@ Crear un objeto utilizando esta herramienta: En la barra lateral izquierda clic 
 
 Crear campos a determinado objeto utilizando esta herramienta: En la barra lateral izquierda clic 	en la ficha Elements -> arrastrar determinar tipo de campo a determinado objeto -> 
 	introducir la info pertinente -> save.
+
+
 
 
 
