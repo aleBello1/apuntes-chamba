@@ -46,6 +46,50 @@ Recuperar metadatos de Salesforce en el proyecto local: Salesforce Platform prop
 Aplicaciones de ejemplo: github.com/trailheadapps
 
 
+BOTONES  Y VINCULOS PERSONALIZADOS
+
+botones personalizados: permiten conectar usuarios con aplicaciones externas.
+	Tipos de botones:
+	- Botón de lista: aparece en una lista relacionada en una página de registro de objeto.
+	- Botón de página de detalles: aparece en el menú de acciones del panel de aspectos 
+		destacados de una página de registro.
+
+Crear un button personalizado: En la parte superior der click en el logo de engrane -> apartado 
+	object manager -> click en determinado objeto -> en apartado izq que diga buttons,
+	links and actions -> new button or link -> asignar un nombre 
+	- button de lista.
+	- button de pagina link (para poner enlaces externos)
+	-> ingresar el link -> save y ok.
+	El button no aparecerá hasta que se agregue.
+
+Agregar el button: En la parte superior der click en el logo de engrane -> apartado 
+	object manager -> click en determinado objeto -> en apartado izq que diga page layouts
+	-> seleccionar determinado layout 
+	- Agregar un button de lista: Presionar fields -> Desplazarse entre los campos y 
+		seleccionar en determinado el símbolo de engrane -> ampliar el apartado de 
+		buttons -> pasar el tipo de button llamado Audit guidelines -> ok -> sabe.
+	- Agregar el button con enlace externo: Presionar custom links -> arrastrar determinado
+		button al apartado de custom links.
+
+Vinculos personalizado: Son enlaces con una dirección URL externa.
+	A los vínculos personalizados se les puede pasar datos en los parámetros de un enlace.
+
+
+
+
+ARCHIVOS
+
+Ver achivos cargados en determinada app: En el app lancher -> Buscar y seleccionar determinada 	app -> click sobre el apartado files.
+
+Cargar un archivo nuevo: En el app lancher -> Buscar y seleccionar determinada 	app -> click 
+	sobre el apartado files -> upload files.
+
+Compartir un archivo: En el app lancher -> Buscar y seleccionar determinada app -> click 
+	sobre el apartado files -> sobre determinado archivo presionar la flecha hacia abajo
+	-> share -> expandir sección who can Access -> créate public link -> créate.
+
+
+
 FORMATO COMPACTO
 
 Forma de definir qué campos de un registro se muestran de manera resumida en ciertas partes de la interfaz.
@@ -60,8 +104,6 @@ Crear un formato compacto para un objeto: En la parte superior der click en el l
 Establecer determinado formato compacto como el formato Compacto principal: click en el 
 	button compact layout assignment -> edit assignment -> seleccionar determinado formato
 	compacto -> sabe.
-
-
 
 
 VISTAS DE LISTA
@@ -195,6 +237,10 @@ Crear una pagina personalizada: En la parte sup derecha buscar el logo de settin
 		-> finish.
 	Después de editar todo lo que se desee se dará click en save.
 
+Lo mismo que el anterior, pero manera alternativa: Abrir determinaod objeto -> abrir un registro
+	-> En la parte sup derecha buscar el logo de settings -> edit page -> editar la pagina
+	y darle save -> not yet.
+
 Cambiar zoom: en la parte sup viene shrink to view cambiar a 100%.
 
 personalizar listas relacionadas: decidir cómo se muestran los registros hijos (relacionados) 	dentro de un registro padre, es decir, controlar qué información ves, cómo la ves y qué 
@@ -208,9 +254,13 @@ personalizar listas relacionadas: decidir cómo se muestran los registros hijos 
 
 Activar la pagina personalizada: En la parte sup derecha buscar el logo de settings -> 
 	opción setup -> apartado home -> en el buscador escribir app builder -> dar click en 
-	edit en determinada pagina -> click en activation -> app, record type, and profile ->
-	assign to apps, recod types, and profiles -> asignar la pagina a determinada
-	application
+	edit en determinada pagina -> click en activation -> Hay varias opciones. 
+	- Para que esta paginas sea por defecto para TODOS los usuarios y en TODAS las apps:
+		Assign as Org Default -> Next -> Desktop & Phone -> Save
+	- Para determinada app: App default.
+	- Para determinada app y si hay un record type especifico: app, record type, and 
+		profile -> assign to apps, recod types, and profiles -> asignar la pagina a 
+		determinada application
 
 
 SCHEMA BUILDER
