@@ -59,6 +59,8 @@ Crear un button personalizado: En la parte superior der click en el logo de engr
 	links and actions -> new button or link -> asignar un nombre 
 	- button de lista.
 	- button de pagina link (para poner enlaces externos)
+	- button de detalle. Se usa cuando se usaran los datos del registro en un enlace, sea 
+		externo o no.
 	-> ingresar el link -> save y ok.
 	El button no aparecerá hasta que se agregue.
 
@@ -70,9 +72,20 @@ Agregar el button: En la parte superior der click en el logo de engrane -> apart
 		buttons -> pasar el tipo de button llamado Audit guidelines -> ok -> sabe.
 	- Agregar el button con enlace externo: Presionar custom links -> arrastrar determinado
 		button al apartado de custom links.
+	-  Agregar un button de detalle: Presionar buttons -> arrastrar determinado button al 
+		apartado de custom buttons.
 
 Vinculos personalizado: Son enlaces con una dirección URL externa.
 	A los vínculos personalizados se les puede pasar datos en los parámetros de un enlace.
+
+Comprobar la creación de button personalizado: En app lancher buscar determinada app -> click
+	en determinado apartado (determinado objeto) -> Entrar a cualquier registro.
+	- button de lista: Presionar en apartado related: Desplazarse hasta determinado campo
+		-> ahí aparecerá con el nombre que le dimos.
+	- button con enlace externo: Presionar en apartado details -> bajar y en apartados de 
+		custom links aparecerá.
+	- button de detalle: En la parte sup derecha de la pagina -> click en la flecha hacia 
+		abajo -> nombre del button personalizado. 
 
 
 
