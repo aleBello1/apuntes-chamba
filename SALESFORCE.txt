@@ -88,6 +88,51 @@ Comprobar la creación de button personalizado: En app lancher buscar determinad
 		abajo -> nombre del button personalizado. 
 
 
+ACCIONES RAPIDAS
+
+Las acciones permiten a sus usuarios realizar tareas rápidamente, como crear registros, registrar llamadas, enviar correos electrónicos y muchas otras cosas. 
+
+Tipos:
+- Acciones específicas de objetos: permiten a los usuarios crear o actualizar registros 
+	rápidamente, registrar llamadas, enviar correos electrónicos y mucho más en el contexto
+	de un objeto concreto.
+	Tipos:
+	- créate
+	- update
+	- log a call: permiten a los usuarios introducir notas acerca de llamadas, reuniones u
+		otras interacciones relacionadas con un registro específico.
+	- Acciones que invocan componentes Lightning, flujos, páginas de Visualforce o 
+		aplicaciones de lienzo.
+	- send email.
+- acciones globales: Las acciones globales están en un formato especial propio, conocido como 
+	el formato global del publicador. No está asociado a ningún objeto y rellena el menú de 
+	acciones globales en Lightning Experience. Si un formato de página de objeto no está 
+	personalizado con acciones, las acciones de estas páginas de registro de objeto se 
+	heredan desde el formato de publicador global.
+
+Crear una acción específica de objeto: En la parte superior der click en el logo de engrane
+	-> apartado object manager -> click en determinado objeto -> apartado izq y click donde
+	diga Buttons, Links, and Actions -> new action -> seleccionar tipo de accion.
+	- créate a record.
+	-> seleccionar el objeto que ejecuta la accion -> asignarle nombre -> sabe.
+	Editor de formato de acción: personalización de los campos que los usuarios deben 
+		rellenar para completar la acción.
+		Cada campo de este formato de acción tiene un asterisco de color rojo, lo que 
+		indica que es un campo obligatorio. Los campos obligatorios se agregan a un 
+		formato de acción de forma predeterminada cuando crea la acción. Si retira un 			campo obligatorio de un formato de acción, los usuarios no pueden completar la 
+		acción correctamente.
+	La accion aun no estará disponible para los usuarios.
+
+Hacer que la accion este disponible para los usuarios: En la parte superior der click en el logo
+	de engrane -> apartado object manager -> click en determinado objeto -> apartado izq y 
+	click donde diga Page Layouts -> seleccionar determinado layout -> en este punto 
+	estaremos en formato de pagina.
+	Formato de pagina:
+	- quick actions: controla qué acciones aparecen en páginas de registros en la interfaz 
+		de usuario de Salesforce Classic.
+	- actions: controla qué acciones aparecen en páginas de registros en Lightning 
+		Experience y en la aplicación Salesforce.
+
 
 
 ARCHIVOS
@@ -192,6 +237,12 @@ Crear un objeto personalizado:
 Agregar un campo a determinado objeto: En la parte sup derecha buscar el logo de settings -> 
 	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
 	apartado izq field and relationships -> new -> seleccionar el tipo de dato del campo
+	- Formula -> Seleccione el tipo de datos que espera que devuelva su fórmula -> next
+		- botón Insert Field: abre un menú que le permite seleccionar campos para 
+			utilizar en su fórmula.
+		- botón Insert Operator: abre una lista desplegable de los operadores 
+			matemáticos y lógicos disponibles.
+		- botón Check Syntax: comprueba la sintaxis de la formula.
 	-> sig -> asginar el nombre del campo, su id y su description -> opcionalmente marcar
 	si es obligatorio o no (required) -> next -> next -> save.
 
@@ -225,6 +276,24 @@ Activar el seguimiento de noticias en tiempo real para un objeto: En la parte su
 	noticias en tiempo real) -> seleccionar determinado objeto -> palomear Enable Feed 
 	Tracking (Activar el seguimiento de noticias en tiempo real) -> seleccionar determinados
 	campos -> save.
+
+
+CAMPOS RESUMEN
+
+Mientras los campos de fórmula calculan valores con campos de un único registro, los campos de
+resumen calculan valores a partir de una serie de registros relacionados. Estos campos se usan
+en una relación uno a muchos (principal - detalle).
+Tipos de resumen:
+- count
+- sum
+- min
+- max
+
+Crear campo resumen: En la parte sup derecha buscar el logo de settings -> opción setup -> 
+	apartado object manager -> click en determinado objeto -> clic en Fields & Relationships
+	-> New -> Roll-Up Summary -> next -> asignar nombre al campo -> seleccionar el objeto 
+	que representa a muchos (en la relación uno a muchos) -> elegir el tipo de resumen y el 
+	campo sobre el que recaerá la accion -> puro next y save.
 
 
 APP LIGHTNING / APP MANAGER
