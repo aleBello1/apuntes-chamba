@@ -183,7 +183,9 @@ Crear un grafico de vista de lista:  En el Iniciador de aplicación -> encuentre
 
 
 
-FLUJOS
+FLOW BUILDER 
+
+Definiciones -------------------------------------------
 
 Salesforce Flow: todo lo que incluye Salesforce para crear, gestionar y ejecutar automatizaciones con clics en vez de código.
 
@@ -194,6 +196,20 @@ Flow Builder: La herramienta principal para crear flujos
 
 Herramientas declarativa: significa que no requiere habilidades de programación de software. 
 Flow Builder es una herramienta declarativa.
+
+Abir Flow builder: clic en App Launcher -> buscar y seleccionar Automation -> new -> 
+	La ventana New Automation (Nuevo automatización) muestra los tipos de flujo que puede
+	crear.
+
+Variables -------------------------------
+
+segúrese de usar las constantes globales True y False. De lo contrario, Flow Builder interpretará "true" y "false" como texto, y no como un valor positivo o negativo.
+
+Crear una variable: Enm el inicio de la aplicación -> buscar y seleccionar Automation -> 
+	click en el apartado flows -> new -> screen Flow -> click sobre el toolbox -> new 
+	resource -> escribir y seleccionar variable -> ingresar el nombre y description ->
+	elegir el tipo de dato. 
+	
 
 
 
