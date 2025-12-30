@@ -183,6 +183,20 @@ Crear un grafico de vista de lista:  En el Iniciador de aplicación -> encuentre
 
 
 
+FLUJOS
+
+Salesforce Flow: todo lo que incluye Salesforce para crear, gestionar y ejecutar automatizaciones con clics en vez de código.
+
+Flujo: configuración de automatización que se guarda en Salesforce con la estructura de un 
+diagrama de flujo.
+
+Flow Builder: La herramienta principal para crear flujos
+
+Herramientas declarativa: significa que no requiere habilidades de programación de software. 
+Flow Builder es una herramienta declarativa.
+
+
+
 //////////////////////////////
 
 
@@ -294,6 +308,21 @@ Crear campo resumen: En la parte sup derecha buscar el logo de settings -> opci�
 	-> New -> Roll-Up Summary -> next -> asignar nombre al campo -> seleccionar el objeto 
 	que representa a muchos (en la relación uno a muchos) -> elegir el tipo de resumen y el 
 	campo sobre el que recaerá la accion -> puro next y save.
+
+
+REGLAS DE VALIDACION
+
+verifican que los datos introducidos por usuarios en registros cumplen 
+los estándares que especifica antes de poder guardarlos. Una regla de validación puede contener 
+una fórmula o expresión que evalúa los datos en uno o más campos y ofrece un valor true o false.
+Las reglas de validación también pueden incluir mensajes de error para mostrar a los usuarios cuando introducen valores no válidos basándose en criterios específicos.
+Puede crear reglas de validación para objetos, campos, miembros de campaña o eventos clave de casos.
+
+Crear regla de validación para un campo especifico: En la parte sup derecha buscar el logo de 
+	settings -> opción setup -> apardato object manager -> click en determinado objeto
+	-> apartado izq que diga validation rules -> new  -> asginar nombre a la regla, la 
+	formula que si se rompe se lanza el mensaje, el mensaje de error -> save. 	
+
 
 
 APP LIGHTNING / APP MANAGER
@@ -459,6 +488,7 @@ PROBLEMAS
 
 No fue posible conectar vsc con algún respositorio porque de acuerdo a las instrucciónes al hacer
 ctrl shift p no aparece la opción: SFDX: Authorize an Org
+
 
 
 
