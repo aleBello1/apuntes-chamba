@@ -201,17 +201,22 @@ Abir Flow builder: clic en App Launcher -> buscar y seleccionar Automation -> ne
 	La ventana New Automation (Nuevo automatización) muestra los tipos de flujo que puede
 	crear.
 
-Variables -------------------------------
 
-segúrese de usar las constantes globales True y False. De lo contrario, Flow Builder interpretará "true" y "false" como texto, y no como un valor positivo o negativo.
+Creación de variables, constantes, formulas, etc -------------------------------
 
-Crear una variable: Enm el inicio de la aplicación -> buscar y seleccionar Automation -> 
-	click en el apartado flows -> new -> screen Flow -> click sobre el toolbox -> new 
-	resource -> escribir y seleccionar variable -> ingresar el nombre y description ->
-	elegir el tipo de dato. 
+Asegúrese de usar las constantes globales True y False. De lo contrario, Flow Builder interpretará "true" y "false" como texto, y no como un valor positivo o negativo.
+
+Crear un flujo de pantalla: En la parte sup derecha buscar el logo de settings -> opción setup
+	-> en el buscador escribir y seleccionar 'flows' -> new flows -> screen Flow.
+
+Crear un recurso: *Se debe estar en un flujo de pantalla* -> click sobre el toolbox -> new 
+	resource -> seleccionar tipo de recurso:
+	- variable -> ingresar el nombre y description -> elegir el tipo de dato. 
+	- constante
+	- formula
 	
 
-
+ 
 
 //////////////////////////////
 
