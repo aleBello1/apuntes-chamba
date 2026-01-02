@@ -1,8 +1,11 @@
+mgranados@curious-fox-vn8yxn.com
+
+
 ////////////////////////////////////GLOSARIO/////////////////////////////////////////
 
 Aplicación: conjunto de objetos, campos y otras funciones para cubrir un proceso empresarial.
 
-organización: entornos para crear u ejecutar aplicaciones de Salesforce. Pe el trailehead
+organización: entornos para crear y ejecutar aplicaciones de Salesforce. Pe el trailehead
 	Playground es un tipo de organización.
 
 Trailhead Playground: Entorno seguro donde puede practicar las habilidades que está adquiriendo antes de aplicarlas en su trabajo real.
@@ -37,13 +40,28 @@ ficha personalizada: Permite que se pueda agregar un objeto personalizado a una 
 
 Data Cloud es un motor de datos de hiperescala.
 
-mgranados@curious-fox-vn8yxn.com
-
 Recuperar metadatos de Salesforce en el proyecto local: Salesforce Platform proporciona la API 
 	de metadatos para ayudarle a recuperar e implementar metadatos de varios tipos entre 
 	entornos de desarrollo, de prueba y de producción. 
 
 Aplicaciones de ejemplo: github.com/trailheadapps
+
+
+////////////////////////////////////SALESFORCE/////////////////////////////////////////
+
+BASICOS
+
+Crear nuevo Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
+	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas) ->
+	clic en Create Playground (Crear Playground). El Playground puede tardar unos minutos
+	en crearse.
+
+Abrir determinado Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
+	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas)
+	-> iniciar.
+
+Ver los metadatos que definen la estructura de una aplicación: Ir a determinada app -> 
+	apartado properties -> selccionar alguna propiedad -> apartado details.
 
 
 BOTONES  Y VINCULOS PERSONALIZADOS
@@ -166,8 +184,8 @@ Establecer determinado formato compacto como el formato Compacto principal: clic
 
 VISTAS DE LISTA
 
-Crear vistas de lista: En el Iniciador de aplicación -> encuentre y seleccione dterminada
-	aplicación -> seleccionar determinado objeto -> presionar el button en forma de 	engrane -> new -> asignar el nombre a la lista -> save.
+Crear vistas de lista: En el Iniciador de aplicación -> encuentre y seleccione determinado
+	objeto -> seleccionar determinado objeto -> presionar el button en forma de 	engrane -> new -> asignar el nombre a la lista -> save.
 
 Agregar filtro: Presionar el logo de filtro -> add filter.
 
@@ -216,49 +234,14 @@ Crear un recurso: *Se debe estar en un flujo de pantalla* -> click sobre el tool
 	- formula
 	
 
- 
-
-//////////////////////////////
-
-
-Crear nuevo Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
-	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas) ->
-	clic en Create Playground (Crear Playground). El Playground puede tardar unos minutos
-	en crearse.
-
-Abrir determinado Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
-	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas)
-	-> iniciar.
-
-Ver los metadatos que definen la estructura de una aplicación: Ir a determinada app -> 
-	apartado properties -> selccionar alguna propiedad -> apartado details.
-
-Restablecer la contraseña para su organización de trailhead playgroud: La integración entre 
-	Trailhead y la organización de Playground hace que la contraseña predeterminada sea 
-	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de 
-	Trailhead, por ejemplo desde herramientas de desarrollador, como Salesforce CLI y
-	VS Code.
-	Clic en Iniciador de aplicación para iniciar App Launcher -> busque y haga clic en 
-	Playground Starter -> click en apartado get your login credentials -> reset my password.
-
-
-
-COMMAND LINE INTERFACE (CLI)
-
-puede crear entornos para desarrollos y pruebas de forma sencilla. Además, Salesforce CLI tiene comandos para sincronizar código fuente entre sus organizaciones y sistemas de control de versiones, y ejecutar pruebas de unidades.
-
-Instalar la Command Line Interface: 
-	Descargar: 	https://developer.salesforce.com/tools/salesforcecli
-	sf update -> Verificar que CLI esta instalada.
-
-
-
 AREA DE SETUP
 
 Crear un objeto personalizado:  
 	- Desde un archivo csv: En la parte sup derecha buscar el logo de settings -> 
 		opción setup -> click apartado object manager -> click sobre créate ->      
-		Seleccione Custom Object from Spreadsheet -> subir Excel.    
+		Seleccione Custom Object from Spreadsheet -> subir Excel.   
+		Muy probablemente nos pedirá el usuario y contraseña de ese playground****, 
+		el cual son credenciales distintas a las de Salesforce. 
 	- Desde la plataforma de Salesforce: En la parte sup derecha buscar el logo de 
 		settings -> opción setup -> click apartado object manager -> click sobre 			créate -> custom object -> rellenar label y plural label con el nombre
 		de interés (los campos Object Name (Nombre de objeto) y Record Name (Nombre 
@@ -345,13 +328,13 @@ Crear regla de validación para un campo especifico: En la parte sup derecha bus
 	formula que si se rompe se lanza el mensaje, el mensaje de error -> save. 	
 
 
-
 APP LIGHTNING / APP MANAGER
 
 Crear una aplicación: En la parte sup derecha buscar el logo de settings -> 
 	opción setup -> buscar y seleccionar app manager -> new lighning app -> asignar los
 	metadatos de la app -> estándar -> next -> next -> En elememtos de navegación se
-	dben poner todos los objetos de interés para que aparezcan como apartados en esa app -> 	seleccionar el perfil system administrator -> finish.
+	dben poner todos los objetos de interés que se desea que aparezcan como apartado en 
+	esa app -> seleccionar el perfil system administrator -> finish.
 
 Crear una página de registro Lightning personalizada -----------------------------
 
@@ -412,9 +395,6 @@ Crear campos a determinado objeto utilizando esta herramienta: En la barra later
 	introducir la info pertinente -> save.
 
 
-
-
-
 APPEXCHANGE
 
 Las aplicaciones de Salesforce Labs son gratuitas y son de código abierto. Puede personalizarlas según necesite y mirar bajo el capó para ver cómo funcionan.
@@ -425,6 +405,62 @@ Buscar aplicación recién instalada:  En la parte sup derecha buscar el logo de
 	opción setup -> busque y seleccione Installed Packages (Paquetes instalados) ->
 	clic en el nombre del paquete que ha instalado. Será el mismo del de la página de 
 	descarga de AppExchange -> clic en View Component
+
+ 
+
+/////////////////////////////////////////DESARROLLO/////////////////////////////////////////
+
+Para desarrollar aplicaciones en Salesforce, necesita las siguientes herramientas.
+1. Un entorno de desarrollo de Salesforce, también llamado organización.
+2. La interfaz de línea de comandos (CLI) de Salesforce para gestionar el ciclo de vida del desarrollo de la aplicación.
+3. Visual Studio Code (VS Code) instalado
+
+
+COMMAND LINE INTERFACE (CLI)
+
+Es la herramienta de línea de comando para trabajar con Salesforce Platform. 
+puede crear entornos para desarrollos y pruebas de forma sencilla. Además, Salesforce CLI tiene comandos para sincronizar código fuente entre sus organizaciones y sistemas de control de versiones, y ejecutar pruebas de unidades.
+
+Instalar la Command Line Interface: 
+	Descargar: 	https://developer.salesforce.com/tools/salesforcecli
+
+sf --versión -> Versifica que el cli esta instalado.
+
+sf update -> Actualizo todo lo relacionado a Salesforce
+
+Crear un nuevo proyecto de Salesforce (desde VS Code): *En vsc* ->  Ctrl + Shift + P -> escribir 	'SFDX: Create Project with Manifest' -> estándar -> Asigna un nombre al proyecto ->
+	Seleccione una carpeta en su dispositivo para guardar el proyecto.
+
+Autorizar determinado playgroud desde cli: Usamos el comando: sf org login web -> Después nos
+	pedirá ingresar un usuario y contraseña. Este usuario y contraseña deben ser los que 	específicamente se crean por si solos, los cuales son diferentes a las credenciales que 
+	usarmos para iniciar sesión en Salesforce.
+	Para determinar el usuiairo y contraseña de un playground deberemos restablecer la 
+	contraseña de determinado playground.
+
+Restablecer la contraseña para su organización de trailhead playgroud: La integración entre 
+	Trailhead y la organización de Playground hace que la contraseña predeterminada sea 
+	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de 
+	Trailhead, por ejemplo desde herramientas de desarrollador, como Salesforce CLI y
+	VS Code.
+	Clic en Iniciador de aplicación para iniciar App Launcher -> buscar y hacer clic en 
+	Playground Starter -> click en apartado get your login credentials -> en esta parte
+	aparecerá un correo, el cual deberemos tomar (este vendrá a ser el ussername que 
+	utilizaremos en próximos comandos) -> después presionar reset my password.
+
+sf org list -> Muestra todas las organizaciones de Salesforce que tienes autorizadas en tu 
+	Salesforce CLI.
+	También mostrara cual playground tenemos seleccionado por defecto.
+
+sf org open -> Abre la organización por defecto.
+	- sf org open -o [nombreAlias/username] -> Abre determinada organización.
+
+sf config set target-org=[username] --global -> Define cuál organización de Salesforce usará la 	CLI por defecto, a nivel global, cuando no se especifique otra.
+
+
+	
+
+
+
 
 
 /////////////////////////////////DESARROLLO SIN CODIGO//////////////////////////////////
