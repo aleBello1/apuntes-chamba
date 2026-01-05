@@ -1,6 +1,7 @@
 mgranados@curious-fox-vn8yxn.com
 
 
+
 ////////////////////////////////////GLOSARIO/////////////////////////////////////////
 
 Aplicación: conjunto de objetos, campos y otras funciones para cubrir un proceso empresarial.
@@ -428,6 +429,9 @@ sf --versión -> Versifica que el cli esta instalado.
 
 sf update -> Actualizo todo lo relacionado a Salesforce
 
+
+Conectar un playground con el local ---------------------------
+
 Crear un nuevo proyecto de Salesforce (desde VS Code): *En vsc* ->  Ctrl + Shift + P -> escribir 	'SFDX: Create Project with Manifest' -> estándar -> Asigna un nombre al proyecto ->
 	Seleccione una carpeta en su dispositivo para guardar el proyecto.
 
@@ -454,27 +458,30 @@ sf org list -> Muestra todas las organizaciones de Salesforce que tienes autoriz
 sf org open -> Abre la organización por defecto.
 	- sf org open -o [nombreAlias/username] -> Abre determinada organización.
 
-sf config set target-org=[username] --global -> Define cuál organización de Salesforce usará la 	CLI por defecto, a nivel global, cuando no se especifique otra.
+sf config set target-org=[username] -> Define cuál organización de Salesforce usará la CLI por 
+	defecto, a nivel global, cuando no se especifique otra.
 
-
+*Dentro de la carpeta que representa a un proyecto*
+sf project retrieve start -x manifest/package.xml -> Para traer (recuperar) metadatos desde tu 
+	org de Salesforce
+	Todo lo que se recupera se guarda en: force-app/main/default/.
+		- Reglas de validación: objects/Contact/validationRules/
+		- flows/
+		- layouts/
+		- objects
+	El archivo package.xml es un archivo que existe en nombreProyecto/manifest/package.xml.
+	En el archivo package.xml se debe especificar que se quiere descargar, se debe agregar 
+	asi: 
+		<types>
+                  <members>*</members>
+                  <name>tipoObjeto</name>
+    		</types>
+	Donde el tipo objeto seria los flows, objetos, etc.
 	
 
 
 
 
-
-/////////////////////////////////DESARROLLO SIN CODIGO//////////////////////////////////
-
-LIGHNING APP BUILDER
-
-Sirve para crear elementos visuales en una pagina, esta herramientas es muy similar a lo que 
-haría un desarrollador front end.
-
-Crear elementos visuales en determinada pagina: En la parte sup derecha buscar el logo de 	settings -> opción setup -> buscar y seleccionar lighning app builder -> darle click 
-	en edit sobre determinada pagina.
-
-
-/////////////////////////////////DESARROLLO CON CODIGO//////////////////////////////////
 
 A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de programación que puede usar, por ejemplo:
 	- El marco Lightning Web Components: un marco de trabajo de desarrollo de interfaz 
@@ -495,21 +502,10 @@ Code builder: entorno de desarrollo integrado de preferencia de Salesforce que p
 APEX
 
 lenguaje de programación orientado a los objetos y con parámetros de asignación rigurosa que permite a los desarrolladores de Salesforce agregar lógica empresarial a eventos del sistema, como clics de botón y actualizaciones, a los registros relacionados.
-
-Crear un nuevo proyecto de Salesforce y conectarlo a su organización de Trailhead Playground:
-	*En vsc* ctrol + shift + p -> buscar y seleccionar SFDX: Create Project -> standard
-	-> ingresar el nombre del proyecto -> ingresar la carpeta donde se estará el proeycto..
-
-Para desarrollar con ápex, de acuerdo a la doc oficial, se recomienda tener vsc y la extensión
-Salesforce Extension Pack (expanded). *
-
-sf org login web -d -a nombreOrganizacion -> Para autenticarte en una organización de 
-	Salesforce desde el navegador y configurarla con roles especiales dentro del CLI.
-
-sf project deploy start -> Sirve para desplegar (deploy) el metadata de tu proyecto local 
-	hacia una organización de Salesforce usando Salesforce CLI.
-	Toma el contenido del proyecto Salesforce (normalmente la carpeta force-app/) y lo 
-	envía a una org destino (scratch org, sandbox o producción).
+Características: 
+- Alojamiento: Apex se guarda, compila y ejecuta en el servidor Salesforce Platform.
+- Orientación a objetos: Apex admite clases, interfaces y elementos heredados.
+- Pruebas sencillas: Apex ofrece compatibilidad integrada para la creación de pruebas de unidades, la ejecución y la cobertura de código.
 
 .forceignore -> Para decirle a Salesforce CLI qué archivos o carpetas NO debe incluir cuando 
 	haces operaciones como deploy, retrieve o convert de metadata.
@@ -532,6 +528,25 @@ public static tipoDato nombreMetodo() {} -> Para que el método pueda invocarse 
 	acción en el flujo.
 
 
+Guardar una clase de ápex: En la parte sup derecha buscar el logo de settings -> opción developer
+	console -> Es esta ventana presionar el menú file -> new -> ápex class -> escribir
+	el nombre de la clase -> Escribir el código y guardar el archivo.
+
+Ejecutar código Apex anónimo: permite ejecutar código de ápex.
+	En Developer Console, clic en Debug -> Open Execute Anonymous Window -> execute.
+
+Registros de depuración: Al ejecutar métodos de Apex, las llamadas se incluyen en el registro de
+	 depuración. Puede escribir sus propios mensajes de depuración en el registro, lo que 
+	facilita la depuración del código en caso de errores. 
+
+System.debug() -> Para escribir mensajes en el registro.
+	Para ver específicamente estos mensajes en la developer console: En la parte inf de la
+	pantalla -> click en el apartado logs -> doble click en el registro de interés -> 
+	palomear la opción debug only. **
+	
+
+
+
 NODEJS
 
 Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha diseñado para 
@@ -540,11 +555,100 @@ desarrollar aplicaciones de red ampliables.
 force:project:create -> Para crear un proyecto nuevo.
 
 
+TIPOS DE DATOS 
 
-PROBLEMAS
+Primitivo (por ejemplo, Integer, Double, Long, Date, Datetime, String, ID y Boolean entre otros).
+Lista tipificada de valores, llamada también enumeración.
+Clases de Apex definidas por el usuario.
+Clases de Apex suministradas por el sistema.
 
-No fue posible conectar vsc con algún respositorio porque de acuerdo a las instrucciónes al hacer
-ctrl shift p no aparece la opción: SFDX: Authorize an Org
+sObject ---------------------------------
+
+Cada registro de Salesforce se representa de forma nativa como un sObject en Apex.
+Si se recuperan registros persistentes de Salesforce, estos se almacenan en una variable de sObject.
+
+NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(); -> Para crear un sObject, debe 
+	declarar una variable y asignarle una instancia de sObject. 
+	Por objeto x nos referimos a un objeto en la gui de Salesforce.
+
+NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(NombreCampo1=valor1, 
+	NombreCampo2=valor2, NombreCampoN=valorN); -> Para crear un sObject y asignarle valores 
+		a sus campos.
+
+nombreVariableObjetoX.nombreCampoY=valorY;  -> Forma alternativa de agregar un valor a 
+	determinado campo de un registro.  
+
+sObject objetoGenerico -> Manera de crear un objeto genérico. 
+	El sObject es el tipo de dato mas genérico que hay.
+
+
+DML
+
+Si una operación DML genera un error, devuelve una excepción del tipo DmlExceptionCopiar. Puede 
+capturar las excepciones del código para controlar los errores.
+
+insert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro.
+
+update nombreVariableObjetoX/nombreListaX; -> Para actualizar un registro.
+
+upsert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro o para actualiarlo.
+	- upsert nombreVariableObjetoX/nombreListaX NombreObjetoX.fields.nombreCampoY; -> Para 
+		hacer un upsert usando como criterio el campo Ye, este campo consideramos que 
+		posee valores únicos pe un email. Entonces si el valor asociado al campo ye
+		para el objeto nombreVariableObjetoX existe hará un update pero si no hará
+		un insert.
+
+delete nombreVariableObjetoX/nombreListaX; -> Para eliminar un registro.
+	Caudno se eliminan lso registros se van a la papelera y cuando pasan 15 dias se eliminan
+	permanentemente.
+
+undelete nombreVariableObjetoX/nombreListaX; -> Para restaurar un registro.
+
+
+Metodos de base de datos ----------------------------
+
+A grandez rasgos sirven para lo mismo que los métodos dml.
+Pero la diferencia es que estos métodos sí se aplican a una lista devolverá una lista de
+objetos que contienen información de validez o error para cada registro.
+
+Database.SaveResult[] results = Database.insert(recordList, allOrNone);
+	Las operaciones de inserción y actualización devuelven en cada caso un conjunto de 
+	objetos Database.SaveResult.
+	- allOrNone: Es un booleano que por defecto vale true pero si vale false significa 
+		la operación debe ser correcta parcialmente, si vale true significa que el 
+		método de base de datos se comporta como su homólogo de declaración DML y 
+		producirá una excepción si se detecta un error.
+
+La alteración devuelve objetos Database.UpsertResultCopiar y la eliminación devuelve objetos Database.DeleteResult
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////DESARROLLO SIN CODIGO//////////////////////////////////
+
+LIGHNING APP BUILDER
+
+Sirve para crear elementos visuales en una pagina, esta herramientas es muy similar a lo que 
+haría un desarrollador front end.
+
+Crear elementos visuales en determinada pagina: En la parte sup derecha buscar el logo de 	settings -> opción setup -> buscar y seleccionar lighning app builder -> darle click 
+	en edit sobre determinada pagina.
+
+
+
+
+
+
 
 
 
