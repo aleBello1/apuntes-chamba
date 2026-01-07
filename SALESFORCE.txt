@@ -32,6 +32,7 @@ Tipos de datos:
 	usted crea.
 
 Tipos de relaciones:
+Los nombres de relaciones personalizadas terminan por el sufijo __r. 
 - relaciones de búsqueda. Es como una relación de uno a muchos pero en si se usa cuando desde
 	un objeto queremos buscar los registros que tiene asociados.
 - relación principal-detalle. Es similar a una relación uno a uno, pero se hace mucho incapia 
@@ -614,12 +615,72 @@ objetos que contienen información de validez o error para cada registro.
 Database.SaveResult[] results = Database.insert(recordList, allOrNone);
 	Las operaciones de inserción y actualización devuelven en cada caso un conjunto de 
 	objetos Database.SaveResult.
-	- allOrNone: Es un booleano que por defecto vale true pero si vale false significa 
-		la operación debe ser correcta parcialmente, si vale true significa que el 
-		método de base de datos se comporta como su homólogo de declaración DML y 
-		producirá una excepción si se detecta un error.
+	- allOrNone: Es un booleano que por defecto vale true.
+		si vale true significa que el método de base de datos se comporta como su 			homólogo de declaración DML y producirá una excepción si se detecta un error.
+		Si vale false significa algunos de los elementos puede fallar, y se devolverá
+		un arreglo de objetos que contiene si el elemento fallo o no.
+		- elemento.isSuccess -> Si se ocupa false, se ocupa esta forma para saber si 
+			un elemento fallo o no.
 
-La alteración devuelve objetos Database.UpsertResultCopiar y la eliminación devuelve objetos Database.DeleteResult
+La alteración devuelve objetos Database.UpsertResult y la eliminación devuelve objetos Database.DeleteResult.
+
+Registros relacionados ---------------------------------------
+
+Puede insertar registros relacionados con los registros existentes si ya se ha definido una relación entre los dos objetos
+Ejemplo: Se crea un nuevo objeto one y se inserta, se obtiene su id y se crea un nuevo objeto
+many, a este objeto many se le setea el id el objeto one, finalmente se inserta el objeto
+many y se crea la relación. Evidentemtne debe existir la relación de búsqueda entre la tabla 
+one y la tabla many.
+
+Si se quiere hacer un update del objeto many, se debe actualizar el objeto many y también
+el objeto one pero desde el objeto many. ***
+	update objetoMany;  //Con lo valores ya cambiados
+	update objetoMany.ClaseOne; 
+
+La operación delete admite eliminaciones en cascada. Si elimina un objeto principal, elimina también automáticamente los secundarios siempre que cada registro secundario se pueda eliminar
+
+
+SALESFORE OBJET QUERY LANGUAGE (SOQL)
+
+Es similar al lenguaje SQL estándar, pero se ha personalizado para Salesforce Platform.
+
+Para incluir consultas SOQL en su código Apex, incluya la instrucción SOQL entre corchetes y asigne el valor devuelto a un conjunto de sObjects.
+Por ejemplo:
+	Account[] accts = [SELECT Name,Phone FROM Account];
+
+Developer Console incluye una consola de editor de consultas, la cual permite ejecutar sus consultas SOQL y ver los resultados.
+El editor de consultas es un método rápido para inspeccionar la base de datos. Además, es una buena forma de probar sus consultas SOQL antes de agregarlas al código Apex. Cando utilice el editor de consultas, debe proporcionar únicamente la instrucción SOQL sin el código de Apex que la rodea.
+
+Abrir el editor de consultas: *En developer console* -> En la parte inf de la ventana click 
+	sobre el apartado query editor -> en el primer cuadro de esa pestaña se escriben las 
+	consultas y hasta abajo viene el button de execute.
+
+A diferencia de otros lenguajes SQL, no puede especificar * para recuperar todos los campos en un
+objeto. En su lugar, utilice la palabra clave FIELDS() para recuperar todos los campos estándar 
+(FIELDS(STANDARD)), todos los campos personalizados (FIELDS(CUSTOM)) o todos los campos 
+(FIELDS(ALL)) en un objeto. 
+
+Para inyectar dinamicamente el valor de una variable en una consulta se ocupan los dos puntos.
+Ejemplo:
+	String targetDepartment = 'Wingo';
+	Contact[] techContacts = [SELECT FirstName,LastName
+                          FROM Contact WHERE Department=:targetDepartment];
+	
+Manera de obtner todos los registros muchos que tiene un registro one:
+	TablaOne[] objetosOne = [SELECT (SELECT * FROM TablaMany)
+                               FROM TablaOne];
+	TablaMany[] objetosMany = objetosOne.TablaMany;
+
+Manera de obtener el objeto one al que esta asociado un objeto many:
+	TablaMany[] objetoMany = [SELECT Account.Name FROM TablaMany
+                 WHERE FirstName = 'Carol' AND LastName='Ruiz'];
+	TablaOne objetoOne = objetoMany.TablaOne;
+
+
+
+
+
+
 
 
 
