@@ -716,6 +716,14 @@ RETURNING Objeto1(Campo11, Campo12, Campo1N),
 			   NombreTablaObjeto1[] subLista1 = (NombreTablaObjeto1[])searchList[0];
 		 	   NombreTablaObjeto2[] subLista2 = (NombreTablaObjeto2[])searchList[1];
 			  NombreTablaObjetoM[] subListaM = (NombreTablaObjetoM[])searchList[M-1];
+			Tabmein al indicar un objeto, se puede colocar condiciones, 
+			ordenaciones y/o limitar el nuemro de registros. **
+			Por ejemplo: 
+				RETURNING Account(Name, Industry WHERE Industry='Apparel')
+				RETURNING Account(Name, Industry ORDER BY Name)
+				RETURNING Account(Name, Industry LIMIT 10)
+			Manera de recibir la lista de listas:
+				List<List<sObject>> searchList = [*consulta*];
 		- En in se indica: EN QUÉ CAMPOS Salesforce va a buscar el texto.
 			- IN ALL FIELDS -> Busca el texto en todos los campos.
 			- IN NAME FIELDS -> Busca el texto en campos que contengan nombres.
@@ -726,16 +734,6 @@ RETURNING Objeto1(Campo11, Campo12, Campo1N),
 			a buscar.
 
 		
-
-
-
-
-
-
-
-
-
-
 
 
 
