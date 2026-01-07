@@ -676,6 +676,58 @@ Manera de obtener el objeto one al que esta asociado un objeto many:
                  WHERE FirstName = 'Carol' AND LastName='Ruiz'];
 	TablaOne objetoOne = objetoMany.TablaOne;
 
+Al iterar una consulta con un for en Apex, Salesforce agrupa los resultados en arreglos de hasta 200 registros. El ciclo se ejecuta una vez por cada grupo. Entonces de la siguiente consulta si 
+tiene 3 registros solo habrá un grupo pero si hay 210 registros habrá dos grupos. 
+for (Account[] tmp : [SELECT Id FROM Account WHERE Name LIKE 'for loop _']) {
+    j = tmp.size();
+    i++;
+}
+
+
+SALESFORCE OBJECT SEARCH LANGUAGE (SOSL)
+
+Es un lenguaje de búsqueda de Salesforce usado para realizar búsquedas de texto en multiples
+campos de multiples tablas.
+
+Usa SOSL cuando:
+No sabes en qué objeto está el dato
+Necesitas buscar un texto (por ejemplo un nombre, email o palabra clave)
+Quieres buscar en varios objetos a la vez
+Buscas coincidencias parciales (texto libre)
+
+Ejemplo de consulta SOSL en el que se buscan cuentas y contactos que tengan campos con la palabra 'SFDC'.
+List<List<SObject>> searchList = [FIND 'SFDC' IN ALL FIELDS
+                                      RETURNING Account(Name), Contact(FirstName,LastName)];
+
+La consulta de búsqueda en el editor de consultasse debe incluir entre corchetes ({SFDC}). Por 
+el contrario, la consulta de búsqueda en Apex se incluye entre comillas simples ('SFDC').***
+
+Sintaxis:
+FIND 'texto a buscar'
+IN ALL FIELDS
+RETURNING Objeto1(Campo11, Campo12, Campo1N),
+          Objeto2(Campo21, Campo22, Campo2N),
+	  ObjetoM(CampoM1, CampoMK2, CampoMN) -> 
+		- En returning se indica: Qué objetos quieres que Salesforce revise y Qué 
+			campos quieres que te regrese si encuentra coincidencias.
+			La búsqueda retorna una lista de listas, Por cada objeto que se
+			seleccione se tiene una lista (entonces la subLista 1 es de objetos de
+			tipo 1, la subLista2 es de objetos de tipo 2 y asi sucesivamente).
+			   NombreTablaObjeto1[] subLista1 = (NombreTablaObjeto1[])searchList[0];
+		 	   NombreTablaObjeto2[] subLista2 = (NombreTablaObjeto2[])searchList[1];
+			  NombreTablaObjetoM[] subListaM = (NombreTablaObjetoM[])searchList[M-1];
+		- En in se indica: EN QUÉ CAMPOS Salesforce va a buscar el texto.
+			- IN ALL FIELDS -> Busca el texto en todos los campos.
+			- IN NAME FIELDS -> Busca el texto en campos que contengan nombres.
+			- IN EMAIL FIELDS -> Busca el texto en campos que contengan emails.
+			- IN PHONE FIELDS -> Busca el texto en campos que contengan números
+				telefonicos.
+		- FIND :nombreVariable -> Para inyectar dinámicamente una variable en el texto
+			a buscar.
+
+		
+
+
 
 
 
