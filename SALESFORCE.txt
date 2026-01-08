@@ -7,44 +7,44 @@ mgranados@curious-fox-vn8yxn.com
 Aplicación: conjunto de objetos, campos y otras funciones para cubrir un proceso empresarial.
 
 organización: entornos para crear y ejecutar aplicaciones de Salesforce. Pe el trailehead
-	Playground es un tipo de organización.
+ 	Playground es un tipo de organización.
 
 Trailhead Playground: Entorno seguro donde puede practicar las habilidades que está adquiriendo antes de aplicarlas en su trabajo real.
 
 Objetos: son tablas en la base de datos de Salesforce que almacenan un tipo de información en particular.
-	Tipos de objetos:
-	- Objetos estándar: son objetos que están incluidos en Salesforce. 
-	- Objetos personalizados son objetos que se crean para almacenar información 
-		 específica de su empresa o sector.
+ 	Tipos de objetos:
+ 	- Objetos estándar: son objetos que están incluidos en Salesforce.
+ 	- Objetos personalizados son objetos que se crean para almacenar información
+ 		 específica de su empresa o sector.
 
 Tipos de campo:
-- Sistema: campos de solo lectura que ofrecen información sobre el sistema como, por ejemplo, 
-	la fecha de creación del registro o la fecha de la última modificación.
+- Sistema: campos de solo lectura que ofrecen información sobre el sistema como, por ejemplo,
+ 	la fecha de creación del registro o la fecha de la última modificación.
 - Nombre: Todos los registros necesitan nombres para poder distinguirlos.
-- personalizado. Cuando se crea un campo personalizado, al nombre del campo se le agrega el 
-	postfijo para identificarlo: __c.
+- personalizado. Cuando se crea un campo personalizado, al nombre del campo se le agrega el
+ 	postfijo para identificarlo: __c.
 
 Tipos de datos:
-- Casilla: los campos de casilla son perfectos para los campos que requieren un simple 
-	"sí" o "no".
+- Casilla: los campos de casilla son perfectos para los campos que requieren un simple
+ 	"sí" o "no".
 - Date y DateTime.
-- Formula: contiene un valor que se calcula automáticamente en función de una fórmula que 
-	usted crea.
+- Formula: contiene un valor que se calcula automáticamente en función de una fórmula que
+ 	usted crea.
 
 Tipos de relaciones:
-Los nombres de relaciones personalizadas terminan por el sufijo __r. 
+Los nombres de relaciones personalizadas terminan por el sufijo __r.
 - relaciones de búsqueda. Es como una relación de uno a muchos pero en si se usa cuando desde
-	un objeto queremos buscar los registros que tiene asociados.
-- relación principal-detalle. Es similar a una relación uno a uno, pero se hace mucho incapia 
-	en que el objeto detalle depende totalmente del objeto principal.
+ 	un objeto queremos buscar los registros que tiene asociados.
+- relación principal-detalle. Es similar a una relación uno a uno, pero se hace mucho incapia
+ 	en que el objeto detalle depende totalmente del objeto principal.
 
 ficha personalizada: Permite que se pueda agregar un objeto personalizado a una aplicación.
 
 Data Cloud es un motor de datos de hiperescala.
 
-Recuperar metadatos de Salesforce en el proyecto local: Salesforce Platform proporciona la API 
-	de metadatos para ayudarle a recuperar e implementar metadatos de varios tipos entre 
-	entornos de desarrollo, de prueba y de producción. 
+Recuperar metadatos de Salesforce en el proyecto local: Salesforce Platform proporciona la API
+ 	de metadatos para ayudarle a recuperar e implementar metadatos de varios tipos entre
+ 	entornos de desarrollo, de prueba y de producción.
 
 Aplicaciones de ejemplo: github.com/trailheadapps
 
@@ -53,105 +53,113 @@ Aplicaciones de ejemplo: github.com/trailheadapps
 
 BASICOS
 
-Crear nuevo Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
-	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas) ->
-	clic en Create Playground (Crear Playground). El Playground puede tardar unos minutos
-	en crearse.
+Crear nuevo Trailhead Playground: Haga clic en su fotografía de perfil en la esquina
+ 	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas) ->
+ 	clic en Create Playground (Crear Playground). El Playground puede tardar unos minutos
+ 	en crearse.
 
-Abrir determinado Trailhead Playground: Haga clic en su fotografía de perfil en la esquina 
-	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas)
-	-> iniciar.
+Abrir determinado Trailhead Playground: Haga clic en su fotografía de perfil en la esquina
+ 	superior derecha de Trailhead -> clic en Hands-On Orgs (Organizaciones prácticas)
+ 	-> iniciar.
 
-Ver los metadatos que definen la estructura de una aplicación: Ir a determinada app -> 
-	apartado properties -> selccionar alguna propiedad -> apartado details.
+Ver los metadatos que definen la estructura de una aplicación: Ir a determinada app ->
+ 	apartado properties -> selccionar alguna propiedad -> apartado details.
 
 
 BOTONES  Y VINCULOS PERSONALIZADOS
 
 botones personalizados: permiten conectar usuarios con aplicaciones externas.
-	Tipos de botones:
-	- Botón de lista: aparece en una lista relacionada en una página de registro de objeto.
-	- Botón de página de detalles: aparece en el menú de acciones del panel de aspectos 
-		destacados de una página de registro.
+ 	Tipos de botones:
+ 	- Botón de lista: aparece en una lista relacionada en una página de registro de objeto.
+ 	- Botón de página de detalles: aparece en el menú de acciones del panel de aspectos
+ 		destacados de una página de registro.
 
-Crear un button personalizado: En la parte superior der click en el logo de engrane -> apartado 
-	object manager -> click en determinado objeto -> en apartado izq que diga buttons,
-	links and actions -> new button or link -> asignar un nombre 
-	- button de lista.
-	- button de pagina link (para poner enlaces externos)
-	- button de detalle. Se usa cuando se usaran los datos del registro en un enlace, sea 
-		externo o no.
-	-> ingresar el link -> save y ok.
-	El button no aparecerá hasta que se agregue.
+Crear un button personalizado: En la parte superior der click en el logo de engrane -> apartado
+ 	object manager -> click en determinado objeto -> en apartado izq que diga buttons,
+ 	links and actions -> new button or link -> asignar un nombre
+ 	- button de lista.
+ 	- button de pagina link (para poner enlaces externos)
+ 	- button de detalle. Se usa cuando se usaran los datos del registro en un enlace, sea
+ 		externo o no.
+ 	-> ingresar el link -> save y ok.
+ 	El button no aparecerá hasta que se agregue.
 
-Agregar el button: En la parte superior der click en el logo de engrane -> apartado 
-	object manager -> click en determinado objeto -> en apartado izq que diga page layouts
-	-> seleccionar determinado layout 
-	- Agregar un button de lista: Presionar fields -> Desplazarse entre los campos y 
-		seleccionar en determinado el símbolo de engrane -> ampliar el apartado de 
-		buttons -> pasar el tipo de button llamado Audit guidelines -> ok -> sabe.
-	- Agregar el button con enlace externo: Presionar custom links -> arrastrar determinado
-		button al apartado de custom links.
-	-  Agregar un button de detalle: Presionar buttons -> arrastrar determinado button al 
-		apartado de custom buttons.
+Agregar el button: En la parte superior der click en el logo de engrane -> apartado
+ 	object manager -> click en determinado objeto -> en apartado izq que diga page layouts
+ 	-> seleccionar determinado layout
+ 	- Agregar un button de lista: Presionar fields -> Desplazarse entre los campos y
+ 		seleccionar en determinado el símbolo de engrane -> ampliar el apartado de
+ 		buttons -> pasar el tipo de button llamado Audit guidelines -> ok -> sabe.
+ 	- Agregar el button con enlace externo: Presionar custom links -> arrastrar determinado
+ 		button al apartado de custom links.
+ 	-  Agregar un button de detalle: Presionar buttons -> arrastrar determinado button al
+ 		apartado de custom buttons.
 
 Vinculos personalizado: Son enlaces con una dirección URL externa.
-	A los vínculos personalizados se les puede pasar datos en los parámetros de un enlace.
+ 	A los vínculos personalizados se les puede pasar datos en los parámetros de un enlace.
 
 Comprobar la creación de button personalizado: En app lancher buscar determinada app -> click
-	en determinado apartado (determinado objeto) -> Entrar a cualquier registro.
-	- button de lista: Presionar en apartado related: Desplazarse hasta determinado campo
-		-> ahí aparecerá con el nombre que le dimos.
-	- button con enlace externo: Presionar en apartado details -> bajar y en apartados de 
-		custom links aparecerá.
-	- button de detalle: En la parte sup derecha de la pagina -> click en la flecha hacia 
-		abajo -> nombre del button personalizado. 
+ 	en determinado apartado (determinado objeto) -> Entrar a cualquier registro.
+ 	- button de lista: Presionar en apartado related: Desplazarse hasta determinado campo
+ 		-> ahí aparecerá con el nombre que le dimos.
+ 	- button con enlace externo: Presionar en apartado details -> bajar y en apartados de
+ 		custom links aparecerá.
+ 	- button de detalle: En la parte sup derecha de la pagina -> click en la flecha hacia
+ 		abajo -> nombre del button personalizado.
 
 
 ACCIONES RAPIDAS
 
-Las acciones permiten a sus usuarios realizar tareas rápidamente, como crear registros, registrar llamadas, enviar correos electrónicos y muchas otras cosas. 
+Las acciones permiten a sus usuarios realizar tareas rápidamente, como crear registros, registrar llamadas, enviar correos electrónicos y muchas otras cosas.
 
 Tipos:
-- Acciones específicas de objetos: permiten a los usuarios crear o actualizar registros 
-	rápidamente, registrar llamadas, enviar correos electrónicos y mucho más en el contexto
-	de un objeto concreto.
-	Tipos:
-	- créate
-	- update
-	- log a call: permiten a los usuarios introducir notas acerca de llamadas, reuniones u
-		otras interacciones relacionadas con un registro específico.
-	- Acciones que invocan componentes Lightning, flujos, páginas de Visualforce o 
-		aplicaciones de lienzo.
-	- send email.
-- acciones globales: Las acciones globales están en un formato especial propio, conocido como 
-	el formato global del publicador. No está asociado a ningún objeto y rellena el menú de 
-	acciones globales en Lightning Experience. Si un formato de página de objeto no está 
-	personalizado con acciones, las acciones de estas páginas de registro de objeto se 
-	heredan desde el formato de publicador global.
+- Acciones específicas de objetos: permiten a los usuarios crear o actualizar registros
+ 	rápidamente, registrar llamadas, enviar correos electrónicos y mucho más en el contexto
+ 	de un objeto concreto.
+ 	Tipos:
+ 	- créate
+ 	- update
+ 	- log a call: permiten a los usuarios introducir notas acerca de llamadas, reuniones u
+ 		otras interacciones relacionadas con un registro específico.
+ 	- Acciones que invocan componentes Lightning, flujos, páginas de Visualforce o
+ 		aplicaciones de lienzo.
+ 	- send email.
+- acciones globales: Las acciones globales están en un formato especial propio, conocido como
+ 	el formato global del publicador. No está asociado a ningún objeto y rellena el menú de
+ 	acciones globales en Lightning Experience. Si un formato de página de objeto no está
+ 	personalizado con acciones, las acciones de estas páginas de registro de objeto se
+ 	heredan desde el formato de publicador global.
 
 Crear una acción específica de objeto: En la parte superior der click en el logo de engrane
-	-> apartado object manager -> click en determinado objeto -> apartado izq y click donde
-	diga Buttons, Links, and Actions -> new action -> seleccionar tipo de accion.
-	- créate a record.
-	-> seleccionar el objeto que ejecuta la accion -> asignarle nombre -> sabe.
-	Editor de formato de acción: personalización de los campos que los usuarios deben 
-		rellenar para completar la acción.
-		Cada campo de este formato de acción tiene un asterisco de color rojo, lo que 
-		indica que es un campo obligatorio. Los campos obligatorios se agregan a un 
-		formato de acción de forma predeterminada cuando crea la acción. Si retira un 			campo obligatorio de un formato de acción, los usuarios no pueden completar la 
-		acción correctamente.
-	La accion aun no estará disponible para los usuarios.
+ 	-> apartado object manager -> click en determinado objeto -> apartado izq y click donde
+ 	diga Buttons, Links, and Actions -> new action -> seleccionar tipo de accion.
+ 	- créate a record.
+ 	-> seleccionar el objeto que ejecuta la accion -> asignarle nombre -> sabe.
+ 	Editor de formato de acción: personalización de los campos que los usuarios deben
+ 		rellenar para completar la acción.
+ 		Cada campo de este formato de acción tiene un asterisco de color rojo, lo que
+ 		indica que es un campo obligatorio. Los campos obligatorios se agregan a un
+ 		formato de acción de forma predeterminada cuando crea la acción. Si retira un 			campo obligatorio de un formato de acción, los usuarios no pueden completar la
+ 		acción correctamente.
+ 	La accion aun no estará disponible para los usuarios.
 
 Hacer que la accion este disponible para los usuarios: En la parte superior der click en el logo
-	de engrane -> apartado object manager -> click en determinado objeto -> apartado izq y 
-	click donde diga Page Layouts -> seleccionar determinado layout -> en este punto 
-	estaremos en formato de pagina.
-	Formato de pagina:
-	- quick actions: controla qué acciones aparecen en páginas de registros en la interfaz 
-		de usuario de Salesforce Classic.
-	- actions: controla qué acciones aparecen en páginas de registros en Lightning 
-		Experience y en la aplicación Salesforce.
+ 	de engrane -> apartado object manager -> click en determinado objeto -> apartado izq y
+ 	click donde diga Page Layouts -> seleccionar determinado layout -> en este punto
+ 	estaremos en formato de pagina.
+ 	Formato de pagina:
+ 	- quick actions: controla qué acciones aparecen en páginas de registros en la interfaz
+ 		de usuario de Salesforce Classic.
+ 	- actions: controla qué acciones aparecen en páginas de registros en Lightning
+ 		Experience y en la aplicación Salesforce.
+
+Crear una notficacion de escritorio personalizada: En la parte superior der click en el logo de 
+	engrane -> set up -> busar y seleccionar a Notification Builder -> custom notifications
+	-> new -> asignar nombre y seleccionar para que dispositivos estará disponible la 
+	notificación -> save.
+	Para comprobar que se recibió la notificación: En la parte sup derecha -> click en el 
+	logo de a campana.
+
 
 
 
@@ -159,12 +167,12 @@ ARCHIVOS
 
 Ver achivos cargados en determinada app: En el app lancher -> Buscar y seleccionar determinada 	app -> click sobre el apartado files.
 
-Cargar un archivo nuevo: En el app lancher -> Buscar y seleccionar determinada 	app -> click 
-	sobre el apartado files -> upload files.
+Cargar un archivo nuevo: En el app lancher -> Buscar y seleccionar determinada 	app -> click
+ 	sobre el apartado files -> upload files.
 
-Compartir un archivo: En el app lancher -> Buscar y seleccionar determinada app -> click 
-	sobre el apartado files -> sobre determinado archivo presionar la flecha hacia abajo
-	-> share -> expandir sección who can Access -> créate public link -> créate.
+Compartir un archivo: En el app lancher -> Buscar y seleccionar determinada app -> click
+ 	sobre el apartado files -> sobre determinado archivo presionar la flecha hacia abajo
+ 	-> share -> expandir sección who can Access -> créate public link -> créate.
 
 
 
@@ -175,51 +183,51 @@ Sirven para que el usuario vea la información más importante de un registro si
 Cuando crea un objeto personalizado, se asigna automáticamente a un formato compacto predeterminado del sistema, que solo tiene un campo: el nombre del objeto.
 
 Crear un formato compacto para un objeto: En la parte superior der click en el logo de engrane
-	-> apartado object manager -> click en determinado objeto -> en los apartados izq 
-	click en compact layouts -> new -> asginar nombre al formato compacto y agregar los 
-	campos de interés y sabe.
+ 	-> apartado object manager -> click en determinado objeto -> en los apartados izq
+ 	click en compact layouts -> new -> asginar nombre al formato compacto y agregar los
+ 	campos de interés y sabe.
 
-Establecer determinado formato compacto como el formato Compacto principal: click en el 
-	button compact layout assignment -> edit assignment -> seleccionar determinado formato
-	compacto -> sabe.
+Establecer determinado formato compacto como el formato Compacto principal: click en el
+ 	button compact layout assignment -> edit assignment -> seleccionar determinado formato
+ 	compacto -> sabe.
 
 
 VISTAS DE LISTA
 
 Crear vistas de lista: En el Iniciador de aplicación -> encuentre y seleccione determinado
-	objeto -> seleccionar determinado objeto -> presionar el button en forma de 	engrane -> new -> asignar el nombre a la lista -> save.
+ 	objeto -> seleccionar determinado objeto -> presionar el button en forma de 	engrane -> new -> asignar el nombre a la lista -> save.
 
 Agregar filtro: Presionar el logo de filtro -> add filter.
 
-Para cambiar los usuario que puede ver la lista: presionar el button en forma de engrane -> 
-	sharing settings -> hacer cambio -> save.
+Para cambiar los usuario que puede ver la lista: presionar el button en forma de engrane ->
+ 	sharing settings -> hacer cambio -> save.
 
 personalizar una vista de lista: presionar el button en forma de engrane -> seleccionar select
-	fields to display -> seleccionar que campos estarán visibles.
+ 	fields to display -> seleccionar que campos estarán visibles.
 
-Crear un grafico de vista de lista:  En el Iniciador de aplicación -> encuentre y seleccione 	determinada aplicación -> seleccionar determinado objeto -> buscar y seleccionar el 
-	button de una flecha hacia abajo -> All Opportunities -> presionar el button en forma
-	de grafica de pastel -> presionar el button de engrane -> new chart
+Crear un grafico de vista de lista:  En el Iniciador de aplicación -> encuentre y seleccione 	determinada aplicación -> seleccionar determinado objeto -> buscar y seleccionar el
+ 	button de una flecha hacia abajo -> All Opportunities -> presionar el button en forma
+ 	de grafica de pastel -> presionar el button de engrane -> new chart
 
 
 
-FLOW BUILDER 
+FLOW BUILDER
 
 Definiciones -------------------------------------------
 
 Salesforce Flow: todo lo que incluye Salesforce para crear, gestionar y ejecutar automatizaciones con clics en vez de código.
 
-Flujo: configuración de automatización que se guarda en Salesforce con la estructura de un 
+Flujo: configuración de automatización que se guarda en Salesforce con la estructura de un
 diagrama de flujo.
 
 Flow Builder: La herramienta principal para crear flujos
 
-Herramientas declarativa: significa que no requiere habilidades de programación de software. 
+Herramientas declarativa: significa que no requiere habilidades de programación de software.
 Flow Builder es una herramienta declarativa.
 
-Abir Flow builder: clic en App Launcher -> buscar y seleccionar Automation -> new -> 
-	La ventana New Automation (Nuevo automatización) muestra los tipos de flujo que puede
-	crear.
+Abir Flow builder: clic en App Launcher -> buscar y seleccionar Automation -> new ->
+ 	La ventana New Automation (Nuevo automatización) muestra los tipos de flujo que puede
+ 	crear.
 
 
 Creación de variables, constantes, formulas, etc -------------------------------
@@ -227,75 +235,75 @@ Creación de variables, constantes, formulas, etc ------------------------------
 Asegúrese de usar las constantes globales True y False. De lo contrario, Flow Builder interpretará "true" y "false" como texto, y no como un valor positivo o negativo.
 
 Crear un flujo de pantalla: En la parte sup derecha buscar el logo de settings -> opción setup
-	-> en el buscador escribir y seleccionar 'flows' -> new flows -> screen Flow.
+ 	-> en el buscador escribir y seleccionar 'flows' -> new flows -> screen Flow.
 
-Crear un recurso: *Se debe estar en un flujo de pantalla* -> click sobre el toolbox -> new 
-	resource -> seleccionar tipo de recurso:
-	- variable -> ingresar el nombre y description -> elegir el tipo de dato. 
-	- constante
-	- formula
-	
+Crear un recurso: *Se debe estar en un flujo de pantalla* -> click sobre el toolbox -> new
+ 	resource -> seleccionar tipo de recurso:
+ 	- variable -> ingresar el nombre y description -> elegir el tipo de dato.
+ 	- constante
+ 	- formula
+ 
 
 AREA DE SETUP
 
-Crear un objeto personalizado:  
-	- Desde un archivo csv: En la parte sup derecha buscar el logo de settings -> 
-		opción setup -> click apartado object manager -> click sobre créate ->      
-		Seleccione Custom Object from Spreadsheet -> subir Excel.   
-		Muy probablemente nos pedirá el usuario y contraseña de ese playground****, 
-		el cual son credenciales distintas a las de Salesforce. 
-	- Desde la plataforma de Salesforce: En la parte sup derecha buscar el logo de 
-		settings -> opción setup -> click apartado object manager -> click sobre 			créate -> custom object -> rellenar label y plural label con el nombre
-		de interés (los campos Object Name (Nombre de objeto) y Record Name (Nombre 
-		del registro) se rellenan automáticamente.) -> save -> modificar tab style
-		al gusto -> next -> next -> save.        
-		- Si se palomea la opción: 'Launch New Custom Tab Wizard after saving this 
-			custom object' significa que Salesforce automáticamente creara una 
-			pestaña (Custom Tab) para ese objeto en determinadas aplicaciones que 
-			eligamos. 
+Crear un objeto personalizado:
+ 	- Desde un archivo csv: En la parte sup derecha buscar el logo de settings ->
+ 		opción setup -> click apartado object manager -> click sobre créate ->
+ 		Seleccione Custom Object from Spreadsheet -> subir Excel.
+ 		Muy probablemente nos pedirá el usuario y contraseña de ese playground****,
+ 		el cual son credenciales distintas a las de Salesforce.
+ 	- Desde la plataforma de Salesforce: En la parte sup derecha buscar el logo de
+ 		settings -> opción setup -> click apartado object manager -> click sobre 			créate -> custom object -> rellenar label y plural label con el nombre
+ 		de interés (los campos Object Name (Nombre de objeto) y Record Name (Nombre
+ 		del registro) se rellenan automáticamente.) -> save -> modificar tab style
+ 		al gusto -> next -> next -> save.
+ 		- Si se palomea la opción: 'Launch New Custom Tab Wizard after saving this
+ 			custom object' significa que Salesforce automáticamente creara una
+ 			pestaña (Custom Tab) para ese objeto en determinadas aplicaciones que
+ 			eligamos.
 
-Agregar un campo a determinado objeto: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
-	apartado izq field and relationships -> new -> seleccionar el tipo de dato del campo
-	- Formula -> Seleccione el tipo de datos que espera que devuelva su fórmula -> next
-		- botón Insert Field: abre un menú que le permite seleccionar campos para 
-			utilizar en su fórmula.
-		- botón Insert Operator: abre una lista desplegable de los operadores 
-			matemáticos y lógicos disponibles.
-		- botón Check Syntax: comprueba la sintaxis de la formula.
-	-> sig -> asginar el nombre del campo, su id y su description -> opcionalmente marcar
-	si es obligatorio o no (required) -> next -> next -> save.
+Agregar un campo a determinado objeto: En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> click apartado object manager -> click sobre determinado objeto ->
+ 	apartado izq field and relationships -> new -> seleccionar el tipo de dato del campo
+ 	- Formula -> Seleccione el tipo de datos que espera que devuelva su fórmula -> next
+ 		- botón Insert Field: abre un menú que le permite seleccionar campos para
+ 			utilizar en su fórmula.
+ 		- botón Insert Operator: abre una lista desplegable de los operadores
+ 			matemáticos y lógicos disponibles.
+ 		- botón Check Syntax: comprueba la sintaxis de la formula.
+ 	-> sig -> asginar el nombre del campo, su id y su description -> opcionalmente marcar
+ 	si es obligatorio o no (required) -> next -> next -> save.
 
-Comprobar la creación del campo nuevo para un objeto: En App Launcher (Iniciador de aplicación) 
-	(Iniciador de 
-	aplicación) -> buscar dreamhouse -> click sobre determinad objeto ->
-	seleccionar un registro -> apartado details -> buscar el campo recién creado.
+Comprobar la creación del campo nuevo para un objeto: En App Launcher (Iniciador de aplicación)
+ 	(Iniciador de
+ 	aplicación) -> buscar dreamhouse -> click sobre determinad objeto ->
+ 	seleccionar un registro -> apartado details -> buscar el campo recién creado.
 
 Ver todos los registros de un objeto: Ir a inicio -> buscar y seleccionar detemrinado objeto.
-	- Para editar uno de los registros: se da click sobre determinado registro.
+ 	- Para editar uno de los registros: se da click sobre determinado registro.
 
 Crear un registro: En el inicio de aplicación -> buscar determinada app -> En los apartados
-	estará determinado objeto -> new -> rellenar el registro.
+ 	estará determinado objeto -> new -> rellenar el registro.
 
-crear una relación de búsqueda: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
-	click en el apartado izq fields and relationships -> new -> lookup Relanship -> next
-	-> elegir la tabla con la que se va a relacionar -> puro next.
+crear una relación de búsqueda: En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> click apartado object manager -> click sobre determinado objeto ->
+ 	click en el apartado izq fields and relationships -> new -> lookup Relanship -> next
+ 	-> elegir la tabla con la que se va a relacionar -> puro next.
 
-crear una relación principal - detalle: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> click apartado object manager -> click sobre determinado objeto -> 
-	click en el apartado izq fields and relationships -> new -> master-detail relationship
-	-> next -> elegir la tabla con la que se va a relacionar -> puro next.
+crear una relación principal - detalle: En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> click apartado object manager -> click sobre determinado objeto ->
+ 	click en el apartado izq fields and relationships -> new -> master-detail relationship
+ 	-> next -> elegir la tabla con la que se va a relacionar -> puro next.
 
 Relacionar dos registros: En App Launcher (Iniciador de aplicación) -> buscar y seleccionar
-	sales -> buscar en los apartados a determinado objeto -> click sobre determinado
-	registro -> apartado related -> new 
+ 	sales -> buscar en los apartados a determinado objeto -> click sobre determinado
+ 	registro -> apartado related -> new
 
-Activar el seguimiento de noticias en tiempo real para un objeto: En la parte sup derecha 
-	buscar el logo de settings -> en la búsqueda escribir Feed Tracking (Seguimiento de 
-	noticias en tiempo real) -> seleccionar determinado objeto -> palomear Enable Feed 
-	Tracking (Activar el seguimiento de noticias en tiempo real) -> seleccionar determinados
-	campos -> save.
+Activar el seguimiento de noticias en tiempo real para un objeto: En la parte sup derecha
+ 	buscar el logo de settings -> en la búsqueda escribir Feed Tracking (Seguimiento de
+ 	noticias en tiempo real) -> seleccionar determinado objeto -> palomear Enable Feed
+ 	Tracking (Activar el seguimiento de noticias en tiempo real) -> seleccionar determinados
+ 	campos -> save.
 
 
 CAMPOS RESUMEN
@@ -309,92 +317,92 @@ Tipos de resumen:
 - min
 - max
 
-Crear campo resumen: En la parte sup derecha buscar el logo de settings -> opción setup -> 
-	apartado object manager -> click en determinado objeto -> clic en Fields & Relationships
-	-> New -> Roll-Up Summary -> next -> asignar nombre al campo -> seleccionar el objeto 
-	que representa a muchos (en la relación uno a muchos) -> elegir el tipo de resumen y el 
-	campo sobre el que recaerá la accion -> puro next y save.
+Crear campo resumen: En la parte sup derecha buscar el logo de settings -> opción setup ->
+ 	apartado object manager -> click en determinado objeto -> clic en Fields & Relationships
+ 	-> New -> Roll-Up Summary -> next -> asignar nombre al campo -> seleccionar el objeto
+ 	que representa a muchos (en la relación uno a muchos) -> elegir el tipo de resumen y el
+ 	campo sobre el que recaerá la accion -> puro next y save.
 
 
 REGLAS DE VALIDACION
 
-verifican que los datos introducidos por usuarios en registros cumplen 
-los estándares que especifica antes de poder guardarlos. Una regla de validación puede contener 
+verifican que los datos introducidos por usuarios en registros cumplen
+los estándares que especifica antes de poder guardarlos. Una regla de validación puede contener
 una fórmula o expresión que evalúa los datos en uno o más campos y ofrece un valor true o false.
 Las reglas de validación también pueden incluir mensajes de error para mostrar a los usuarios cuando introducen valores no válidos basándose en criterios específicos.
 Puede crear reglas de validación para objetos, campos, miembros de campaña o eventos clave de casos.
 
-Crear regla de validación para un campo especifico: En la parte sup derecha buscar el logo de 
-	settings -> opción setup -> apardato object manager -> click en determinado objeto
-	-> apartado izq que diga validation rules -> new  -> asginar nombre a la regla, la 
-	formula que si se rompe se lanza el mensaje, el mensaje de error -> save. 	
+Crear regla de validación para un campo especifico: En la parte sup derecha buscar el logo de
+ 	settings -> opción setup -> apardato object manager -> click en determinado objeto
+ 	-> apartado izq que diga validation rules -> new  -> asginar nombre a la regla, la
+ 	formula que si se rompe se lanza el mensaje, el mensaje de error -> save.
 
 
 APP LIGHTNING / APP MANAGER
 
-Crear una aplicación: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> buscar y seleccionar app manager -> new lighning app -> asignar los
-	metadatos de la app -> estándar -> next -> next -> En elememtos de navegación se
-	dben poner todos los objetos de interés que se desea que aparezcan como apartado en 
-	esa app -> seleccionar el perfil system administrator -> finish.
+Crear una aplicación: En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> buscar y seleccionar app manager -> new lighning app -> asignar los
+ 	metadatos de la app -> estándar -> next -> next -> En elememtos de navegación se
+ 	dben poner todos los objetos de interés que se desea que aparezcan como apartado en
+ 	esa app -> seleccionar el perfil system administrator -> finish.
 
 Crear una página de registro Lightning personalizada -----------------------------
 
 Por pagina de registro se refiere a la pagina que se abre para añadir un nuevo registro a un
 objeto.
 
-Crear una pagina personalizada: En la parte sup derecha buscar el logo de settings -> opción 
-	setup -> Object Manager -> Seleccionar determinado objeto -> apartado izq Lightning 
-	Record Pages -> new -> record page -> escribir el nombre de la pagina y el nombre de 
-	determinado objeto -> del apartado izq arrastrar 'record detail' (aquí están todos los 
-	campos) 
-	- Para poder editar los campos: Cuando este componenete este en el lienzo, si lo 
-		seleccionamos, en el lado derecho aparecerá un recuadro que contendrá un 
-		button el cual dira upgrade now, presionarlo -> seleccionar determinado layout 
-		-> finish.
-	Después de editar todo lo que se desee se dará click en save.
+Crear una pagina personalizada: En la parte sup derecha buscar el logo de settings -> opción
+ 	setup -> Object Manager -> Seleccionar determinado objeto -> apartado izq Lightning
+ 	Record Pages -> new -> record page -> escribir el nombre de la pagina y el nombre de
+ 	determinado objeto -> del apartado izq arrastrar 'record detail' (aquí están todos los
+ 	campos)
+ 	- Para poder editar los campos: Cuando este componenete este en el lienzo, si lo
+ 		seleccionamos, en el lado derecho aparecerá un recuadro que contendrá un
+ 		button el cual dira upgrade now, presionarlo -> seleccionar determinado layout
+ 		-> finish.
+ 	Después de editar todo lo que se desee se dará click en save.
 
 Lo mismo que el anterior, pero manera alternativa: Abrir determinaod objeto -> abrir un registro
-	-> En la parte sup derecha buscar el logo de settings -> edit page -> editar la pagina
-	y darle save -> not yet.
+ 	-> En la parte sup derecha buscar el logo de settings -> edit page -> editar la pagina
+ 	y darle save -> not yet.
 
 Cambiar zoom: en la parte sup viene shrink to view cambiar a 100%.
 
-personalizar listas relacionadas: decidir cómo se muestran los registros hijos (relacionados) 	dentro de un registro padre, es decir, controlar qué información ves, cómo la ves y qué 
-	acciones puedes hacer sobre esos registros relacionados.
-	En la parte sup derecha buscar el logo de settings -> opción setup -> apartado objetc
-	manager -> seleccionar determinado objteo -> apartado izq llamado page layouts -> 	seleccionar determindo layout -> dar click sobre related lists -> arrastrar algún tipo 
-	de elemento hacia el apartado related lists.
-	Tipos de elementos relacionados:
-	- file: Asi los usuarios pueden agregar archivos a un registro y ver una lista de los 
-		archivos asociados con el registro.
+personalizar listas relacionadas: decidir cómo se muestran los registros hijos (relacionados) 	dentro de un registro padre, es decir, controlar qué información ves, cómo la ves y qué
+ 	acciones puedes hacer sobre esos registros relacionados.
+ 	En la parte sup derecha buscar el logo de settings -> opción setup -> apartado objetc
+ 	manager -> seleccionar determinado objteo -> apartado izq llamado page layouts -> 	seleccionar determindo layout -> dar click sobre related lists -> arrastrar algún tipo
+ 	de elemento hacia el apartado related lists.
+ 	Tipos de elementos relacionados:
+ 	- file: Asi los usuarios pueden agregar archivos a un registro y ver una lista de los
+ 		archivos asociados con el registro.
 
-Activar la pagina personalizada: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> apartado home -> en el buscador escribir app builder -> dar click en 
-	edit en determinada pagina -> click en activation -> Hay varias opciones. 
-	- Para que esta paginas sea por defecto para TODOS los usuarios y en TODAS las apps:
-		Assign as Org Default -> Next -> Desktop & Phone -> Save
-	- Para determinada app: App default.
-	- Para determinada app y si hay un record type especifico: app, record type, and 
-		profile -> assign to apps, recod types, and profiles -> asignar la pagina a 
-		determinada application
+Activar la pagina personalizada: En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> apartado home -> en el buscador escribir app builder -> dar click en
+ 	edit en determinada pagina -> click en activation -> Hay varias opciones.
+ 	- Para que esta paginas sea por defecto para TODOS los usuarios y en TODAS las apps:
+ 		Assign as Org Default -> Next -> Desktop & Phone -> Save
+ 	- Para determinada app: App default.
+ 	- Para determinada app y si hay un record type especifico: app, record type, and
+ 		profile -> assign to apps, recod types, and profiles -> asignar la pagina a
+ 		determinada application
 
 
 SCHEMA BUILDER
 
 Es una herramienta que permite diseñar, visualizar y modificar el modelo de datos.
 
-Ingresar al schema builder: En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> Buscar en el lateral schema builder y dar click ahí.
+Ingresar al schema builder: En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> Buscar en el lateral schema builder y dar click ahí.
 
 Ver la relación entre ciertas tablas de interés: En el apartado izq buscar y presionar clear
-	all -> seleccionar las tablas de interés -> presionar auto-layout.
+ 	all -> seleccionar las tablas de interés -> presionar auto-layout.
 
 Crear un objeto utilizando esta herramienta: En la barra lateral izquierda clic en la ficha 	Elements -> arrastrar el componente object -> introducir la información del objeto
-	-> save.
+ 	-> save.
 
-Crear campos a determinado objeto utilizando esta herramienta: En la barra lateral izquierda clic 	en la ficha Elements -> arrastrar determinar tipo de campo a determinado objeto -> 
-	introducir la info pertinente -> save.
+Crear campos a determinado objeto utilizando esta herramienta: En la barra lateral izquierda clic 	en la ficha Elements -> arrastrar determinar tipo de campo a determinado objeto ->
+ 	introducir la info pertinente -> save.
 
 
 APPEXCHANGE
@@ -403,12 +411,12 @@ Las aplicaciones de Salesforce Labs son gratuitas y son de código abierto. Pued
 
 https://appexchange.salesforce.com/
 
-Buscar aplicación recién instalada:  En la parte sup derecha buscar el logo de settings -> 
-	opción setup -> busque y seleccione Installed Packages (Paquetes instalados) ->
-	clic en el nombre del paquete que ha instalado. Será el mismo del de la página de 
-	descarga de AppExchange -> clic en View Component
+Buscar aplicación recién instalada:  En la parte sup derecha buscar el logo de settings ->
+ 	opción setup -> busque y seleccione Installed Packages (Paquetes instalados) ->
+ 	clic en el nombre del paquete que ha instalado. Será el mismo del de la página de
+ 	descarga de AppExchange -> clic en View Component
 
- 
+ 
 
 /////////////////////////////////////////DESARROLLO/////////////////////////////////////////
 
@@ -420,11 +428,11 @@ Para desarrollar aplicaciones en Salesforce, necesita las siguientes herramienta
 
 COMMAND LINE INTERFACE (CLI)
 
-Es la herramienta de línea de comando para trabajar con Salesforce Platform. 
+Es la herramienta de línea de comando para trabajar con Salesforce Platform.
 puede crear entornos para desarrollos y pruebas de forma sencilla. Además, Salesforce CLI tiene comandos para sincronizar código fuente entre sus organizaciones y sistemas de control de versiones, y ejecutar pruebas de unidades.
 
-Instalar la Command Line Interface: 
-	Descargar: 	https://developer.salesforce.com/tools/salesforcecli
+Instalar la Command Line Interface:
+ 	Descargar: 	https://developer.salesforce.com/tools/salesforcecli
 
 sf --versión -> Versifica que el cli esta instalado.
 
@@ -434,62 +442,62 @@ sf update -> Actualizo todo lo relacionado a Salesforce
 Conectar un playground con el local ---------------------------
 
 Crear un nuevo proyecto de Salesforce (desde VS Code): *En vsc* ->  Ctrl + Shift + P -> escribir 	'SFDX: Create Project with Manifest' -> estándar -> Asigna un nombre al proyecto ->
-	Seleccione una carpeta en su dispositivo para guardar el proyecto.
+ 	Seleccione una carpeta en su dispositivo para guardar el proyecto.
 
 Autorizar determinado playgroud desde cli: Usamos el comando: sf org login web -> Después nos
-	pedirá ingresar un usuario y contraseña. Este usuario y contraseña deben ser los que 	específicamente se crean por si solos, los cuales son diferentes a las credenciales que 
-	usarmos para iniciar sesión en Salesforce.
-	Para determinar el usuiairo y contraseña de un playground deberemos restablecer la 
-	contraseña de determinado playground.
+ 	pedirá ingresar un usuario y contraseña. Este usuario y contraseña deben ser los que 	específicamente se crean por si solos, los cuales son diferentes a las credenciales que
+ 	usarmos para iniciar sesión en Salesforce.
+ 	Para determinar el usuiairo y contraseña de un playground deberemos restablecer la
+ 	contraseña de determinado playground.
 
-Restablecer la contraseña para su organización de trailhead playgroud: La integración entre 
-	Trailhead y la organización de Playground hace que la contraseña predeterminada sea 
-	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de 
-	Trailhead, por ejemplo desde herramientas de desarrollador, como Salesforce CLI y
-	VS Code.
-	Clic en Iniciador de aplicación para iniciar App Launcher -> buscar y hacer clic en 
-	Playground Starter -> click en apartado get your login credentials -> en esta parte
-	aparecerá un correo, el cual deberemos tomar (este vendrá a ser el ussername que 
-	utilizaremos en próximos comandos) -> después presionar reset my password.
+Restablecer la contraseña para su organización de trailhead playgroud: La integración entre
+ 	Trailhead y la organización de Playground hace que la contraseña predeterminada sea
+ 	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de
+ 	Trailhead, por ejemplo desde herramientas de desarrollador, como Salesforce CLI y
+ 	VS Code.
+ 	Clic en Iniciador de aplicación para iniciar App Launcher -> buscar y hacer clic en
+ 	Playground Starter -> click en apartado get your login credentials -> en esta parte
+ 	aparecerá un correo, el cual deberemos tomar (este vendrá a ser el ussername que
+ 	utilizaremos en próximos comandos) -> después presionar reset my password.
 
-sf org list -> Muestra todas las organizaciones de Salesforce que tienes autorizadas en tu 
-	Salesforce CLI.
-	También mostrara cual playground tenemos seleccionado por defecto.
+sf org list -> Muestra todas las organizaciones de Salesforce que tienes autorizadas en tu
+ 	Salesforce CLI.
+ 	También mostrara cual playground tenemos seleccionado por defecto.
 
 sf org open -> Abre la organización por defecto.
-	- sf org open -o [nombreAlias/username] -> Abre determinada organización.
+ 	- sf org open -o [nombreAlias/username] -> Abre determinada organización.
 
-sf config set target-org=[username] -> Define cuál organización de Salesforce usará la CLI por 
-	defecto, a nivel global, cuando no se especifique otra.
+sf config set target-org=[username] -> Define cuál organización de Salesforce usará la CLI por
+ 	defecto, a nivel global, cuando no se especifique otra.
 
 *Dentro de la carpeta que representa a un proyecto*
-sf project retrieve start -x manifest/package.xml -> Para traer (recuperar) metadatos desde tu 
-	org de Salesforce
-	Todo lo que se recupera se guarda en: force-app/main/default/.
-		- Reglas de validación: objects/Contact/validationRules/
-		- flows/
-		- layouts/
-		- objects
-	El archivo package.xml es un archivo que existe en nombreProyecto/manifest/package.xml.
-	En el archivo package.xml se debe especificar que se quiere descargar, se debe agregar 
-	asi: 
-		<types>
-                  <members>*</members>
-                  <name>tipoObjeto</name>
-    		</types>
-	Donde el tipo objeto seria los flows, objetos, etc.
-	
+sf project retrieve start -x manifest/package.xml -> Para traer (recuperar) metadatos desde tu
+ 	org de Salesforce
+ 	Todo lo que se recupera se guarda en: force-app/main/default/.
+ 		- Reglas de validación: objects/Contact/validationRules/
+ 		- flows/
+ 		- layouts/
+ 		- objects
+ 	El archivo package.xml es un archivo que existe en nombreProyecto/manifest/package.xml.
+ 	En el archivo package.xml se debe especificar que se quiere descargar, se debe agregar
+ 	asi:
+ 		<types>
+                  <members>*</members>
+                  <name>tipoObjeto</name>
+    		</types>
+ 	Donde el tipo objeto seria los flows, objetos, etc.
+ 
 
 
 
 
 
 A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de programación que puede usar, por ejemplo:
-	- El marco Lightning Web Components: un marco de trabajo de desarrollo de interfaz 
-		de usuario basada en JavaScript.
-	- Apex: lenguaje de programación creado por Salesforce con una sintaxis similar a Java.
-	- Node.js: Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha 
-		diseñado para desarrollar aplicaciones de red ampliables.
+ 	- El marco Lightning Web Components: un marco de trabajo de desarrollo de interfaz
+ 		de usuario basada en JavaScript.
+ 	- Apex: lenguaje de programación creado por Salesforce con una sintaxis similar a Java.
+ 	- Node.js: Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha
+ 		diseñado para desarrollar aplicaciones de red ampliables.
 
 
 COMPONENTS WEB LIGHNING
@@ -503,21 +511,21 @@ Code builder: entorno de desarrollo integrado de preferencia de Salesforce que p
 APEX
 
 lenguaje de programación orientado a los objetos y con parámetros de asignación rigurosa que permite a los desarrolladores de Salesforce agregar lógica empresarial a eventos del sistema, como clics de botón y actualizaciones, a los registros relacionados.
-Características: 
+Características:
 - Alojamiento: Apex se guarda, compila y ejecuta en el servidor Salesforce Platform.
 - Orientación a objetos: Apex admite clases, interfaces y elementos heredados.
 - Pruebas sencillas: Apex ofrece compatibilidad integrada para la creación de pruebas de unidades, la ejecución y la cobertura de código.
 
-.forceignore -> Para decirle a Salesforce CLI qué archivos o carpetas NO debe incluir cuando 
-	haces operaciones como deploy, retrieve o convert de metadata.
+.forceignore -> Para decirle a Salesforce CLI qué archivos o carpetas NO debe incluir cuando
+ 	haces operaciones como deploy, retrieve o convert de metadata.
 
-sf apex generate class --name nombreClase --output-dir force-app/main/default/clases -> Para 
-	crear una clase de ápex.
-	Esto crear dos archivos: uno con extensión .cls y otro con extencion .cls-meta.xml
-	en la ruta force-app/main/default.
+sf apex generate class --name nombreClase --output-dir force-app/main/default/clases -> Para
+ 	crear una clase de ápex.
+ 	Esto crear dos archivos: uno con extensión .cls y otro con extencion .cls-meta.xml
+ 	en la ruta force-app/main/default.
 
 Crear un script anonimo: es código de Apex que no se almacena en los metadatos, pero puede 	compilarse y ejecutarse.
-	Crear un archivo con extensión .apex en la carpeta: scripts/ápex
+ 	Crear un archivo con extensión .apex en la carpeta: scripts/ápex
 
 *Dentro de una clase y donde se declaran atributos*
 @InvocableVariable
@@ -525,38 +533,38 @@ tipoDato nombreAtributo; -> Para que este atributo pueda enviar datos al flujo.
 
 *En la clase main*
 @InvocableMethod
-public static tipoDato nombreMetodo() {} -> Para que el método pueda invocarse en forma de 
-	acción en el flujo.
+public static tipoDato nombreMetodo() {} -> Para que el método pueda invocarse en forma de
+ 	acción en el flujo.
 
 
 Guardar una clase de ápex: En la parte sup derecha buscar el logo de settings -> opción developer
-	console -> Es esta ventana presionar el menú file -> new -> ápex class -> escribir
-	el nombre de la clase -> Escribir el código y guardar el archivo.
+ 	console -> Es esta ventana presionar el menú file -> new -> ápex class -> escribir
+ 	el nombre de la clase -> Escribir el código y guardar el archivo.
 
 Ejecutar código Apex anónimo: permite ejecutar código de ápex.
-	En Developer Console, clic en Debug -> Open Execute Anonymous Window -> execute.
+ 	En Developer Console, clic en Debug -> Open Execute Anonymous Window -> execute.
 
 Registros de depuración: Al ejecutar métodos de Apex, las llamadas se incluyen en el registro de
-	 depuración. Puede escribir sus propios mensajes de depuración en el registro, lo que 
-	facilita la depuración del código en caso de errores. 
+ 	 depuración. Puede escribir sus propios mensajes de depuración en el registro, lo que
+ 	facilita la depuración del código en caso de errores.
 
 System.debug() -> Para escribir mensajes en el registro.
-	Para ver específicamente estos mensajes en la developer console: En la parte inf de la
-	pantalla -> click en el apartado logs -> doble click en el registro de interés -> 
-	palomear la opción debug only. **
-	
+ 	Para ver específicamente estos mensajes en la developer console: En la parte inf de la
+ 	pantalla -> click en el apartado logs -> doble click en el registro de interés ->
+ 	palomear la opción debug only. **
+ 
 
 
 
 NODEJS
 
-Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha diseñado para 
-desarrollar aplicaciones de red ampliables. 
+Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha diseñado para
+desarrollar aplicaciones de red ampliables.
 
 force:project:create -> Para crear un proyecto nuevo.
 
 
-TIPOS DE DATOS 
+TIPOS DE DATOS
 
 Primitivo (por ejemplo, Integer, Double, Long, Date, Datetime, String, ID y Boolean entre otros).
 Lista tipificada de valores, llamada también enumeración.
@@ -568,24 +576,24 @@ sObject ---------------------------------
 Cada registro de Salesforce se representa de forma nativa como un sObject en Apex.
 Si se recuperan registros persistentes de Salesforce, estos se almacenan en una variable de sObject.
 
-NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(); -> Para crear un sObject, debe 
-	declarar una variable y asignarle una instancia de sObject. 
-	Por objeto x nos referimos a un objeto en la gui de Salesforce.
+NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(); -> Para crear un sObject, debe
+ 	declarar una variable y asignarle una instancia de sObject.
+ 	Por objeto x nos referimos a un objeto en la gui de Salesforce.
 
-NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(NombreCampo1=valor1, 
-	NombreCampo2=valor2, NombreCampoN=valorN); -> Para crear un sObject y asignarle valores 
-		a sus campos.
+NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(NombreCampo1=valor1,
+ 	NombreCampo2=valor2, NombreCampoN=valorN); -> Para crear un sObject y asignarle valores
+ 		a sus campos.
 
-nombreVariableObjetoX.nombreCampoY=valorY;  -> Forma alternativa de agregar un valor a 
-	determinado campo de un registro.  
+nombreVariableObjetoX.nombreCampoY=valorY;  -> Forma alternativa de agregar un valor a
+ 	determinado campo de un registro.
 
-sObject objetoGenerico -> Manera de crear un objeto genérico. 
-	El sObject es el tipo de dato mas genérico que hay.
+sObject objetoGenerico -> Manera de crear un objeto genérico.
+ 	El sObject es el tipo de dato mas genérico que hay.
 
 
 DML
 
-Si una operación DML genera un error, devuelve una excepción del tipo DmlExceptionCopiar. Puede 
+Si una operación DML genera un error, devuelve una excepción del tipo DmlExceptionCopiar. Puede
 capturar las excepciones del código para controlar los errores.
 
 insert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro.
@@ -593,15 +601,15 @@ insert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro.
 update nombreVariableObjetoX/nombreListaX; -> Para actualizar un registro.
 
 upsert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro o para actualiarlo.
-	- upsert nombreVariableObjetoX/nombreListaX NombreObjetoX.fields.nombreCampoY; -> Para 
-		hacer un upsert usando como criterio el campo Ye, este campo consideramos que 
-		posee valores únicos pe un email. Entonces si el valor asociado al campo ye
-		para el objeto nombreVariableObjetoX existe hará un update pero si no hará
-		un insert.
+ 	- upsert nombreVariableObjetoX/nombreListaX NombreObjetoX.fields.nombreCampoY; -> Para
+ 		hacer un upsert usando como criterio el campo Ye, este campo consideramos que
+ 		posee valores únicos pe un email. Entonces si el valor asociado al campo ye
+ 		para el objeto nombreVariableObjetoX existe hará un update pero si no hará
+ 		un insert.
 
 delete nombreVariableObjetoX/nombreListaX; -> Para eliminar un registro.
-	Caudno se eliminan lso registros se van a la papelera y cuando pasan 15 dias se eliminan
-	permanentemente.
+ 	Caudno se eliminan lso registros se van a la papelera y cuando pasan 15 dias se eliminan
+ 	permanentemente.
 
 undelete nombreVariableObjetoX/nombreListaX; -> Para restaurar un registro.
 
@@ -613,14 +621,14 @@ Pero la diferencia es que estos métodos sí se aplican a una lista devolverá u
 objetos que contienen información de validez o error para cada registro.
 
 Database.SaveResult[] results = Database.insert(recordList, allOrNone);
-	Las operaciones de inserción y actualización devuelven en cada caso un conjunto de 
-	objetos Database.SaveResult.
-	- allOrNone: Es un booleano que por defecto vale true.
-		si vale true significa que el método de base de datos se comporta como su 			homólogo de declaración DML y producirá una excepción si se detecta un error.
-		Si vale false significa algunos de los elementos puede fallar, y se devolverá
-		un arreglo de objetos que contiene si el elemento fallo o no.
-		- elemento.isSuccess -> Si se ocupa false, se ocupa esta forma para saber si 
-			un elemento fallo o no.
+ 	Las operaciones de inserción y actualización devuelven en cada caso un conjunto de
+ 	objetos Database.SaveResult.
+ 	- allOrNone: Es un booleano que por defecto vale true.
+ 		si vale true significa que el método de base de datos se comporta como su 			homólogo de declaración DML y producirá una excepción si se detecta un error.
+ 		Si vale false significa algunos de los elementos puede fallar, y se devolverá
+ 		un arreglo de objetos que contiene si el elemento fallo o no.
+ 		- elemento.isSuccess -> Si se ocupa false, se ocupa esta forma para saber si
+ 			un elemento fallo o no.
 
 La alteración devuelve objetos Database.UpsertResult y la eliminación devuelve objetos Database.DeleteResult.
 
@@ -629,13 +637,13 @@ Registros relacionados ---------------------------------------
 Puede insertar registros relacionados con los registros existentes si ya se ha definido una relación entre los dos objetos
 Ejemplo: Se crea un nuevo objeto one y se inserta, se obtiene su id y se crea un nuevo objeto
 many, a este objeto many se le setea el id el objeto one, finalmente se inserta el objeto
-many y se crea la relación. Evidentemtne debe existir la relación de búsqueda entre la tabla 
+many y se crea la relación. Evidentemtne debe existir la relación de búsqueda entre la tabla
 one y la tabla many.
 
 Si se quiere hacer un update del objeto many, se debe actualizar el objeto many y también
 el objeto one pero desde el objeto many. ***
-	update objetoMany;  //Con lo valores ya cambiados
-	update objetoMany.ClaseOne; 
+ 	update objetoMany;  //Con lo valores ya cambiados
+ 	update objetoMany.ClaseOne;
 
 La operación delete admite eliminaciones en cascada. Si elimina un objeto principal, elimina también automáticamente los secundarios siempre que cada registro secundario se pueda eliminar
 
@@ -646,41 +654,41 @@ Es similar al lenguaje SQL estándar, pero se ha personalizado para Salesforce P
 
 Para incluir consultas SOQL en su código Apex, incluya la instrucción SOQL entre corchetes y asigne el valor devuelto a un conjunto de sObjects.
 Por ejemplo:
-	Account[] accts = [SELECT Name,Phone FROM Account];
+ 	Account[] accts = [SELECT Name,Phone FROM Account];
 
 Developer Console incluye una consola de editor de consultas, la cual permite ejecutar sus consultas SOQL y ver los resultados.
 El editor de consultas es un método rápido para inspeccionar la base de datos. Además, es una buena forma de probar sus consultas SOQL antes de agregarlas al código Apex. Cando utilice el editor de consultas, debe proporcionar únicamente la instrucción SOQL sin el código de Apex que la rodea.
 
-Abrir el editor de consultas: *En developer console* -> En la parte inf de la ventana click 
-	sobre el apartado query editor -> en el primer cuadro de esa pestaña se escriben las 
-	consultas y hasta abajo viene el button de execute.
+Abrir el editor de consultas: *En developer console* -> En la parte inf de la ventana click
+ 	sobre el apartado query editor -> en el primer cuadro de esa pestaña se escriben las
+ 	consultas y hasta abajo viene el button de execute.
 
 A diferencia de otros lenguajes SQL, no puede especificar * para recuperar todos los campos en un
-objeto. En su lugar, utilice la palabra clave FIELDS() para recuperar todos los campos estándar 
-(FIELDS(STANDARD)), todos los campos personalizados (FIELDS(CUSTOM)) o todos los campos 
-(FIELDS(ALL)) en un objeto. 
+objeto. En su lugar, utilice la palabra clave FIELDS() para recuperar todos los campos estándar
+(FIELDS(STANDARD)), todos los campos personalizados (FIELDS(CUSTOM)) o todos los campos
+(FIELDS(ALL)) en un objeto.
 
 Para inyectar dinamicamente el valor de una variable en una consulta se ocupan los dos puntos.
 Ejemplo:
-	String targetDepartment = 'Wingo';
-	Contact[] techContacts = [SELECT FirstName,LastName
-                          FROM Contact WHERE Department=:targetDepartment];
-	
+ 	String targetDepartment = 'Wingo';
+ 	Contact[] techContacts = [SELECT FirstName,LastName
+                          FROM Contact WHERE Department=:targetDepartment];
+ 
 Manera de obtner todos los registros muchos que tiene un registro one:
-	TablaOne[] objetosOne = [SELECT (SELECT * FROM TablaMany)
-                               FROM TablaOne];
-	TablaMany[] objetosMany = objetosOne.TablaMany;
+ 	TablaOne[] objetosOne = [SELECT (SELECT * FROM TablaMany)
+                               FROM TablaOne];
+ 	TablaMany[] objetosMany = objetosOne.TablaMany;
 
 Manera de obtener el objeto one al que esta asociado un objeto many:
-	TablaMany[] objetoMany = [SELECT Account.Name FROM TablaMany
-                 WHERE FirstName = 'Carol' AND LastName='Ruiz'];
-	TablaOne objetoOne = objetoMany.TablaOne;
+ 	TablaMany[] objetoMany = [SELECT Account.Name FROM TablaMany
+                 WHERE FirstName = 'Carol' AND LastName='Ruiz'];
+ 	TablaOne objetoOne = objetoMany.TablaOne;
 
-Al iterar una consulta con un for en Apex, Salesforce agrupa los resultados en arreglos de hasta 200 registros. El ciclo se ejecuta una vez por cada grupo. Entonces de la siguiente consulta si 
-tiene 3 registros solo habrá un grupo pero si hay 210 registros habrá dos grupos. 
+Al iterar una consulta con un for en Apex, Salesforce agrupa los resultados en arreglos de hasta 200 registros. El ciclo se ejecuta una vez por cada grupo. Entonces de la siguiente consulta si
+tiene 3 registros solo habrá un grupo pero si hay 210 registros habrá dos grupos.
 for (Account[] tmp : [SELECT Id FROM Account WHERE Name LIKE 'for loop _']) {
-    j = tmp.size();
-    i++;
+    j = tmp.size();
+    i++;
 }
 
 
@@ -697,48 +705,91 @@ Buscas coincidencias parciales (texto libre)
 
 Ejemplo de consulta SOSL en el que se buscan cuentas y contactos que tengan campos con la palabra 'SFDC'.
 List<List<SObject>> searchList = [FIND 'SFDC' IN ALL FIELDS
-                                      RETURNING Account(Name), Contact(FirstName,LastName)];
+                                      RETURNING Account(Name), Contact(FirstName,LastName)];
 
-La consulta de búsqueda en el editor de consultasse debe incluir entre corchetes ({SFDC}). Por 
+La consulta de búsqueda en el editor de consultasse debe incluir entre corchetes ({SFDC}). Por
 el contrario, la consulta de búsqueda en Apex se incluye entre comillas simples ('SFDC').***
 
 Sintaxis:
 FIND 'texto a buscar'
 IN ALL FIELDS
 RETURNING Objeto1(Campo11, Campo12, Campo1N),
-          Objeto2(Campo21, Campo22, Campo2N),
-	  ObjetoM(CampoM1, CampoMK2, CampoMN) -> 
-		- En returning se indica: Qué objetos quieres que Salesforce revise y Qué 
-			campos quieres que te regrese si encuentra coincidencias.
-			La búsqueda retorna una lista de listas, Por cada objeto que se
-			seleccione se tiene una lista (entonces la subLista 1 es de objetos de
-			tipo 1, la subLista2 es de objetos de tipo 2 y asi sucesivamente).
-			   NombreTablaObjeto1[] subLista1 = (NombreTablaObjeto1[])searchList[0];
-		 	   NombreTablaObjeto2[] subLista2 = (NombreTablaObjeto2[])searchList[1];
-			  NombreTablaObjetoM[] subListaM = (NombreTablaObjetoM[])searchList[M-1];
-			Tabmein al indicar un objeto, se puede colocar condiciones, 
-			ordenaciones y/o limitar el nuemro de registros. **
-			Por ejemplo: 
-				RETURNING Account(Name, Industry WHERE Industry='Apparel')
-				RETURNING Account(Name, Industry ORDER BY Name)
-				RETURNING Account(Name, Industry LIMIT 10)
-			Manera de recibir la lista de listas:
-				List<List<sObject>> searchList = [*consulta*];
-		- En in se indica: EN QUÉ CAMPOS Salesforce va a buscar el texto.
-			- IN ALL FIELDS -> Busca el texto en todos los campos.
-			- IN NAME FIELDS -> Busca el texto en campos que contengan nombres.
-			- IN EMAIL FIELDS -> Busca el texto en campos que contengan emails.
-			- IN PHONE FIELDS -> Busca el texto en campos que contengan números
-				telefonicos.
-		- FIND :nombreVariable -> Para inyectar dinámicamente una variable en el texto
-			a buscar.
+          Objeto2(Campo21, Campo22, Campo2N),
+ 	  ObjetoM(CampoM1, CampoMK2, CampoMN) ->
+ 		- En returning se indica: Qué objetos quieres que Salesforce revise y Qué
+ 			campos quieres que te regrese si encuentra coincidencias.
+ 			La búsqueda retorna una lista de listas, Por cada objeto que se
+ 			seleccione se tiene una lista (entonces la subLista 1 es de objetos de
+ 			tipo 1, la subLista2 es de objetos de tipo 2 y asi sucesivamente).
+ 			   NombreTablaObjeto1[] subLista1 = (NombreTablaObjeto1[])searchList[0];
+ 		 	   NombreTablaObjeto2[] subLista2 = (NombreTablaObjeto2[])searchList[1];
+ 			  NombreTablaObjetoM[] subListaM = (NombreTablaObjetoM[])searchList[M-1];
+ 			Tabmein al indicar un objeto, se puede colocar condiciones,
+ 			ordenaciones y/o limitar el nuemro de registros. **
+ 			Por ejemplo:
+ 				RETURNING Account(Name, Industry WHERE Industry='Apparel')
+ 				RETURNING Account(Name, Industry ORDER BY Name)
+ 				RETURNING Account(Name, Industry LIMIT 10)
+ 			Manera de recibir la lista de listas:
+ 				List<List<sObject>> searchList = [*consulta*];
+ 		- En in se indica: EN QUÉ CAMPOS Salesforce va a buscar el texto.
+ 			- IN ALL FIELDS -> Busca el texto en todos los campos.
+ 			- IN NAME FIELDS -> Busca el texto en campos que contengan nombres.
+ 			- IN EMAIL FIELDS -> Busca el texto en campos que contengan emails.
+ 			- IN PHONE FIELDS -> Busca el texto en campos que contengan números
+ 				telefonicos.
+ 		- FIND :nombreVariable -> Para inyectar dinámicamente una variable en el texto
+ 			a buscar.
 
-		
+ 
+DESENCADENADORES DE APEX
+
+permiten realizar acciones personalizadas antes o después de eventos para registros en Salesforce, como inserciones, actualizaciones o eliminaciones
+ 
+Crear un nuevo trigger: *En el developer console* -> click menú file -> new -> ápex trigger
+ 	-> Ingresar el nombre del trigger y el nombre de la tabla sobre el cual recaerá el
+ 	trigger.
+
+trigger TriggerName on ObjectName (trigger_events) {
+   // n instrucciones
+} -> Para crear un trigger.
+ 	Eventos:
+ 	Especifique varios eventos de desencadenador en una lista separada por comas.
+ 	- before insert
+ 	- before update
+ 	- before delete
+ 	- after insert
+ 	- after update
+ 	- after delete
+ 	- after undelete
+
+Variables de contexto --------------------
+
+Se ocupan dentro del cuerpo de un trigger.
+
+Trigger.new -> Contiene todos los registros insertados en desencadenadores de tipo insert o
+ 	update.
+
+Trigger.old -> Proporciona la versión anterior de sObjects antes de actualizarlos en
+ 	desencadenadores update o una lista de sObjects eliminados en desencadenadores delete.
+
+Trigger.isInsert -> Devuelve true si este desencadenador se activó debido a una operación
+ 	de inserción
+
+Trigger.isUpdate -> Devuelve true si este desencadenador se activó debido a una operación
+ 	de update
+
+Hay muchísimos mas.
 
 
+addError() -> Genera un error grave en el desencadenador. El mensaje de error se muestra en la 
+	interfaz de usuario y se registra.
+	La llamada a este método en un desencadenador revierte todo el conjunto de operaciones, 
+	excepto si se llama a DML masivo con una validez parcial.
 
-
-
+Desactivar un desencadenador: En la parte sup derecha buscar el logo de settings -> opción 
+	setup -> buscar y seleccionar Apex Triggers -> edit sobre determinado trigger -> 
+	despalomear is active -> sabe.
 
 
 
@@ -749,11 +800,11 @@ RETURNING Objeto1(Campo11, Campo12, Campo1N),
 
 LIGHNING APP BUILDER
 
-Sirve para crear elementos visuales en una pagina, esta herramientas es muy similar a lo que 
+Sirve para crear elementos visuales en una pagina, esta herramientas es muy similar a lo que
 haría un desarrollador front end.
 
-Crear elementos visuales en determinada pagina: En la parte sup derecha buscar el logo de 	settings -> opción setup -> buscar y seleccionar lighning app builder -> darle click 
-	en edit sobre determinada pagina.
+Crear elementos visuales en determinada pagina: En la parte sup derecha buscar el logo de 	settings -> opción setup -> buscar y seleccionar lighning app builder -> darle click
+ 	en edit sobre determinada pagina.
 
 
 
