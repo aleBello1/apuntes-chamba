@@ -767,8 +767,8 @@ Variables de contexto --------------------
 
 Se ocupan dentro del cuerpo de un trigger.
 
-Trigger.new -> Contiene todos los registros insertados en desencadenadores de tipo insert o
- 	update.
+Trigger.new -> Contiene todos los registros del objeto sobre el que se ejecuta el trigger en 	operaciones de tipo insert o update.
+	El tipo de dato de la lista es List<SObject>.
 
 Trigger.old -> Proporciona la versión anterior de sObjects antes de actualizarlos en
  	desencadenadores update o una lista de sObjects eliminados en desencadenadores delete.
@@ -789,7 +789,16 @@ addError() -> Genera un error grave en el desencadenador. El mensaje de error se
 
 Desactivar un desencadenador: En la parte sup derecha buscar el logo de settings -> opción 
 	setup -> buscar y seleccionar Apex Triggers -> edit sobre determinado trigger -> 
-	despalomear is active -> sabe.
+	despalomear is active -> save.
+
+public class NombreClaseX {
+    @future(callout=true)
+    public static void nombreMetodoY() {
+        // n instrucciones.
+    }
+} -> Para hacer una llamada externa (consumir una servicio externo) desde un desencadenador, se 
+	crea un método anotado con @future(callout=true).
+	Este método se llamara dentro de un trigger.
 
 
 
