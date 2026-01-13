@@ -1,0 +1,181 @@
+PATRONES DE DISEÑO
+
+Lazy Initialization: Patron de diseño que consiste en hacer:
+	- No se crea el objeto al iniciar la clase
+	- Se crea cuando se usa por primera vez
+	- Se reutiliza después
+	Útil para:
+	- Evitar trabajo innecesario
+	- Mejorar performance
+	- Reducir consumo de recursos
+	Esto se logra haciendo en el código: by lazy { … }
+
+Memoization / Caching: Patron de diseño que consiste en hacer:
+	- Guardar el resutlado de una operación costosa.
+	- Reutilizar el resultado.
+
+
+/////////////////////////////CLIENTES HTTP
+
+WEB CLIENT
+
+Es un cliente http similar a restTemplate solo que este es usado en programación reactiva.
+Reactivo es lo mismo que no bloqueante. ***
+
+Difrerencias con restTemplate: Es No bloqueante (reactivo).
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency> -> Dependencia para usar web client en el proyecto.
+	Con esta dependencia también se Habilita la programación reactiva (Mono, Flux).
+
+@Autowired
+private lateinit var builder: WebClient.Builder -> Para inyectar web client.
+
+Instrucciones para mandar una petición ----------------------------
+
+builder.build() -> Crea una instancia de WebClient.
+	Todavía no hace la petición en este momento.
+
+*Metodos cadena del anterior metodo*
+
+.nombreMetodoHttp() -> Indica el método http.
+
+.uri(nombreUrl) -> Define la url.
+
+.contentType(MediaType.NombreTipo) -> Define el tipo de los datos que se están
+	enviando.
+	-  APPLICATION_FORM_URLENCODED -> Significa que se están enviando datos de tipo 
+		formulario.
+
+.bodyValue(body) -> Contiene el cuerpo de la petición.
+
+.header("nombreHeader", valorHeader) -> Para configurar un header.
+
+.retrieve() -> Ejecuta la petición y Obtiene el código de respuesta HTTP.
+	Aun no tiene el cuerpo de la respuesta. **
+
+.bodyToMono(TipoDatoZ) -> Toma el body de la respuesta y Lo convierte en un objeto Envuelto en 
+	un Mono.
+	El valor que recibe esta instrucción es equivalente a: Mono<TipoDatoX>
+	TipoDatoZ:
+	- object : ParameterizedTypeReference<Map<String, Any>>() {} -> Este es el tipo de dato 
+		mas genérico porque esto significa: El JSON es un mapa con claves String y 
+		valores de cualquier tipo.
+	- String::class.java -> Para recibir el cuerpo de la respuesta y convertirlo a string.
+		Se tendría que parsear después.
+		Este valor es mas usado cuando se lanza una query. *****
+
+
+
+
+	
+
+
+
+
+//////////////////////////////////////////////SALESFORCE////////////////////////////////////////
+
+Project Reactor es un framework de programación reactiva para Java (y Kotlin) que sirve para manejar operaciones asíncronas y no bloqueantes de forma eficiente, especialmente en aplicaciones modernas como Spring WebFlux.
+Project Reactor NO solo se usa con WebFlux.
+
+Mono<T> representa una operación que producirá un cero, un valor en el futuro o un error.
+	Es el resultado de una operación asíncrona.
+	Analogía Te avisaré cuando tenga el resultado.
+
+En programación reactiva:
+Mono = 0 o 1 elemento
+Flux = 0 a N elementos
+
+*Donde se declaran los atributos de clase*
+private val tokenMono: Mono<Map<String, Any>> by lazy { 
+    authenticate().cache() 
+} -> Sirve para obtener un token de autenticación UNA sola vez y reutilizarlo cada vez que se 
+	necesite, sin volver a autenticarse.
+	Este cuerpo no se ejecuta todavía, se ejecuta cuando alguien lo usa por primera vez.
+	- .cache() -> Ejecuta solo la primera vez y cachea (guarda) el resultado.
+
+private fun authenticate(): Mono<Map<String, Any>> {
+    val body = "grant_type=password" +
+            "&client_id=${props.consumerKey }" +
+            "&client_secret=${props.consumerSecret}" +
+            "&username=${props.username}" +
+            "&password=${props.password}"
+
+    return builder.build()
+        .post()
+        .uri(props.urlAuth)
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .bodyValue(body)
+        .retrieve()
+        .bodyToMono(object : ParameterizedTypeReference<Map<String, Any>>() {})
+} -> Este método se autentica contra un servidor OAuth 2.0 y recupera un token de acceso de 
+	forma asíncrona y no bloqueante.
+
+
+Creadores de flujos -------------------------------
+
+
+Flux.fromIterable(records) -> Convierte cualquier iterable (List, Set, Collection, etc.) en un
+	 Flux<JsonNode>.
+
+Flux.fromArray(array) -> Convierte un arreglo en un Flux<JsonNode>.
+
+Flux.range(1, 10) -> Crea un flujo usando un rango.
+
+Flux.just(1, 2, 3) -> Crea un flujo utilizando valroes explicitos.
+
+
+Operadores reactivos -----------------------------
+
+Un operador reactivo es una función que: Se aplica sobre un Mono o un Flux, Recibe un flujo
+Devuelve otro flujo y/o Transforma, controla o reacciona a los eventos del flujo.
+
+°°°°°°° Transformación °°°°°°°°
+
+tokenMono.flatMap {} -> Toma el valor emitido por tokenMono cuando este disponible, ejecuta 
+	estás instrucciones de manera asíncrona usando ese valor.
+
+tokenMono.flatMapMany {} -> sirve para convertir un Mono en un Flux.
+	Parte de un solo valor asíncrono (Mono).
+	Ese valor se transforma en muchos elementos (Flux).
+	Se usa cuando cuando tienes: una llamada que devuelve un solo resultado pero ese 
+	resultado contiene muchos datos se necesita “desempaquetar” ese único resultado en 
+	múltiples elementos.
+
+°°°°°°° Control de errores °°°°°°°°
+
+.onErrorResume {e -> // n instrucciones} -> Si cualquier parte del flujo reactivo anterior falla,
+	se ejecuta este bloque de código.
+	Se utiliza para interceptar el error y reemplazar el flujo fallido por otro flujo 
+	alternativo, evitando que la excepción se propague.
+	Se puede aplicar a cualquier cosa que devuelva un mono o flux.
+	Es muy similar a onErrorReturn pero este nos permite hacer varias cosas y meterle 
+	lógica a lo que queramos devovler ***
+
+onErrorReturn(valor) -> Devuelve un valor fijo cuando ocurre un error.
+
+.retry(n) -> Reintenta el flujo automáticamente cuando ocurre un error.
+
+.retryWhen(
+    Retry.backoff(n, Duration.ofSeconds(m))
+) -> Reintenta con lógica avanzada.
+	Significa que habrá n intentos y esperara m segundos entre un intento y otro.
+
+.onErrorMap { e -> CustomException(e) } -> Transforma un error en otro error.
+
+.onErrorContinue -> Ignora el elemento que falló y continúa con los demás.
+
+
+
+
+
+	
+
+
+
+
+
+
+	

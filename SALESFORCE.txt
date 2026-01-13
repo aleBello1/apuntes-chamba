@@ -1,6 +1,8 @@
 mgranados@curious-fox-vn8yxn.com
 
 
+mgranados@creative-moose-h4ps3b.com
+
 
 ////////////////////////////////////GLOSARIO/////////////////////////////////////////
 
@@ -503,9 +505,83 @@ A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de 
 COMPONENTS WEB LIGHNING
 
 Desarrollo para dispositivos de escritorio y móviles basado en componentes para el desarrollo
-de interfaces de usuario
+de interfaces de usuario.
 
-Code builder: entorno de desarrollo integrado de preferencia de Salesforce que puede utilizar para desarrollar, depurar y probar código en su organización.
+Proporciona únicamente los elementos necesarios para ejecutarse correctamente en los navegadores admitidos en Salesforce. 
+La mayoría de código que escribe es JavaScript y HTML estándar.
+
+Los componentes Aura pueden contener componentes web Lightning (pero no a la inversa). 
+
+Es necesario tener intalado Salesforce CLI y vsc.
+un componente necesita que la carpeta y sus archivos tengan el mismo nombre. ******
+Para crear un componente web Lightning se necesitan tres archivos: HTML, css y js.
+
+Donde se buscan los componentes que ya están hechos para integrarlos en nuestros proyectos:
+https://developer.salesforce.com/docs/component-library/overview/components
+
+Crear un nuevo componente lightning: *En vsc y dentro de un proyecto de salesforce* -> expandir
+	la carpeta dentro del proyecto: '\force-app\main\default' -> click derecho sobre la 
+	carpeta lwc -> seleccionar 'SFDX: Create Lightning Web Component' -> escribir el nombre
+	del componenete -> enter -> enter (para aceptar la carpeta predeterminada).
+	
+Instrucciones en archivos HTML --------------------
+
+<template>
+  // n instrucciones html
+</template> -> contiene el código HTML que define la estructura del componente.
+
+{nombreVariable} -> Para inyectar una variable en la vista.
+	Las variables tienen que exportarse de los archivos js y al parecer se importan en 
+	automatico en los archivos HTML.
+	Un archivo HTML tendrá un solo archivo js del cual leera las variables, será de aquel 
+	archivo js que este en la misma carpeta que el arhcivo HTML.
+
+<template lwc:if={expresión}>
+  // n instrucciones html
+</template>
+<template lwc:else>
+  // n instrucciones html
+</template> -> Manera de hacer un if - else en la vista.
+
+
+js ------------------------
+
+Estos arhcivos js definen lo que hay que hacer con los datos, eventos, entradas, cambios de estado y mucho más para que el componente funcione.
+
+Debe incluir como mínimo este código: 
+
+import { LightningElement } from 'lwc';
+export default class nombreComponenteX extends LightningElement {
+}
+
+Hooks ---------------------------------
+
+connectedCallback() -> Se ejecuta automáticamente cuando el componente se inserta en el DOM 	(cuando aparece en la página).
+	Usado para inicializar variables, llamar a ápex o a servicios externos, lógica que 
+	debe ejecutarse una sola vez al cargar.
+
+Decoradores ----------------------------
+
+Los decoradores se suelen usar en JavaScript para modificar el comportamiento de una propiedad o función.
+Para usar un decorador, impórtelo desde el módulo lwc y colóquelo delante de la propiedad o función.
+una propiedad o función solo puede tener un decorador y no mas. *
+
+@api -> Hace que una propiedad o método sea público.
+	Usado para:
+	Recibir datos desde un componente padre
+	Permitir que el padre llame métodos del hijo
+	Configurar el componente desde fuera.
+
+@track -> Se usa para hacer reactivos los cambios en objetos o arreglos, de modo que la UI se 
+	vuelva a renderizar cuando cambian.
+	Hoy en día casi no se usa, porque LWC ya maneja reactividad automática en muchos 
+	casos. **
+
+@wire se usa para obtener datos reactivos automáticamente desde Apex o desde Lightning Data 
+	Service (LDS) sin escribir lógica imperativa.
+	Para conectar un componente LWC a una fuente de datos de Salesforce y mantener la UI 
+	sincronizada automáticamente cuando los datos cambian.
+
 
 
 APEX
@@ -692,6 +768,8 @@ for (Account[] tmp : [SELECT Id FROM Account WHERE Name LIKE 'for loop _']) {
 }
 
 
+
+
 SALESFORCE OBJECT SEARCH LANGUAGE (SOSL)
 
 Es un lenguaje de búsqueda de Salesforce usado para realizar búsquedas de texto en multiples
@@ -799,6 +877,34 @@ public class NombreClaseX {
 } -> Para hacer una llamada externa (consumir una servicio externo) desde un desencadenador, se 
 	crea un método anotado con @future(callout=true).
 	Este método se llamara dentro de un trigger.
+
+Ejmeplo de optimización de consulta -------------------------
+
+No recuerdo si debería ir dento de este tema.
+
+En vez de usar una consulta asi:
+
+    for(Account a : Trigger.new) {
+        Opportunity[] opps = [SELECT Id,Name,CloseDate
+                             FROM Opportunity WHERE AccountId=:a.Id];
+        // Do some other processing
+    }
+Es mejor hacerla asi:
+    List<Account> acctsWithOpps =
+        [SELECT Id,(SELECT Id,Name,CloseDate FROM Opportunities)
+         FROM Account WHERE Id IN :Trigger.new];
+
+
+Swtich para el trigger ---------------------------------
+
+switch on Trigger.operationType -> se usa para saber qué tipo de operación DML disparó el 
+	trigger y ejecutar lógica distinta según el evento (insert, update, delete, etc.).
+	- when BEFORE_INSERT {} -> Se ejecuta antes de insertar registros nuevos.
+	- when BEFORE_UPDATE {} -> Se ejecuta antes de actualizar registros.
+	- existe before_delete, after_insert, after_update y after_delete.
+
+
+
 
 
 
