@@ -1,7 +1,6 @@
 mgranados@curious-fox-vn8yxn.com
 
 
-mgranados@creative-moose-h4ps3b.com
 
 
 ////////////////////////////////////GLOSARIO/////////////////////////////////////////
@@ -447,7 +446,7 @@ Crear un nuevo proyecto de Salesforce (desde VS Code): *En vsc* ->  Ctrl + Shift
  	Seleccione una carpeta en su dispositivo para guardar el proyecto.
 
 Autorizar determinado playgroud desde cli: Usamos el comando: sf org login web -> Después nos
- 	pedirá ingresar un usuario y contraseña. Este usuario y contraseña deben ser los que 	específicamente se crean por si solos, los cuales son diferentes a las credenciales que
+ 	pedirá ingresar un usuario y contraseña. Este usuario y contraseña deben ser los que 	específicamente tiene cada playground, los cuales son diferentes a las credenciales que
  	usarmos para iniciar sesión en Salesforce.
  	Para determinar el usuiairo y contraseña de un playground deberemos restablecer la
  	contraseña de determinado playground.
@@ -523,6 +522,15 @@ Crear un nuevo componente lightning: *En vsc y dentro de un proyecto de salesfor
 	la carpeta dentro del proyecto: '\force-app\main\default' -> click derecho sobre la 
 	carpeta lwc -> seleccionar 'SFDX: Create Lightning Web Component' -> escribir el nombre
 	del componenete -> enter -> enter (para aceptar la carpeta predeterminada).
+
+Subir los archivos a la organización: *Primero se debe Conectar un playground con el local y 
+	establecerla como organización default* -> clic con el botón derecho en la carpeta 
+	force-app/main/default -> seleccione SFDX: Deploy This Source to Org.
+
+Permitir que las variables de js que almacenan links de imágenes provenientes de amazon 
+	(almacenadas en s3) se puedan mostrar: 
+	
+	
 	
 Instrucciones en archivos HTML --------------------
 
@@ -581,6 +589,24 @@ una propiedad o función solo puede tener un decorador y no mas. *
 	Service (LDS) sin escribir lógica imperativa.
 	Para conectar un componente LWC a una fuente de datos de Salesforce y mantener la UI 
 	sincronizada automáticamente cuando los datos cambian.
+
+Archvio de configuraion ---------------------------
+
+El archivo que tiene la extensión .js-meta.xml, es el archivo de configuración de un 
+componente. Este archivo proporciona metadatos para Salesforce, incluida la configuración de diseño de los componentes que se van a usar en Lightning App Builder
+
+Configuraciones de este archivo:
+
+apiVersion -> vincula el componente a una versión de API de Salesforce.
+
+isExposed -> Si vale false el componente no se expone en Lightning App Builder ni Experience 
+	Builder.
+
+targets -> Especifica los tipos de páginas Lightning a las que se puede agregar el componente 
+	en Lightning App Builder.
+
+targetConfigs -> permite especificar comportamiento específico para cada tipo de página 
+	Lightning, incluidas cosas como los objetos que respaldan el componente.
 
 
 
