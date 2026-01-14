@@ -528,7 +528,24 @@ Subir los archivos a la organización: *Primero se debe Conectar un playground c
 	force-app/main/default -> seleccione SFDX: Deploy This Source to Org.
 
 Permitir que las variables de js que almacenan links de imágenes provenientes de amazon 
-	(almacenadas en s3) se puedan mostrar: 
+	(almacenadas en s3) se puedan mostrar: *En salesforce* -> En la parte sup derecha buscar
+	 el logo de settings -> opción setup -> busque y seleccione trusted urls > new trusted 
+	url -> sginar nombre al link y escribir el link que queremos permitir que se muestre 
+	-> tipo de images: img-src -> save.
+
+Crear una nueva pagiina para los componentes: *En salesforce* -> En la parte sup derecha buscar
+	el logo de settings -> opción setup -> busque y seleccione Lightning App Builder ->
+	new -> app page -> tipe of page: one región -> asginar nombe a la pagina -> *En la 
+	parte izq ya podremos ver los componentes y arrastrarlos* -> después ya nadamas 
+	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
+	seleccionar 
+	- Cambiar el tipo de pagina: Si nos equivocamos sobre el tipo de pagina le damos en 
+		edit -> En la parte derecha de la pagina -> edit templates.
+	
+
+
+	 
+
 	
 	
 	
