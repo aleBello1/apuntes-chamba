@@ -544,10 +544,6 @@ Crear una nueva pagiina para los componentes: *En salesforce* -> En la parte sup
 	
 
 
-	 
-
-	
-	
 	
 Instrucciones en archivos HTML --------------------
 
@@ -568,6 +564,49 @@ Instrucciones en archivos HTML --------------------
   // n instrucciones html
 </template> -> Manera de hacer un if - else en la vista.
 
+<c-nombreComponenteHijoX></c-nombreComponenteHijoX> -> Para que un componente padre 
+	pueda mostrar a su componente hijo.
+	- onproductselected={handleProductSelected} -> 
+
+<template for:each={nombreArregloX} for:item="elementoX">
+  // n instrucciones html
+</template> -> Para iterar un arreglo en la vista.
+	
+Comunicaciones entre componentes -----------------------------
+
+Los componentes se pueden comunicar entre un padre y un hijo en ambos sentidos.
+
+     Comunicación ascendente 
+
+Para llevar a cabo una comunicación hacia arriba se usan eventos y/o agentes de escucha de eventos.
+El componente secundario envía el evento y el principal lo escucha. 
+
+*En la vista del padre*
+<c-nombreComponenteHijoX onNombreEventoPadreY={nombreEventoPadreY}></c-nombreComponenteHijoX> -> 	Se llama al componenete hijo y como atributo de la etiqueta se le pasa el nombre del 
+	evento del padre.
+	Por nomeclatura el nombre del atributo se le antepone el prefijo on.
+
+*En el archivo js del padre*
+nombreEventoPadreY() {
+   // n instrucciones
+} 
+
+     Comunicación descendente
+
+La información se puede comunicar en sentido descendente mediante propiedades públicas y métodos públicos.
+
+*En el archivo js del hijo*
+@api nombreAtributo; -> Para recibir valores.
+
+*En el archivo html del padre*
+<c-nombreComponenteHijoX nombre-atributo={valor}></c-nombreComponenteHijoX> -> Para mandar 	valores desde el padre al hijo.
+	Observese que en la vista, el nombre del atributo usa la nomeclatura snake-case y en
+	js se ocupa camelCase.
+
+
+
+
+ 
 
 js ------------------------
 
