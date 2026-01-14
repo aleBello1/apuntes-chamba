@@ -603,10 +603,35 @@ La información se puede comunicar en sentido descendente mediante propiedades p
 	Observese que en la vista, el nombre del atributo usa la nomeclatura snake-case y en
 	js se ocupa camelCase.
 
+Estilos ---------------------------------------
+
+Salesforce tiene su propia macro de css (estilos propios de saelesorce que son usados para 
+que nuestros componentes tengan los mismos estilos que las paginas de salesforce) conocido como
+Salesforce Lightning Design System (SLDS).
 
 
+Incorporar datos de Salesforce a nuestros componentes -----------------
 
- 
+El servicio "wire" incorpora datos en su aplicación.
+Este servicio forma parte de nuestra plataforma y proporciona una transmisión de datos.
+
+@wire(tipoAdaptador, { parametros })
+nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
+	devuelve el adaptador (UI API o Apex).	
+	El atributo contendrá dos atirubots el primero (data) contiene la infor solicitada y 
+	el segundo (error) un posible mensaje de errro.
+	Tipos de adaptadores:
+	Cada uno de estos se deben importar desde diferentes paquetes.
+	Adaptadores para LDS ------------------
+	- getRecord -> Para traerse en un registro individual.
+	- getRecordUi -> Para metadatos del registro.
+	- getObjectInfo -> Metadatos del objeto.
+	Valores para el segundo parámetro:
+	- Si se uso getRecord: Se debe pasar un objeto con dos atributos los cuales define QUÉ 
+		datos traes y CÓMO los traes.
+		En el primer atributos se coloca el id del registro (Es obligatorio) y en el 
+		segundo atributo se especifica un array de campos que deseamos traernos del 
+		registro.
 
 js ------------------------
 

@@ -1,0 +1,2 @@
+Cuando hay un archivo buildspec.yml son los despliegues automáticos exclusivos de aws para 
+desplegar aplicaciones hacia ec2. No funciona para un arm porque son arquitecturas diferentes.
