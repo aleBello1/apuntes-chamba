@@ -1,5 +1,5 @@
+mgranados@empathetic-shark-b7yzem.com
 
-mgranados@cunning-bear-94p9n.com
 
 
 ////////////////////////////////////GLOSARIO/////////////////////////////////////////
@@ -524,6 +524,12 @@ Crear un nuevo componente lightning: *En vsc y dentro de un proyecto de salesfor
 	carpeta lwc -> seleccionar 'SFDX: Create Lightning Web Component' -> escribir el nombre
 	del componenete -> enter -> enter (para aceptar la carpeta predeterminada).
 
+Crear un nuevo componente lightning (forma alternativa: con comando): *En vsc y dentro de un 
+	proyecto de salesforce* -> abrir la terminal y ejecutar: sf lightning generate 	component -n nombreComponente -d force-app/main/default/lwc --type lwc.
+	- -n -> define el nombre de la carpeta de componentes web de Lightning y sus archivos.
+	- -d -> define el directorio destino donde debe crearse el componente web de Lightning. 
+	- --type -> especifica que quieres crear un componente web de Lightning.
+
 Subir los componentes a la organización: *Primero se debe Conectar un playground con el local y 
 	establecerla como organización default* -> clic con el botón derecho en la carpeta 
 	force-app/main/default -> seleccione SFDX: Deploy This Source to Org.
@@ -549,6 +555,11 @@ Agregar los componentes a una aplicación existente: *En salesforce* -> Buscar d
 	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
 	seleccionar 
 
+Herrameintoas para los componentes --------------------------------
+
+local dev: es una herramienta de CLI de Salesforce que te permite ejecutar una vista previa en tiempo real de tus componentes web de Lightning en tu navegador. La vista previa se actualiza automáticamente a medida que editas tus componentes localmente, así que no tienes que desplegar código ni actualizar manualmente la página del navegador.
+
+Doc para su instalación: https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html
 	
 
 Otros ------------------------------
@@ -703,6 +714,48 @@ targets -> Especifica los tipos de páginas Lightning a las que se puede agregar
 
 targetConfigs -> permite especificar comportamiento específico para cada tipo de página 
 	Lightning, incluidas cosas como los objetos que respaldan el componente.
+
+
+Dev hub --------------------------------------------------
+
+Es una funcionalidad especial que se habilita en una org y que permite:
+Crear, administrar y controlar Scratch Orgs
+Usar completamente Salesforce DX (SFDX)
+Facilitar desarrollo moderno y colaborativo
+sirve para:
+Crear Scratch Orgs (orgs temporales)
+Definir la configuración de esas orgs con código
+Centralizar el control del desarrollo
+Facilitar CI/CD y trabajo en equipo.
+
+Una Scratch Org es:
+Una org temporal
+Se crea desde código (archivo project-scratch-def.json)
+Dura días (1–30)
+Se borra y se vuelve a crear fácilmente
+Ideal para:
+Desarrollo
+Pruebas
+Automatización
+Labs avanzados.
+
+Activar dev hub para determinado playground: *Estando en salesforce en determinado playground*
+	-> En la parte sup derecha buscar el logo de settings -> opción setup -> buscar y 	seleccionar dev hub -> activar.
+
+Autorizar un Dev Hub desde VS Code: *Tiene que estar autorizado determinado playground para 
+	trabajar con dev hub* -> ctrl + shift + p -> escribir sfdx: authorize a Dev Hub ->
+	ingresar un alias para la organización -> Inicia sesión usando tus credenciales de 	organización -> permitir.
+
+activa Local Dev: *en vsc y dentro de un proyecto* -> Buscar y abrir el archivo 
+	config/project-scratch-def.json -> Dentro de la clave lightningExperienceSettings ->
+	agregar: "enableLightningPreviewPref": true
+
+Crear una organización de cero: *Tiene que estar activo local dev* -> abir la terminal y ejecutar
+	el siguiente comando: sf org create scratch 
+	--definition-file config/project-scratch-def.json --alias nombreAlias --target-dev-hub 
+	nombreOrganizacionHub
+
+
 
 
 
