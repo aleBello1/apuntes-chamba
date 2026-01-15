@@ -1,6 +1,5 @@
-mgranados@curious-fox-vn8yxn.com
 
-
+mgranados@cunning-bear-94p9n.com
 
 
 ////////////////////////////////////GLOSARIO/////////////////////////////////////////
@@ -442,6 +441,8 @@ sf update -> Actualizo todo lo relacionado a Salesforce
 
 Conectar un playground con el local ---------------------------
 
+Es necesario que en vsc se tenga instalada la extensión Salesforce Extension Pack (expanded).
+
 Crear un nuevo proyecto de Salesforce (desde VS Code): *En vsc* ->  Ctrl + Shift + P -> escribir 	'SFDX: Create Project with Manifest' -> estándar -> Asigna un nombre al proyecto ->
  	Seleccione una carpeta en su dispositivo para guardar el proyecto.
 
@@ -523,7 +524,7 @@ Crear un nuevo componente lightning: *En vsc y dentro de un proyecto de salesfor
 	carpeta lwc -> seleccionar 'SFDX: Create Lightning Web Component' -> escribir el nombre
 	del componenete -> enter -> enter (para aceptar la carpeta predeterminada).
 
-Subir los archivos a la organización: *Primero se debe Conectar un playground con el local y 
+Subir los componentes a la organización: *Primero se debe Conectar un playground con el local y 
 	establecerla como organización default* -> clic con el botón derecho en la carpeta 
 	force-app/main/default -> seleccione SFDX: Deploy This Source to Org.
 
@@ -533,7 +534,7 @@ Permitir que las variables de js que almacenan links de imágenes provenientes d
 	url -> sginar nombre al link y escribir el link que queremos permitir que se muestre 
 	-> tipo de images: img-src -> save.
 
-Crear una nueva pagiina para los componentes: *En salesforce* -> En la parte sup derecha buscar
+Crear una nueva pagina para los componentes: *En salesforce* -> En la parte sup derecha buscar
 	el logo de settings -> opción setup -> busque y seleccione Lightning App Builder ->
 	new -> app page -> tipe of page: one región -> asginar nombe a la pagina -> *En la 
 	parte izq ya podremos ver los componentes y arrastrarlos* -> después ya nadamas 
@@ -541,7 +542,21 @@ Crear una nueva pagiina para los componentes: *En salesforce* -> En la parte sup
 	seleccionar 
 	- Cambiar el tipo de pagina: Si nos equivocamos sobre el tipo de pagina le damos en 
 		edit -> En la parte derecha de la pagina -> edit templates.
+
+Agregar los componentes a una aplicación existente: *En salesforce* -> Buscar determinada app
+	-> en la parte sup derecha en el logo de engrane -> edit page -> -> *En la 
+	parte izq ya podremos ver los componentes y arrastrarlos* -> después ya nadamas 
+	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
+	seleccionar 
+
 	
+
+Otros ------------------------------
+
+Para poder personalizar especificamente la pagina home: Por personalización se refiere a 
+	a modificar qué ve el usuario cuando entra a Salesforce, usando Lightning App Builder, 
+	es decir, Qué componentes aparecen, Dónde aparecen y Para quién aparecen.
+	En la parte sup derecha buscar el logo de settings -> opción setup -> buscar y 	seleccionar home -> en advanced seller home cambiar la configuración a inactivo.
 
 
 	
@@ -1031,9 +1046,10 @@ Crear elementos visuales en determinada pagina: En la parte sup derecha buscar e
 
 
 
+/////////////////////////////////OTROS/////////////////////////////////
 
 
-
+	
 
 
 
