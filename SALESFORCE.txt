@@ -755,6 +755,13 @@ Crear una organización de cero: *Tiene que estar activo local dev* -> abir la t
 	--definition-file config/project-scratch-def.json --alias nombreAlias --target-dev-hub 
 	nombreOrganizacionHub
 
+Para desplegar los componentes a cierta organización de zero: abir la terminal y ejecutar el 
+	siguiente comando: sf project deploy start --target-org nombreAliasOrgZero.
+
+sf org open --target-org nombreAliasOrgZero -> Para abrir determinada organización zero.
+	Una vez estando en la organización, podremos hacer 'Agregar los componentes a una 
+	aplicación existente' ó 'Crear una nueva pagina para los componentes'.
+
 
 
 
