@@ -555,12 +555,6 @@ Agregar los componentes a una aplicación existente: *En salesforce* -> Buscar d
 	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
 	seleccionar 
 
-Herrameintoas para los componentes --------------------------------
-
-local dev: es una herramienta de CLI de Salesforce que te permite ejecutar una vista previa en tiempo real de tus componentes web de Lightning en tu navegador. La vista previa se actualiza automáticamente a medida que editas tus componentes localmente, así que no tienes que desplegar código ni actualizar manualmente la página del navegador.
-
-Doc para su instalación: https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html
-	
 
 Otros ------------------------------
 
@@ -697,7 +691,7 @@ una propiedad o función solo puede tener un decorador y no mas. *
 	Para conectar un componente LWC a una fuente de datos de Salesforce y mantener la UI 
 	sincronizada automáticamente cuando los datos cambian.
 
-Archvio de configuraion ---------------------------
+Archivo de configuración ---------------------------
 
 El archivo que tiene la extensión .js-meta.xml, es el archivo de configuración de un 
 componente. Este archivo proporciona metadatos para Salesforce, incluida la configuración de diseño de los componentes que se van a usar en Lightning App Builder
@@ -717,6 +711,12 @@ targetConfigs -> permite especificar comportamiento específico para cada tipo d
 
 
 Dev hub --------------------------------------------------
+
+local dev: es una herramienta de CLI de Salesforce que te permite ejecutar una vista previa en tiempo real de tus componentes web de Lightning en tu navegador. La vista previa se actualiza automáticamente a medida que editas tus componentes localmente, así que no tienes que desplegar código ni actualizar manualmente la página del navegador.
+
+Para poder incorporar esta herramienta es necesario instalarla y hacer todo lo relacionado
+con dev hub.
+Doc para su instalación: https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html
 
 Es una funcionalidad especial que se habilita en una org y que permite:
 Crear, administrar y controlar Scratch Orgs
@@ -762,8 +762,50 @@ sf org open --target-org nombreAliasOrgZero -> Para abrir determinada organizaci
 	Una vez estando en la organización, podremos hacer 'Agregar los componentes a una 
 	aplicación existente' ó 'Crear una nueva pagina para los componentes'.
 
+sf lightning dev app --target-org nombreAliasOrgZero --device-type tipoDevice -> Crea (o abre) 
+	una Lightning Development App, que es una aplicación especial donde puedes probar y 
+	visualizar componentes Lightning sin necesidad de agregarlos a una app estándar 
+	existente.
+	No es una app productiva, es solo para desarrollo y pruebas
+	Solamente es temporal la app.
+	Tipo device:
+	- Desktop
+	- phone
+	- Tablet.
+	Se nos pediría seleccionar una app para previsualizar.
 
 
+Configurar herramienta de mobile app simulator ----------------------------------
+
+El simulador de apps móviles para ios solo se puede hacer en mac. ****
+
+Primero se debe tomar las credenciales de determinado playground (se debe hacer el proceso 
+de restrablecer la contraseña).
+
+Configurar emulador de android: *En Android studio* -> clic en Más acciones o Icono de menú de 
+	3 puntos -> selecciona Administrador de dispositivos virtuales -> clic en Crear 
+	dispositivo -> selecciona tu dispositivo preferido y haz clic en Siguiente -> Selecciona
+	una versión y haz clic en Siguiente -> terminar 
+
+Lanzar un dispositivo móvil: *En Android studio* -> clic en Más acciones o Icono de menú de 
+	3 puntos -> selecciona Administrador de dispositivos virtuales -> clic Emulador botón de 	reproducir. en la columna Acciones del dispositivo para lanzar el emulador de Android.
+
+Instala el emulador de la aplicación móvil Salesforce para Android:  *Teniendo un dispositivo
+	movil corriendo* -> Descarga la versión del emulador de Android de la app Salesforce 	Mobile en: https://developer.salesforce.com/tools/mobile-debugging -> Arrastra el 
+	archivo de .apk descargado a la ventana del emulador de Android.
+
+Configurar la app de Salesforce en el emulador Android: Entrar a la app en el dispositivo 
+	simulado -> clic en Acepto para aceptar el acuerdo de licencia de usuario final ->
+	meter las credenciales de de4terminado playground.
+
+Activar el modo depuración en el playground: En la parte sup derecha -> click logo de engrane
+	-> set up -> buscar y seleccionar debug mode -> clic en la casilla de verificación junto 	a nuestro usuario -> activar.
+
+conectar Chrome con dev tools para Android: En el dispositivo Android emulado -> abre la app 	Configuración -> entrar en About emulated device -> Desplázate hasta el final de la 
+	página y haz clic en Build número 7 veces. El mensaje "¡Ahora eres un desarrollador!"
+	-> abre la app móvil de Salesforce y navega a tu componente web personalizado de 
+	Lightning -> Abre Chrome en tu escritorio -> introduce chrome://inspect/#devices 
+	-> clic en Inspeccionar en el emulador de Target remoto con el que estás trabajando.
 
 
 APEX
