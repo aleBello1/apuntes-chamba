@@ -1,4 +1,3 @@
-mgranados@empathetic-shark-b7yzem.com
 
 
 
@@ -653,6 +652,15 @@ nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente c
 		segundo atributo se especifica un array de campos que deseamos traernos del 
 		registro.
 
+@wire(tipoAdaptador, { parametros })
+wiredNombreObjeto({data, error}) {
+ // logica
+}
+nombreAtributo; -> Se usa igualito que el anterior pero se anexa una función entre el atributo
+	y la anotación para agregar lógica a los datos.
+
+
+
 js ------------------------
 
 Estos arhcivos js definen lo que hay que hacer con los datos, eventos, entradas, cambios de estado y mucho más para que el componente funcione.
@@ -806,6 +814,124 @@ conectar Chrome con dev tools para Android: En el dispositivo Android emulado ->
 	-> abre la app móvil de Salesforce y navega a tu componente web personalizado de 
 	Lightning -> Abre Chrome en tu escritorio -> introduce chrome://inspect/#devices 
 	-> clic en Inspeccionar en el emulador de Target remoto con el que estás trabajando.
+
+Trabajar con datos ---------------------------------------
+
+°°°°°°°° Usando lightning data service °°°°°°°°°
+
+Es la forma preferida (y más sencilla) de trabajar con datos de Salesforce.
+Se usa JavaScript para conectar componentes a los datos de Salesforce.
+
+Mantiene datos consistentes y actualizados entre múltiples componentes y clientes a lo largo del ciclo de vida de la aplicación. Si varios componentes utilizan Lightning Data Service para trabajar con un registro, y uno de ellos actualiza el registro, los demás componentes reflejan automáticamente esa actualización.
+
+Es la forma recomendada en Salesforce (LWC) para leer, crear, actualizar y eliminar registros sin
+escribir Apex, usando datos “en caché” y respetando seguridad, permisos y FLS automáticamente.
+
+
+<lightning-record-form
+    *atributos*>
+</lightning-record-form> -> Permite crear, ver o editar un registro.
+	NO requiere JS obligatorio.
+	Se usa cuando Necesitas un formulario rápido y No necesitas lógica compleja.
+	No se debe usar cuando Quieres interceptar campos individuales, Necesitas UI muy 	personalizada y Necesitas validaciones personalizadas complejas.+
+	Atributos: 
+	- object-api-name="nombreObjeto" -> Define el objeto Salesforce.
+		En Salesforce los objetos usan API Name en singular, no plural. ***
+	- record-id
+		- Si existe → modo edición o vista
+		- Si NO existe → modo creación.
+	- mode="valor" -> Define el comportamiento del formulario
+		- view -> Solo lectura
+		- edit -> Edición
+		- readonly -> Similar a view
+		- create -> Crear nuevo registro
+	- layout-type -> Usa layouts de Salesforce.
+		- Full -> Layout completo
+		- Compact -> Compact Layout
+	- columns="n" -> Número de columnas (solo en Full layout).
+	- fields = ['nombreCampo1', 'nombreCampo2', 'nombreCampoN'];
+	  fields={fields} -> sirve para decirle explícitamente al componente qué campos mostrar,
+		y en que orden en lugar de usar el layout del objeto.
+	Eventos disponibles: 
+	- onsubmit={nombreFuncion} -> Funcion que se manda a llamar al presionar el button del 
+		formulario.
+		Solo se usa cuando Debes modificar campos antes de guardar, Debes validar datos 
+		custom y Debes cancelar el guardado bajo ciertas condiciones.
+	- onsuccess={nombreFuncion} -> Funcion que se manda a llamar después completar 
+		correctamente la función onsubmit.
+	- onerror={nombreFuncion} -> Funcion que se manda a llamar después la función onsubmit
+		fallara.
+
+
+°°°°°°°° Usando la anotación wire °°°°°°°°°
+
+Unicmanete se usa para leer registros.
+Ya se explico en otra sección como usarlo.
+
+
+°°°°°°°° Usando UI Record API en modo imperativo °°°°°°°°°
+
+Es un conjunto de funciones JS que te permite: Crear, Actualizar y Eliminar (y obtener info de 
+metadata).
+Se llama imperativo porque tú decides cuándo ejecutar la acción (click, evento, lógica).
+
+Usa UI Record API cuando: Necesitas botones personalizados, Quieres lógica antes/después del guardado y No quieres depender de layouts.
+
+Ejemplo de guardar un registro:
+
+handleCreate() {
+    const fields = {
+        Name: 'Cuenta creada por LWC',
+        Phone: '555-1234',
+        Industry: 'Technology'
+    };
+
+    const recordInput = {
+        apiName: 'Account',
+        fields
+    };
+
+    createRecord(recordInput)
+        .then(record => {
+            console.log('ID creado:', record.id);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+Ejemplo de actualizar un registro:
+
+handleUpdate() {
+    const fields = {
+        Id: this.recordId,      // OBLIGATORIO
+        Phone: '555-9999'
+    };
+
+    updateRecord({ fields })
+        .then(() => {
+            console.log('Registro actualizado');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+Ejemplo de eliminación de registro:
+
+handleDelete() {
+    deleteRecord(this.recordId)
+        .then(() => {
+            console.log('Registro eliminado');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+
 
 
 APEX
