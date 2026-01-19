@@ -827,6 +827,7 @@ Mantiene datos consistentes y actualizados entre múltiples componentes y client
 Es la forma recomendada en Salesforce (LWC) para leer, crear, actualizar y eliminar registros sin
 escribir Apex, usando datos “en caché” y respetando seguridad, permisos y FLS automáticamente.
 
+||||||| Usando el componente form |||||||
 
 <lightning-record-form
     *atributos*>
@@ -863,13 +864,13 @@ escribir Apex, usando datos “en caché” y respetando seguridad, permisos y F
 		fallara.
 
 
-°°°°°°°° Usando la anotación wire °°°°°°°°°
+||||||| Usando la anotación wire |||||||
 
 Unicmanete se usa para leer registros.
 Ya se explico en otra sección como usarlo.
 
 
-°°°°°°°° Usando UI Record API en modo imperativo °°°°°°°°°
+||||||| Usando UI Record API en modo imperativo |||||||
 
 Es un conjunto de funciones JS que te permite: Crear, Actualizar y Eliminar (y obtener info de 
 metadata).
@@ -931,6 +932,122 @@ handleDelete() {
 }
 
 
+°°°°°°°° Usando apex °°°°°°°°°
+
+Cuando quieres personalizar una transacción de datos de un solo registro, o realizar operaciones
+multi-registro en una sola transacción, Apex es la mejor opción.
+
+
+||||||| Usar métodos ápex |||||||
+
+La anotación pone el método Apex a disposición de los componentes de Lightning (tanto los componentes web lightning como los de Aura).
+
+*En apex*
+public with sharing class nombreClaseController {} -> Se crea una clase de manera especial: la 	parte de with sharing es para Respeta las reglas de sharing del usuario (Solo devuelve 	registos que el usuario tiene permiso de ver).
+
+*En apex*
+@AuraEnabled(cacheable=true)
+public static tipoDato nombreMetodoApex(parametros) {
+    // una operación hacia la db
+} -> La notación @AuraEnabled Permite que el 	método sea llamado desde: Lightning Web Components y Componentes Aura.
+	- cacheable=true -> Indica que: El método NO modifica datos y Salesforce puede cachear 
+		el resultado
+		Cuando un método es cacheable, las versiones nuevas o modificadas de los 			registros no pueden devolverse hasta que la caché se actualice.
+
+*xml*
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__AppPage</target>
+    </targets>
+</LightningComponentBundle> -> Al configurar el XML se define dónde y cómo puede usarse tu 
+	Lightning Web Component dentro de Salesforce.
+	- <isExposed>true</isExposed> -> Hace que el componente sea visible en el Lightning App 
+		Builder
+		Si fuera false: No podrías arrastrarlo a ninguna página.
+	- <targets> -> Define en qué tipos de páginas puede usarse el componente.
+		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.				NO podría usarse en: Record Pages y Home Pages
+
+
+Hay dos formas de interactuar con los métodos Apex de los componentes de Lightning: o bien cablear el método o llamarlo imperativamente. 
+
+Utilizando cables:
+
+Forma para metodos: 
+
+*En js*
+import { LightningElement, wire } from 'lwc';
+import nombreMetodoApex from '@salesforce/apex/nombreClaseController.nombreMetodoApex';
+export default class nombreClaseY extends LightningElement {
+ @wire(nombreMetodoApex, { birthDate: '$minBirthDate' })
+ nombreAtributo;
+} -> Para llamar el método ápex en js para usarlo n lwc
+	El segundo parámetro de la anotación wire es el objeto que se envia como parámetro al 
+	método nombreMetodoApex.
+
+Forma para mostrar una tabla en la vista: 
+
+*En js*
+
+import NOMBRE_CAMPO1_FIELD from '@salesforce/schema/NombreTabla.nombreCampo1';
+import NOMBRE_CAMPO2_FIELD from '@salesforce/schema/NombreTabla.nombreCampo2';
+import NOMBRE_CAMPON_FIELD from '@salesforce/schema/NombreTabla.nombreCampoN';
+import nombreMetodoApex from '@salesforce/apex/NombreClaseController.nombreMetodoApex'; -> Nos 	traemos todos los campos de una tabla que deseamos meter en la tabla e importamos la 
+	función que nos trae los datos de ápex.
+
+const COLUMNS = [
+    { label: 'nombre columna 1', fieldName: NOMBRE_CAMPO1_FIELD.fieldApiName, type: 'tipoCampo' },
+    { label: 'nombre columna 2', fieldName: NOMBRE_CAMPO2_FIELD.fieldApiName, type: 'tipoCampo' },
+    { label: 'nombre columna N', fieldName: NOMBRE_CAMPON_FIELD.fieldApiName, type: 'tipoCampo' }
+]; -> Para crear los metadatos de las columnas de las tablas.
+	tipos de campo:
+	- text
+	- currency
+
+columns = COLUMNS;
+@wire(nombreMetodoApex)
+nombreArregloDeRegistros; -> Para crear la tabla con los registros.
+
+*En html*
+
+<template if:true={nombreArregloDeRegistros.data}>
+    <lightning-datatable
+        key-field="Id"
+        data={nombreArregloDeRegistros.data}
+        columns={columns}
+    >
+    </lightning-datatable>
+</template> -> Si hay registros en la tabla, los mostrara en una tabla.
+	El componente lightning-datatable es componente que ya viene con Salesforce y se encarga
+	de renderizar una tabla en la vista con los datos que le pasemos. Solo funciona en 
+	escritorio y no en móvil. Para móvil se necesita crear un componente personalizado.
+
+
+Utilizando forma imperativa:
+
+Llama a Apex imperativamente cuando necesites controlar la invocación de las operaciones de 
+lectura y cuando modifiques registros. 
+
+*En js*
+import { LightningElement, api, wire } from 'lwc';
+importar nombreMetodoApex desde '@salesforce/apex/ContactController.nombreMetodoApex';
+export default class nombreComponente extends LightningElement {
+    @api nombreParameto;
+    nombreFuncionEvento() {
+        nombreMetodoApex({ 
+            nombreParameto: this.nombreParameto
+        })
+        .then(records => {
+            // Codigo si se presenta el error
+        })
+        .catch(error => {
+            // Codigo si hay error
+        });
+    }
+}
+
 
 
 
@@ -979,6 +1096,8 @@ System.debug() -> Para escribir mensajes en el registro.
  	pantalla -> click en el apartado logs -> doble click en el registro de interés ->
  	palomear la opción debug only. **
  
+Crear una clase ápex en vsc: ctrl + shift + p -> escribir sfdx: créate ápex class -> ingresar 
+	el nombre de la clase -> dejar la ruta por defecto para la creación de la clase.
 
 
 
