@@ -662,3 +662,69 @@ export default class nombreComponente extends LightningElement {
         });
     }
 }
+
+
+
+
+/////////////////////////////////////////PRUEBAS/////////////////////////////////////////
+
+Se utiliza jest como herramientas para realizr las pruebas y para usarlo se deb tener nstalado
+node.js.
+Verificarlo con 
+	node --versión
+	npm --versión
+
+Los Jest tests no se ejecutan en un navegador ni se conectan a una organización, así que van rápido. 
+Usa Jest para escribir pruebas unitarias para todos tus componentes web de Lightning. Para ejecutar pruebas Jest para componentes web de Lightning, necesitas el módulo Node @salesforce/sfdx-lwc-jest en tu proyecto Salesforce DX.
+
+Las pruebas Jest solo funcionan con componentes web de Lightning en proyectos de Salesforce DX, no funcionan con componentes de Aura. ****
+
+Las pruebas Jest para un componente web de Lightning deberían probar el comportamiento de un solo componente de forma aislada, con dependencias mínimas de componentes o servicios externos.
+
+Instalar el módulo node sfdx-lwc-jest: sf force lightning lwc test setup.
+
+Diferentes formas en que puedes realizar pruebas de Jest: 
+
+npm run test:unit -> Para ejecutar todas las pruebas de tu proyecto.
+	Si quieres ejecutar pruebas en un directorio específico, se debe usar este comando 
+	en un directorio específico para solo ejecutar las pruebas de ese directorio.
+
+npm run test:unit:watch -> para ejecutar pruebas unitarias en modo “watch” (observación 
+	continua).
+	El modo watch implica que se quedara escuchando cambios en: Archivos .js, Archivos .html
+	y Archivos de test, entonces Tú modificas un archivo y Automáticamente vuelve a ejecutar 
+	las pruebas y Te muestra resultados al instante.
+	Para que funcione este comando se necesita tener un repositorio de git en el proyecto.
+
+Puedes depurar pruebas Jest usando las siguientes herramientas:
+Paquete de extensiones de Visual Studio Code Salesforce
+Herramientas para desarrolladores de Chrome
+Configuración avanzada del depurador Visual Studio Code
+
+npm run test:unit:coverage > Para ejecutar las pruebas con cobertura.
+
+Para ejecutar las pruebas usando vsc: En el apartado izq -> click en el vaso de precipitado 
+	triangular (matraz).
+	Cuando se ejecuta una prueba, los resultados se muestran en el terminal. Los resultados 
+	también se indican por el color en la barra lateral. Verde significa aprobar. El azul 
+	indica que no se ha ejecutado, el naranja indica que se ha saltado el examen y el rojo 
+	indica un examen suspendido. Al hacer clic en el test en la barra lateral se abre el 
+	archivo y te lleva directamente a ese test.
+	Para ejecutar todas las pruebas del archivo cada vez que guardes cambios, haz clic en el
+	icono Prueba el icono del botón del reloj. del reloj en la barra de pestañas.
+
+Las pruebas Jest son solo locales y se guardan y ejecutan de forma independiente de Salesforce.
+
+Dentro de cada componenete en el nivel mas alto en teoría se debe crear en automatico una 
+carpeta llamada __test__, aquí se depositan nuestras pruebas.
+Si no se creo la carpeta se debe crear manualmente.
+
+Crear una prueba: Dentro del paquete de un componente -> click derecho sobre la carpeta 
+	__test__ -> darle nombre al archivo y la extensión .test.js.
+
+
+
+
+
+
+
