@@ -1,0 +1,664 @@
+
+
+/////////////////////////////////////////DESARROLLO/////////////////////////////////////////
+
+
+Para desarrollar aplicaciones en Salesforce, necesita las siguientes herramientas.
+1. Un entorno de desarrollo de Salesforce, también llamado organización.
+2. La interfaz de línea de comandos (CLI) de Salesforce para gestionar el ciclo de vida del
+ desarrollo de la aplicación.
+3. Visual Studio Code (VS Code) instalado
+
+
+COMMAND LINE INTERFACE (CLI)
+
+Es la herramienta de línea de comando para trabajar con Salesforce Platform.
+puede crear entornos para desarrollos y pruebas de forma sencilla. Además, Salesforce CLI tiene
+comandos para sincronizar código fuente entre sus organizaciones y sistemas de control de 
+versiones, y ejecutar pruebas de unidades.
+
+Instalar la Command Line Interface:
+ 	Descargar: 	https://developer.salesforce.com/tools/salesforcecli
+
+sf --versión -> Versifica que el cli esta instalado.
+
+sf update -> Actualizo todo lo relacionado a Salesforce
+
+
+CONECTAR VSC CON UN PLAYGROUND
+
+Es necesario que en vsc se tenga instalada la extensión Salesforce Extension Pack (expanded).
+
+Crear un nuevo proyecto de Salesforce (desde VS Code): *En vsc* ->  Ctrl + Shift + P -> escribir 
+	'SFDX: Create Project with Manifest' -> estándar -> Asigna un nombre al proyecto ->
+ 	Seleccione una carpeta en su dispositivo para guardar el proyecto.
+
+Autorizar determinado playgroud desde cli: Usamos el comando: sf org login web -> Después nos
+ 	pedirá ingresar un usuario y contraseña. Este usuario y contraseña deben ser los que 	
+	específicamente tiene cada playground, los cuales son diferentes a las credenciales que
+ 	usarmos para iniciar sesión en Salesforce.
+ 	Para determinar el usuiairo y contraseña de un playground deberemos restablecer la
+ 	contraseña de determinado playground.
+
+Restablecer la contraseña para su organización de trailhead playgroud: La integración entre
+ 	Trailhead y la organización de Playground hace que la contraseña predeterminada sea
+ 	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de
+ 	Trailhead, por ejemplo desde herramientas de desarrollador, como Salesforce CLI y
+ 	VS Code.
+ 	Clic en Iniciador de aplicación para iniciar App Launcher -> buscar y hacer clic en
+ 	Playground Starter -> click en apartado get your login credentials -> en esta parte
+ 	aparecerá un correo, el cual deberemos tomar (este vendrá a ser el ussername que
+ 	utilizaremos en próximos comandos) -> después presionar reset my password.
+
+sf org list -> Muestra todas las organizaciones de Salesforce que tienes autorizadas en tu
+ 	Salesforce CLI.
+ 	También mostrara cual playground tenemos seleccionado por defecto.
+
+sf org open -> Abre la organización por defecto.
+ 	- sf org open -o [nombreAlias/username] -> Abre determinada organización.
+
+sf config set target-org=[username] -> Define cuál organización de Salesforce usará la CLI por
+ 	defecto, a nivel global, cuando no se especifique otra.
+
+*Dentro de la carpeta que representa a un proyecto*
+sf project retrieve start -x manifest/package.xml -> Para traer (recuperar) metadatos desde tu
+ 	org de Salesforce
+ 	Todo lo que se recupera se guarda en: force-app/main/default/.
+ 		- Reglas de validación: objects/Contact/validationRules/
+ 		- flows/
+ 		- layouts/
+ 		- objects
+ 	El archivo package.xml es un archivo que existe en nombreProyecto/manifest/package.xml.
+ 	En el archivo package.xml se debe especificar que se quiere descargar, se debe agregar
+ 	asi:
+ 		<types>
+                  <members>*</members>
+                  <name>tipoObjeto</name>
+    		</types>
+ 	Donde el tipo objeto seria los flows, objetos, etc.
+ 
+
+A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de programación que puede usar, por ejemplo:
+ 	- El marco Lightning Web Components: un marco de trabajo de desarrollo de interfaz
+ 		de usuario basada en JavaScript.
+ 	- Apex: lenguaje de programación creado por Salesforce con una sintaxis similar a Java.
+ 	- Node.js: Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha
+ 		diseñado para desarrollar aplicaciones de red ampliables.
+
+
+COMPONENTS WEB LIGHNING
+
+Desarrollo para dispositivos de escritorio y móviles basado en componentes para el desarrollo
+de interfaces de usuario.
+
+Proporciona únicamente los elementos necesarios para ejecutarse correctamente en los navegadores admitidos en Salesforce. 
+La mayoría de código que escribe es JavaScript y HTML estándar.
+
+Los componentes Aura pueden contener componentes web Lightning (pero no a la inversa). 
+
+Es necesario tener intalado Salesforce CLI y vsc.
+un componente necesita que la carpeta y sus archivos tengan el mismo nombre. ******
+Para crear un componente web Lightning se necesitan tres archivos: HTML, css y js.
+
+Donde se buscan los componentes que ya están hechos para integrarlos en nuestros proyectos:
+https://developer.salesforce.com/docs/component-library/overview/components
+
+Crear un nuevo componente lightning: *En vsc y dentro de un proyecto de salesforce* -> expandir
+	la carpeta dentro del proyecto: '\force-app\main\default' -> click derecho sobre la 
+	carpeta lwc -> seleccionar 'SFDX: Create Lightning Web Component' -> escribir el nombre
+	del componenete -> enter -> enter (para aceptar la carpeta predeterminada).
+
+Crear un nuevo componente lightning (forma alternativa: con comando): *En vsc y dentro de un 
+	proyecto de salesforce* -> abrir la terminal y ejecutar: sf lightning generate 	
+	component -n nombreComponente -d force-app/main/default/lwc --type lwc
+	- -n -> define el nombre de la carpeta de componentes web de Lightning y sus archivos.
+	- -d -> define el directorio destino donde debe crearse el componente web de Lightning. 
+	- --type -> especifica que quieres crear un componente web de Lightning.
+
+Subir los componentes a la organización: *Primero se debe Conectar un playground con el local y 
+	establecerla como organización default* -> clic con el botón derecho en la carpeta 
+	force-app/main/default -> seleccione SFDX: Deploy This Source to Org.
+
+Permitir que las variables de js que almacenan links de imágenes provenientes de amazon 
+	(almacenadas en s3) se puedan mostrar: *En salesforce* -> En la parte sup derecha buscar
+	 el logo de settings -> opción setup -> busque y seleccione trusted urls > new trusted 
+	url -> sginar nombre al link y escribir el link que queremos permitir que se muestre 
+	-> tipo de images: img-src -> save.
+
+Crear una nueva pagina para los componentes: *En salesforce* -> En la parte sup derecha buscar
+	el logo de settings -> opción setup -> busque y seleccione Lightning App Builder ->
+	new -> app page -> tipe of page: one región -> asginar nombe a la pagina -> *En la 
+	parte izq ya podremos ver los componentes y arrastrarlos* -> después ya nadamas 
+	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
+	seleccionar 
+	- Cambiar el tipo de pagina: Si nos equivocamos sobre el tipo de pagina le damos en 
+		edit -> En la parte derecha de la pagina -> edit templates.
+
+Agregar los componentes a una aplicación existente: *En salesforce* -> Buscar determinada app
+	-> en la parte sup derecha en el logo de engrane -> edit page -> -> *En la 
+	parte izq ya podremos ver los componentes y arrastrarlos* -> después ya nadamas 
+	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
+	seleccionar 
+
+
+Otros ------------------------------
+
+Para poder personalizar especificamente la pagina home: Por personalización se refiere a 
+	a modificar qué ve el usuario cuando entra a Salesforce, usando Lightning App Builder, 
+	es decir, Qué componentes aparecen, Dónde aparecen y Para quién aparecen.
+	En la parte sup derecha buscar el logo de settings -> opción setup -> buscar y 	
+	seleccionar home -> en advanced seller home cambiar la configuración a inactivo.
+
+
+	
+Instrucciones en archivos HTML --------------------
+
+<template>
+  // n instrucciones html
+</template> -> contiene el código HTML que define la estructura del componente.
+
+{nombreVariable} -> Para inyectar una variable en la vista.
+	Las variables tienen que exportarse de los archivos js y al parecer se importan en 
+	automatico en los archivos HTML.
+	Un archivo HTML tendrá un solo archivo js del cual leera las variables, será de aquel 
+	archivo js que este en la misma carpeta que el arhcivo HTML.
+
+<template lwc:if={expresión}>
+  // n instrucciones html
+</template>
+<template lwc:else>
+  // n instrucciones html
+</template> -> Manera de hacer un if - else en la vista.
+
+<c-nombreComponenteHijoX></c-nombreComponenteHijoX> -> Para que un componente padre 
+	pueda mostrar a su componente hijo.
+	- onproductselected={handleProductSelected} -> 
+
+<template for:each={nombreArregloX} for:item="elementoX">
+  // n instrucciones html
+</template> -> Para iterar un arreglo en la vista.
+	
+
+Comunicaciones entre componentes -----------------------------
+
+Los componentes se pueden comunicar entre un padre y un hijo en ambos sentidos.
+
+     Comunicación ascendente 
+
+Para llevar a cabo una comunicación hacia arriba se usan eventos y/o agentes de escucha de eventos.
+El componente secundario envía el evento y el principal lo escucha. 
+
+*En la vista del padre*
+<c-nombreComponenteHijoX onNombreEventoPadreY={nombreEventoPadreY}></c-nombreComponenteHijoX> -> 	Se llama al componenete hijo y como atributo de la etiqueta se le pasa el nombre del 
+	evento del padre.
+	Por nomeclatura el nombre del atributo se le antepone el prefijo on.
+
+*En el archivo js del padre*
+nombreEventoPadreY() {
+   // n instrucciones
+} 
+
+     Comunicación descendente
+
+La información se puede comunicar en sentido descendente mediante propiedades públicas y métodos públicos.
+
+*En el archivo js del hijo*
+@api nombreAtributo; -> Para recibir valores.
+
+*En el archivo html del padre*
+<c-nombreComponenteHijoX nombre-atributo={valor}></c-nombreComponenteHijoX> -> Para mandar 	valores desde el padre al hijo.
+	Observese que en la vista, el nombre del atributo usa la nomeclatura snake-case y en
+	js se ocupa camelCase.
+
+Estilos ---------------------------------------
+
+Salesforce tiene su propia macro de css (estilos propios de saelesorce que son usados para 
+que nuestros componentes tengan los mismos estilos que las paginas de salesforce) conocido como
+Salesforce Lightning Design System (SLDS).
+
+
+Incorporar datos de Salesforce a nuestros componentes -----------------
+
+El servicio "wire" incorpora datos en su aplicación.
+Este servicio forma parte de nuestra plataforma y proporciona una transmisión de datos.
+
+@wire(tipoAdaptador, { parametros })
+nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
+	devuelve el adaptador (UI API o Apex).	
+	El atributo contendrá dos atirubots el primero (data) contiene la infor solicitada y 
+	el segundo (error) un posible mensaje de errro.
+	Tipos de adaptadores:
+	Cada uno de estos se deben importar desde diferentes paquetes.
+	Adaptadores para LDS ------------------
+	- getRecord -> Para traerse en un registro individual.
+	- getRecordUi -> Para metadatos del registro.
+	- getObjectInfo -> Metadatos del objeto.
+	Valores para el segundo parámetro:
+	- Si se uso getRecord: Se debe pasar un objeto con dos atributos los cuales define QUÉ 
+		datos traes y CÓMO los traes.
+		En el primer atributos se coloca el id del registro (Es obligatorio) y en el 
+		segundo atributo se especifica un array de campos que deseamos traernos del 
+		registro.
+
+@wire(tipoAdaptador, { parametros })
+wiredNombreObjeto({data, error}) {
+ // logica
+}
+nombreAtributo; -> Se usa igualito que el anterior pero se anexa una función entre el atributo
+	y la anotación para agregar lógica a los datos.
+
+
+
+js ------------------------
+
+Estos arhcivos js definen lo que hay que hacer con los datos, eventos, entradas, cambios de
+estado y mucho más para que el componente funcione.
+
+Debe incluir como mínimo este código: 
+
+import { LightningElement } from 'lwc';
+export default class nombreComponenteX extends LightningElement {
+}
+
+
+Hooks ---------------------------------
+
+connectedCallback() -> Se ejecuta automáticamente cuando el componente se inserta en el DOM 	
+	(cuando aparece en la página).
+	Usado para inicializar variables, llamar a ápex o a servicios externos, lógica que 
+	debe ejecutarse una sola vez al cargar.
+
+Decoradores ----------------------------
+
+Los decoradores se suelen usar en JavaScript para modificar el comportamiento de una propiedad o función.
+Para usar un decorador, impórtelo desde el módulo lwc y colóquelo delante de la propiedad o función.
+una propiedad o función solo puede tener un decorador y no mas. *
+
+@api -> Hace que una propiedad o método sea público.
+	Usado para:
+	Recibir datos desde un componente padre
+	Permitir que el padre llame métodos del hijo
+	Configurar el componente desde fuera.
+
+@track -> Se usa para hacer reactivos los cambios en objetos o arreglos, de modo que la UI se 
+	vuelva a renderizar cuando cambian.
+	Hoy en día casi no se usa, porque LWC ya maneja reactividad automática en muchos 
+	casos. **
+
+@wire se usa para obtener datos reactivos automáticamente desde Apex o desde Lightning Data 
+	Service (LDS) sin escribir lógica imperativa.
+	Para conectar un componente LWC a una fuente de datos de Salesforce y mantener la UI 
+	sincronizada automáticamente cuando los datos cambian.
+
+Archivo de configuración ---------------------------
+
+El archivo que tiene la extensión .js-meta.xml, es el archivo de configuración de un 
+componente. Este archivo proporciona metadatos para Salesforce, incluida la configuración de 
+diseño de los componentes que se van a usar en Lightning App Builder
+
+Configuraciones de este archivo:
+
+apiVersion -> vincula el componente a una versión de API de Salesforce.
+
+isExposed -> Si vale false el componente no se expone en Lightning App Builder ni Experience 
+	Builder.
+
+targets -> Especifica los tipos de páginas Lightning a las que se puede agregar el componente 
+	en Lightning App Builder.
+
+targetConfigs -> permite especificar comportamiento específico para cada tipo de página 
+	Lightning, incluidas cosas como los objetos que respaldan el componente.
+
+
+Dev hub --------------------------------------------------
+
+local dev: es una herramienta de CLI de Salesforce que te permite ejecutar una vista previa 
+en tiempo real de tus componentes web de Lightning en tu navegador. La vista previa se actualiza 
+automáticamente a medida que editas tus componentes localmente, así que no tienes que desplegar 
+código ni actualizar manualmente la página del navegador.
+
+Para poder incorporar esta herramienta es necesario instalarla y hacer todo lo relacionado
+con dev hub.
+Doc para su instalación: https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html
+
+Es una funcionalidad especial que se habilita en una org y que permite:
+Crear, administrar y controlar Scratch Orgs
+Usar completamente Salesforce DX (SFDX)
+Facilitar desarrollo moderno y colaborativo
+sirve para:
+Crear Scratch Orgs (orgs temporales)
+Definir la configuración de esas orgs con código
+Centralizar el control del desarrollo
+Facilitar CI/CD y trabajo en equipo.
+
+Una Scratch Org es:
+Una org temporal
+Se crea desde código (archivo project-scratch-def.json)
+Dura días (1–30)
+Se borra y se vuelve a crear fácilmente
+Ideal para:
+Desarrollo
+Pruebas
+Automatización
+Labs avanzados.
+
+Activar dev hub para determinado playground: *Estando en salesforce en determinado playground*
+	-> En la parte sup derecha buscar el logo de settings -> opción setup -> buscar y 	
+	seleccionar dev hub -> activar.
+
+Autorizar un Dev Hub desde VS Code: *Tiene que estar autorizado determinado playground para 
+	trabajar con dev hub* -> ctrl + shift + p -> escribir sfdx: authorize a Dev Hub ->
+	ingresar un alias para la organización -> Inicia sesión usando tus credenciales de 	
+	organización -> permitir.
+
+activa Local Dev: *en vsc y dentro de un proyecto* -> Buscar y abrir el archivo 
+	config/project-scratch-def.json -> Dentro de la clave lightningExperienceSettings ->
+	agregar: "enableLightningPreviewPref": true
+
+Crear una organización de cero: *Tiene que estar activo local dev* -> abir la terminal y ejecutar
+	el siguiente comando: sf org create scratch 
+	--definition-file config/project-scratch-def.json --alias nombreAlias --target-dev-hub 
+	nombreOrganizacionHub
+
+Para desplegar los componentes a cierta organización de zero: abir la terminal y ejecutar el 
+	siguiente comando: sf project deploy start --target-org nombreAliasOrgZero.
+
+sf org open --target-org nombreAliasOrgZero -> Para abrir determinada organización zero.
+	Una vez estando en la organización, podremos hacer 'Agregar los componentes a una 
+	aplicación existente' ó 'Crear una nueva pagina para los componentes'.
+
+sf lightning dev app --target-org nombreAliasOrgZero --device-type tipoDevice -> Crea (o abre) 
+	una Lightning Development App, que es una aplicación especial donde puedes probar y 
+	visualizar componentes Lightning sin necesidad de agregarlos a una app estándar 
+	existente.
+	No es una app productiva, es solo para desarrollo y pruebas
+	Solamente es temporal la app.
+	Tipo device:
+	- Desktop
+	- phone
+	- Tablet.
+	Se nos pediría seleccionar una app para previsualizar.
+
+
+
+Configurar herramienta de mobile app simulator ----------------------------------
+
+El simulador de apps móviles para ios solo se puede hacer en mac. ****
+
+Primero se debe tomar las credenciales de determinado playground (se debe hacer el proceso 
+de restrablecer la contraseña).
+
+Configurar emulador de android: *En Android studio* -> clic en Más acciones o Icono de menú de 
+	3 puntos -> selecciona Administrador de dispositivos virtuales -> clic en Crear 
+	dispositivo -> selecciona tu dispositivo preferido y haz clic en Siguiente -> Selecciona
+	una versión y haz clic en Siguiente -> terminar 
+
+Lanzar un dispositivo móvil: *En Android studio* -> clic en Más acciones o Icono de menú de 
+	3 puntos -> selecciona Administrador de dispositivos virtuales -> clic Emulador botón de 	
+	reproducir. en la columna Acciones del dispositivo para lanzar el emulador de Android.
+
+Instala el emulador de la aplicación móvil Salesforce para Android:  *Teniendo un dispositivo
+	movil corriendo* -> Descarga la versión del emulador de Android de la app Salesforce 	
+	Mobile en: https://developer.salesforce.com/tools/mobile-debugging -> Arrastra el 
+	archivo de .apk descargado a la ventana del emulador de Android.
+
+Configurar la app de Salesforce en el emulador Android: Entrar a la app en el dispositivo 
+	simulado -> clic en Acepto para aceptar el acuerdo de licencia de usuario final ->
+	meter las credenciales de de4terminado playground.
+
+Activar el modo depuración en el playground: En la parte sup derecha -> click logo de engrane
+	-> set up -> buscar y seleccionar debug mode -> clic en la casilla de verificación junto 
+	a nuestro usuario -> activar.
+
+conectar Chrome con dev tools para Android: En el dispositivo Android emulado -> abre la app 	
+	Configuración -> entrar en About emulated device -> Desplázate hasta el final de la 
+	página y haz clic en Build número 7 veces. El mensaje "¡Ahora eres un desarrollador!"
+	-> abre la app móvil de Salesforce y navega a tu componente web personalizado de 
+	Lightning -> Abre Chrome en tu escritorio -> introduce chrome://inspect/#devices 
+	-> clic en Inspeccionar en el emulador de Target remoto con el que estás trabajando.
+
+Trabajar con datos ---------------------------------------
+
+°°°°°°°° Usando lightning data service °°°°°°°°°
+
+Es la forma preferida (y más sencilla) de trabajar con datos de Salesforce.
+Se usa JavaScript para conectar componentes a los datos de Salesforce.
+
+Mantiene datos consistentes y actualizados entre múltiples componentes y clientes a lo largo 
+del ciclo de vida de la aplicación. Si varios componentes utilizan Lightning Data Service para 
+trabajar con un registro, y uno de ellos actualiza el registro, los demás componentes reflejan 
+automáticamente esa actualización.
+
+Es la forma recomendada en Salesforce (LWC) para leer, crear, actualizar y eliminar registros sin
+escribir Apex, usando datos “en caché” y respetando seguridad, permisos y FLS automáticamente.
+
+||||||| Usando el componente form |||||||
+
+<lightning-record-form
+    *atributos*>
+</lightning-record-form> -> Permite crear, ver o editar un registro.
+	NO requiere JS obligatorio.
+	Se usa cuando Necesitas un formulario rápido y No necesitas lógica compleja.
+	No se debe usar cuando Quieres interceptar campos individuales, Necesitas UI muy 	
+	personalizada y Necesitas validaciones personalizadas complejas.+
+	Atributos: 
+	- object-api-name="nombreObjeto" -> Define el objeto Salesforce.
+		En Salesforce los objetos usan API Name en singular, no plural. ***
+	- record-id
+		- Si existe → modo edición o vista
+		- Si NO existe → modo creación.
+	- mode="valor" -> Define el comportamiento del formulario
+		- view -> Solo lectura
+		- edit -> Edición
+		- readonly -> Similar a view
+		- create -> Crear nuevo registro
+	- layout-type -> Usa layouts de Salesforce.
+		- Full -> Layout completo
+		- Compact -> Compact Layout
+	- columns="n" -> Número de columnas (solo en Full layout).
+	- fields = ['nombreCampo1', 'nombreCampo2', 'nombreCampoN'];
+	  fields={fields} -> sirve para decirle explícitamente al componente qué campos mostrar,
+		y en que orden en lugar de usar el layout del objeto.
+	Eventos disponibles: 
+	- onsubmit={nombreFuncion} -> Funcion que se manda a llamar al presionar el button del 
+		formulario.
+		Solo se usa cuando Debes modificar campos antes de guardar, Debes validar datos 
+		custom y Debes cancelar el guardado bajo ciertas condiciones.
+	- onsuccess={nombreFuncion} -> Funcion que se manda a llamar después completar 
+		correctamente la función onsubmit.
+	- onerror={nombreFuncion} -> Funcion que se manda a llamar después la función onsubmit
+		fallara.
+
+
+||||||| Usando la anotación wire |||||||
+
+Unicmanete se usa para leer registros.
+Ya se explico en otra sección como usarlo.
+
+
+||||||| Usando UI Record API en modo imperativo |||||||
+
+Es un conjunto de funciones JS que te permite: Crear, Actualizar y Eliminar (y obtener info de 
+metadata).
+Se llama imperativo porque tú decides cuándo ejecutar la acción (click, evento, lógica).
+
+Usa UI Record API cuando: Necesitas botones personalizados, Quieres lógica antes/después del
+guardado y No quieres depender de layouts.
+
+Ejemplo de guardar un registro:
+
+handleCreate() {
+    const fields = {
+        Name: 'Cuenta creada por LWC',
+        Phone: '555-1234',
+        Industry: 'Technology'
+    };
+
+    const recordInput = {
+        apiName: 'Account',
+        fields
+    };
+
+    createRecord(recordInput)
+        .then(record => {
+            console.log('ID creado:', record.id);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+Ejemplo de actualizar un registro:
+
+handleUpdate() {
+    const fields = {
+        Id: this.recordId,      // OBLIGATORIO
+        Phone: '555-9999'
+    };
+
+    updateRecord({ fields })
+        .then(() => {
+            console.log('Registro actualizado');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+Ejemplo de eliminación de registro:
+
+handleDelete() {
+    deleteRecord(this.recordId)
+        .then(() => {
+            console.log('Registro eliminado');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+°°°°°°°° Usando apex °°°°°°°°°
+
+Cuando quieres personalizar una transacción de datos de un solo registro, o realizar operaciones
+multi-registro en una sola transacción, Apex es la mejor opción.
+
+
+||||||| Usar métodos ápex |||||||
+
+La anotación pone el método Apex a disposición de los componentes de Lightning (tanto los componentes 
+web lightning como los de Aura).
+
+*En apex*
+public with sharing class nombreClaseController {} -> Se crea una clase de manera especial: la 	
+parte de with sharing es para Respeta las reglas de sharing del usuario (Solo devuelve registos que
+el usuario tiene permiso de ver).
+
+*En apex*
+@AuraEnabled(cacheable=true)
+public static tipoDato nombreMetodoApex(parametros) {
+    // una operación hacia la db
+} -> La notación @AuraEnabled Permite que el método sea llamado desde: Lightning Web Components y
+	Componentes Aura.
+	- cacheable=true -> Indica que: El método NO modifica datos y Salesforce puede cachear 
+		el resultado
+		Cuando un método es cacheable, las versiones nuevas o modificadas de los 			
+		registros no pueden devolverse hasta que la caché se actualice.
+
+*xml*
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__AppPage</target>
+    </targets>
+</LightningComponentBundle> -> Al configurar el XML se define dónde y cómo puede usarse tu 
+	Lightning Web Component dentro de Salesforce.
+	- <isExposed>true</isExposed> -> Hace que el componente sea visible en el Lightning App 
+		Builder
+		Si fuera false: No podrías arrastrarlo a ninguna página.
+	- <targets> -> Define en qué tipos de páginas puede usarse el componente.
+		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.		
+			NO podría usarse en: Record Pages y Home Pages
+
+
+Hay dos formas de interactuar con los métodos Apex de los componentes de Lightning: o bien 
+cablear el método o llamarlo imperativamente. 
+
+Utilizando cables:
+
+Forma para metodos: 
+
+*En js*
+import { LightningElement, wire } from 'lwc';
+import nombreMetodoApex from '@salesforce/apex/nombreClaseController.nombreMetodoApex';
+export default class nombreClaseY extends LightningElement {
+ @wire(nombreMetodoApex, { birthDate: '$minBirthDate' })
+ nombreAtributo;
+} -> Para llamar el método ápex en js para usarlo n lwc
+	El segundo parámetro de la anotación wire es el objeto que se envia como parámetro al 
+	método nombreMetodoApex.
+
+Forma para mostrar una tabla en la vista: 
+
+*En js*
+
+import NOMBRE_CAMPO1_FIELD from '@salesforce/schema/NombreTabla.nombreCampo1';
+import NOMBRE_CAMPO2_FIELD from '@salesforce/schema/NombreTabla.nombreCampo2';
+import NOMBRE_CAMPON_FIELD from '@salesforce/schema/NombreTabla.nombreCampoN';
+import nombreMetodoApex from '@salesforce/apex/NombreClaseController.nombreMetodoApex'; -> Nos 
+	traemos todos los campos de una tabla que deseamos meter en la tabla e importamos la 
+	función que nos trae los datos de ápex.
+
+const COLUMNS = [
+    { label: 'nombre columna 1', fieldName: NOMBRE_CAMPO1_FIELD.fieldApiName, type: 'tipoCampo' },
+    { label: 'nombre columna 2', fieldName: NOMBRE_CAMPO2_FIELD.fieldApiName, type: 'tipoCampo' },
+    { label: 'nombre columna N', fieldName: NOMBRE_CAMPON_FIELD.fieldApiName, type: 'tipoCampo' }
+]; -> Para crear los metadatos de las columnas de las tablas.
+	tipos de campo:
+	- text
+	- currency
+
+columns = COLUMNS;
+@wire(nombreMetodoApex)
+nombreArregloDeRegistros; -> Para crear la tabla con los registros.
+
+*En html*
+
+<template if:true={nombreArregloDeRegistros.data}>
+    <lightning-datatable
+        key-field="Id"
+        data={nombreArregloDeRegistros.data}
+        columns={columns}
+    >
+    </lightning-datatable>
+</template> -> Si hay registros en la tabla, los mostrara en una tabla.
+	El componente lightning-datatable es componente que ya viene con Salesforce y se encarga
+	de renderizar una tabla en la vista con los datos que le pasemos. Solo funciona en 
+	escritorio y no en móvil. Para móvil se necesita crear un componente personalizado.
+
+
+Utilizando forma imperativa:
+
+Llama a Apex imperativamente cuando necesites controlar la invocación de las operaciones de 
+lectura y cuando modifiques registros. 
+
+*En js*
+import { LightningElement, api, wire } from 'lwc';
+importar nombreMetodoApex desde '@salesforce/apex/ContactController.nombreMetodoApex';
+export default class nombreComponente extends LightningElement {
+    @api nombreParameto;
+    nombreFuncionEvento() {
+        nombreMetodoApex({ 
+            nombreParameto: this.nombreParameto
+        })
+        .then(records => {
+            // Codigo si se presenta el error
+        })
+        .catch(error => {
+            // Codigo si hay error
+        });
+    }
+}

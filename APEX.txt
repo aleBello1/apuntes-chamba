@@ -1,0 +1,343 @@
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+APEX
+
+lenguaje de programación orientado a los objetos y con parámetros de asignación rigurosa que 
+permite a los desarrolladores de Salesforce agregar lógica empresarial a eventos del sistema,
+como clics de botón y actualizaciones, a los registros relacionados.
+Características:
+- Alojamiento: Apex se guarda, compila y ejecuta en el servidor Salesforce Platform.
+- Orientación a objetos: Apex admite clases, interfaces y elementos heredados.
+- Pruebas sencillas: Apex ofrece compatibilidad integrada para la creación de pruebas de 
+	unidades, la ejecución y la cobertura de código.
+
+.forceignore -> Para decirle a Salesforce CLI qué archivos o carpetas NO debe incluir cuando
+ 	haces operaciones como deploy, retrieve o convert de metadata.
+
+sf apex generate class --name nombreClase --output-dir force-app/main/default/clases -> Para
+ 	crear una clase de ápex.
+ 	Esto crear dos archivos: uno con extensión .cls y otro con extencion .cls-meta.xml
+ 	en la ruta force-app/main/default.
+
+Crear un script anonimo: es código de Apex que no se almacena en los metadatos, pero puede 	
+	compilarse y ejecutarse.
+ 	Crear un archivo con extensión .apex en la carpeta: scripts/ápex
+
+*Dentro de una clase y donde se declaran atributos*
+@InvocableVariable
+tipoDato nombreAtributo; -> Para que este atributo pueda enviar datos al flujo.
+
+*En la clase main*
+@InvocableMethod
+public static tipoDato nombreMetodo() {} -> Para que el método pueda invocarse en forma de
+ 	acción en el flujo.
+
+
+Guardar una clase de ápex: En la parte sup derecha buscar el logo de settings -> opción developer
+ 	console -> Es esta ventana presionar el menú file -> new -> ápex class -> escribir
+ 	el nombre de la clase -> Escribir el código y guardar el archivo.
+
+Ejecutar código Apex anónimo: permite ejecutar código de ápex.
+ 	En Developer Console, clic en Debug -> Open Execute Anonymous Window -> execute.
+
+Registros de depuración: Al ejecutar métodos de Apex, las llamadas se incluyen en el registro de
+ 	 depuración. Puede escribir sus propios mensajes de depuración en el registro, lo que
+ 	facilita la depuración del código en caso de errores.
+
+System.debug() -> Para escribir mensajes en el registro.
+ 	Para ver específicamente estos mensajes en la developer console: En la parte inf de la
+ 	pantalla -> click en el apartado logs -> doble click en el registro de interés ->
+ 	palomear la opción debug only. **
+ 
+Crear una clase ápex en vsc: ctrl + shift + p -> escribir sfdx: créate ápex class -> ingresar 
+	el nombre de la clase -> dejar la ruta por defecto para la creación de la clase.
+
+
+
+NODEJS
+
+Entorno de ejecución JavaScript asíncrono y basado en eventos que se ha diseñado para
+desarrollar aplicaciones de red ampliables.
+
+force:project:create -> Para crear un proyecto nuevo.
+
+
+TIPOS DE DATOS
+
+Primitivo (por ejemplo, Integer, Double, Long, Date, Datetime, String, ID y Boolean entre otros).
+Lista tipificada de valores, llamada también enumeración.
+Clases de Apex definidas por el usuario.
+Clases de Apex suministradas por el sistema.
+
+sObject ---------------------------------
+
+Cada registro de Salesforce se representa de forma nativa como un sObject en Apex.
+Si se recuperan registros persistentes de Salesforce, estos se almacenan en una variable de sObject.
+
+NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(); -> Para crear un sObject, debe
+ 	declarar una variable y asignarle una instancia de sObject.
+ 	Por objeto x nos referimos a un objeto en la gui de Salesforce.
+
+NombreObjetoX nombreVariableObjetoX = new NombreObjetoX(NombreCampo1=valor1,
+ 	NombreCampo2=valor2, NombreCampoN=valorN); -> Para crear un sObject y asignarle valores
+ 		a sus campos.
+
+nombreVariableObjetoX.nombreCampoY=valorY;  -> Forma alternativa de agregar un valor a
+ 	determinado campo de un registro.
+
+sObject objetoGenerico -> Manera de crear un objeto genérico.
+ 	El sObject es el tipo de dato mas genérico que hay.
+
+
+DML
+
+Si una operación DML genera un error, devuelve una excepción del tipo DmlExceptionCopiar. Puede
+capturar las excepciones del código para controlar los errores.
+
+insert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro.
+
+update nombreVariableObjetoX/nombreListaX; -> Para actualizar un registro.
+
+upsert nombreVariableObjetoX/nombreListaX; -> Para insertar un nuevo registro o para actualiarlo.
+ 	- upsert nombreVariableObjetoX/nombreListaX NombreObjetoX.fields.nombreCampoY; -> Para
+ 		hacer un upsert usando como criterio el campo Ye, este campo consideramos que
+ 		posee valores únicos pe un email. Entonces si el valor asociado al campo ye
+ 		para el objeto nombreVariableObjetoX existe hará un update pero si no hará
+ 		un insert.
+
+delete nombreVariableObjetoX/nombreListaX; -> Para eliminar un registro.
+ 	Caudno se eliminan lso registros se van a la papelera y cuando pasan 15 dias se eliminan
+ 	permanentemente.
+
+undelete nombreVariableObjetoX/nombreListaX; -> Para restaurar un registro.
+
+
+Metodos de base de datos ----------------------------
+
+A grandez rasgos sirven para lo mismo que los métodos dml.
+Pero la diferencia es que estos métodos sí se aplican a una lista devolverá una lista de
+objetos que contienen información de validez o error para cada registro.
+
+Database.SaveResult[] results = Database.insert(recordList, allOrNone);
+ 	Las operaciones de inserción y actualización devuelven en cada caso un conjunto de
+ 	objetos Database.SaveResult.
+ 	- allOrNone: Es un booleano que por defecto vale true.
+ 		si vale true significa que el método de base de datos se comporta como su 		
+		homólogo de declaración DML y producirá una excepción si se detecta un error.
+ 		Si vale false significa algunos de los elementos puede fallar, y se devolverá
+ 		un arreglo de objetos que contiene si el elemento fallo o no.
+ 		- elemento.isSuccess -> Si se ocupa false, se ocupa esta forma para saber si
+ 			un elemento fallo o no.
+
+La alteración devuelve objetos Database.UpsertResult y la eliminación devuelve objetos 
+Database.DeleteResult.
+
+Registros relacionados ---------------------------------------
+
+Puede insertar registros relacionados con los registros existentes si ya se ha definido una
+relación entre los dos objetos
+Ejemplo: Se crea un nuevo objeto one y se inserta, se obtiene su id y se crea un nuevo objeto
+many, a este objeto many se le setea el id el objeto one, finalmente se inserta el objeto
+many y se crea la relación. Evidentemtne debe existir la relación de búsqueda entre la tabla
+one y la tabla many.
+
+Si se quiere hacer un update del objeto many, se debe actualizar el objeto many y también
+el objeto one pero desde el objeto many. ***
+ 	update objetoMany;  //Con lo valores ya cambiados
+ 	update objetoMany.ClaseOne;
+
+La operación delete admite eliminaciones en cascada. Si elimina un objeto principal, elimina 
+también automáticamente los secundarios siempre que cada registro secundario se pueda eliminar
+
+
+SALESFORE OBJET QUERY LANGUAGE (SOQL)
+
+Es similar al lenguaje SQL estándar, pero se ha personalizado para Salesforce Platform.
+
+Para incluir consultas SOQL en su código Apex, incluya la instrucción SOQL entre corchetes y 
+asigne el valor devuelto a un conjunto de sObjects.
+Por ejemplo:
+ 	Account[] accts = [SELECT Name,Phone FROM Account];
+
+Developer Console incluye una consola de editor de consultas, la cual permite ejecutar sus 
+consultas SOQL y ver los resultados.
+El editor de consultas es un método rápido para inspeccionar la base de datos. Además, es una 
+buena forma de probar sus consultas SOQL antes de agregarlas al código Apex. Cando utilice el 
+editor de consultas, debe proporcionar únicamente la instrucción SOQL sin el código de Apex que 
+la rodea.
+
+Abrir el editor de consultas: *En developer console* -> En la parte inf de la ventana click
+ 	sobre el apartado query editor -> en el primer cuadro de esa pestaña se escriben las
+ 	consultas y hasta abajo viene el button de execute.
+
+A diferencia de otros lenguajes SQL, no puede especificar * para recuperar todos los campos en un
+objeto. En su lugar, utilice la palabra clave FIELDS() para recuperar todos los campos estándar
+(FIELDS(STANDARD)), todos los campos personalizados (FIELDS(CUSTOM)) o todos los campos
+(FIELDS(ALL)) en un objeto.
+
+Para inyectar dinamicamente el valor de una variable en una consulta se ocupan los dos puntos.
+Ejemplo:
+ 	String targetDepartment = 'Wingo';
+ 	Contact[] techContacts = [SELECT FirstName,LastName
+                          FROM Contact WHERE Department=:targetDepartment];
+ 
+Manera de obtner todos los registros muchos que tiene un registro one:
+ 	TablaOne[] objetosOne = [SELECT (SELECT * FROM TablaMany)
+                               FROM TablaOne];
+ 	TablaMany[] objetosMany = objetosOne.TablaMany;
+
+Manera de obtener el objeto one al que esta asociado un objeto many:
+ 	TablaMany[] objetoMany = [SELECT Account.Name FROM TablaMany
+                 WHERE FirstName = 'Carol' AND LastName='Ruiz'];
+ 	TablaOne objetoOne = objetoMany.TablaOne;
+
+Al iterar una consulta con un for en Apex, Salesforce agrupa los resultados en arreglos de hasta 
+200 registros. El ciclo se ejecuta una vez por cada grupo. Entonces de la siguiente consulta si
+tiene 3 registros solo habrá un grupo pero si hay 210 registros habrá dos grupos.
+for (Account[] tmp : [SELECT Id FROM Account WHERE Name LIKE 'for loop _']) {
+    j = tmp.size();
+    i++;
+}
+
+
+
+
+SALESFORCE OBJECT SEARCH LANGUAGE (SOSL)
+
+Es un lenguaje de búsqueda de Salesforce usado para realizar búsquedas de texto en multiples
+campos de multiples tablas.
+
+Usa SOSL cuando:
+No sabes en qué objeto está el dato
+Necesitas buscar un texto (por ejemplo un nombre, email o palabra clave)
+Quieres buscar en varios objetos a la vez
+Buscas coincidencias parciales (texto libre)
+
+Ejemplo de consulta SOSL en el que se buscan cuentas y contactos que tengan campos con la palabra 'SFDC'.
+List<List<SObject>> searchList = [FIND 'SFDC' IN ALL FIELDS
+                                      RETURNING Account(Name), Contact(FirstName,LastName)];
+
+La consulta de búsqueda en el editor de consultasse debe incluir entre corchetes ({SFDC}). Por
+el contrario, la consulta de búsqueda en Apex se incluye entre comillas simples ('SFDC').***
+
+Sintaxis:
+FIND 'texto a buscar'
+IN ALL FIELDS
+RETURNING Objeto1(Campo11, Campo12, Campo1N),
+          Objeto2(Campo21, Campo22, Campo2N),
+ 	  ObjetoM(CampoM1, CampoMK2, CampoMN) ->
+ 		- En returning se indica: Qué objetos quieres que Salesforce revise y Qué
+ 			campos quieres que te regrese si encuentra coincidencias.
+ 			La búsqueda retorna una lista de listas, Por cada objeto que se
+ 			seleccione se tiene una lista (entonces la subLista 1 es de objetos de
+ 			tipo 1, la subLista2 es de objetos de tipo 2 y asi sucesivamente).
+ 			   NombreTablaObjeto1[] subLista1 = (NombreTablaObjeto1[])searchList[0];
+ 		 	   NombreTablaObjeto2[] subLista2 = (NombreTablaObjeto2[])searchList[1];
+ 			  NombreTablaObjetoM[] subListaM = (NombreTablaObjetoM[])searchList[M-1];
+ 			Tabmein al indicar un objeto, se puede colocar condiciones,
+ 			ordenaciones y/o limitar el nuemro de registros. **
+ 			Por ejemplo:
+ 				RETURNING Account(Name, Industry WHERE Industry='Apparel')
+ 				RETURNING Account(Name, Industry ORDER BY Name)
+ 				RETURNING Account(Name, Industry LIMIT 10)
+ 			Manera de recibir la lista de listas:
+ 				List<List<sObject>> searchList = [*consulta*];
+ 		- En in se indica: EN QUÉ CAMPOS Salesforce va a buscar el texto.
+ 			- IN ALL FIELDS -> Busca el texto en todos los campos.
+ 			- IN NAME FIELDS -> Busca el texto en campos que contengan nombres.
+ 			- IN EMAIL FIELDS -> Busca el texto en campos que contengan emails.
+ 			- IN PHONE FIELDS -> Busca el texto en campos que contengan números
+ 				telefonicos.
+ 		- FIND :nombreVariable -> Para inyectar dinámicamente una variable en el texto
+ 			a buscar.
+
+ 
+DESENCADENADORES DE APEX
+
+permiten realizar acciones personalizadas antes o después de eventos para registros en Salesforce, 
+como inserciones, actualizaciones o eliminaciones
+ 
+Crear un nuevo trigger: *En el developer console* -> click menú file -> new -> ápex trigger
+ 	-> Ingresar el nombre del trigger y el nombre de la tabla sobre el cual recaerá el
+ 	trigger.
+
+trigger TriggerName on ObjectName (trigger_events) {
+   // n instrucciones
+} -> Para crear un trigger.
+ 	Eventos:
+ 	Especifique varios eventos de desencadenador en una lista separada por comas.
+ 	- before insert
+ 	- before update
+ 	- before delete
+ 	- after insert
+ 	- after update
+ 	- after delete
+ 	- after undelete
+
+Variables de contexto --------------------
+
+Se ocupan dentro del cuerpo de un trigger.
+
+Trigger.new -> Contiene todos los registros del objeto sobre el que se ejecuta el trigger en 
+	operaciones de tipo insert o update.
+	El tipo de dato de la lista es List<SObject>.
+
+Trigger.old -> Proporciona la versión anterior de sObjects antes de actualizarlos en
+ 	desencadenadores update o una lista de sObjects eliminados en desencadenadores delete.
+
+Trigger.isInsert -> Devuelve true si este desencadenador se activó debido a una operación
+ 	de inserción
+
+Trigger.isUpdate -> Devuelve true si este desencadenador se activó debido a una operación
+ 	de update
+
+Hay muchísimos mas.
+
+
+addError() -> Genera un error grave en el desencadenador. El mensaje de error se muestra en la 
+	interfaz de usuario y se registra.
+	La llamada a este método en un desencadenador revierte todo el conjunto de operaciones, 
+	excepto si se llama a DML masivo con una validez parcial.
+
+Desactivar un desencadenador: En la parte sup derecha buscar el logo de settings -> opción 
+	setup -> buscar y seleccionar Apex Triggers -> edit sobre determinado trigger -> 
+	despalomear is active -> save.
+
+public class NombreClaseX {
+    @future(callout=true)
+    public static void nombreMetodoY() {
+        // n instrucciones.
+    }
+} -> Para hacer una llamada externa (consumir una servicio externo) desde un desencadenador, se 
+	crea un método anotado con @future(callout=true).
+	Este método se llamara dentro de un trigger.
+
+Ejmeplo de optimización de consulta -------------------------
+
+No recuerdo si debería ir dento de este tema.
+
+En vez de usar una consulta asi:
+
+    for(Account a : Trigger.new) {
+        Opportunity[] opps = [SELECT Id,Name,CloseDate
+                             FROM Opportunity WHERE AccountId=:a.Id];
+        // Do some other processing
+    }
+Es mejor hacerla asi:
+    List<Account> acctsWithOpps =
+        [SELECT Id,(SELECT Id,Name,CloseDate FROM Opportunities)
+         FROM Account WHERE Id IN :Trigger.new];
+
+
+Swtich para el trigger ---------------------------------
+
+switch on Trigger.operationType -> se usa para saber qué tipo de operación DML disparó el 
+	trigger y ejecutar lógica distinta según el evento (insert, update, delete, etc.).
+	- when BEFORE_INSERT {} -> Se ejecuta antes de insertar registros nuevos.
+	- when BEFORE_UPDATE {} -> Se ejecuta antes de actualizar registros.
+	- existe before_delete, after_insert, after_update y after_delete.
+
+
+
+
