@@ -225,8 +225,8 @@ Este servicio forma parte de nuestra plataforma y proporciona una transmisión d
 @wire(tipoAdaptador, { parametros })
 nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
 	devuelve el adaptador (UI API o Apex).	
-	El atributo contendrá dos atirubots el primero (data) contiene la infor solicitada y 
-	el segundo (error) un posible mensaje de errro.
+	El atributo contendrá dos atributos el primero (data) contiene la info solicitada y 
+	el segundo (error) un posible mensaje de error.
 	Tipos de adaptadores:
 	Cada uno de estos se deben importar desde diferentes paquetes.
 	Adaptadores para LDS ------------------
@@ -243,10 +243,9 @@ nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente c
 @wire(tipoAdaptador, { parametros })
 wiredNombreObjeto({data, error}) {
  // logica
-}
-nombreAtributo; -> Se usa igualito que el anterior pero se anexa una función entre el atributo
-	y la anotación para agregar lógica a los datos.
-
+} -> Ahora en vez de ser un atributo es una función que se ejecuta automaticamnte y recibe 
+	como objeto los atributos data y errr.
+	Se usa para procesar datos y manejar errores.
 
 
 js ------------------------
@@ -664,6 +663,36 @@ export default class nombreComponente extends LightningElement {
 }
 
 
+CONFIGURAR DEV TOOLS PARA ESCRITORIO
+
+*Primero se debe activar el modo debug en el playground*
+
+Desactivar el almacenamiento en caché durante las tareas de desarrollo: se Desactive el 
+	almacenamiento en caché persistente y seguro en el navegador para ver el efecto de los 
+	cambios en el código sin tener que vaciar la caché.
+	En la parte superior der click en el logo de engrane -> apartado home -> buscar y 
+	seleccionar session settings -> Anular la casilla 'Enable secure and persistent browser 
+	caching to improve performance'
+	Se debe volver a activar el almacenamiento en caché después de depurar el código.
+
+sf org assign permset -n nombrePermissionSet -> para asignar un Permission Set a un usuario en 
+	una org de Salesforce, normalmente a tu usuario actual.
+	Un Permission Set es un conjunto de permisos adicionales que se le pueden asignar a uno o
+	varios usuarios, sin cambiar su perfil.
+	- Solutions_Full_Access -> conjunto de permisos de acceso completo.
+
+Abrir dev tools: *Esto solo funciona en chrome* -> *Estando en el playground* -> click derecho 
+	donde sea -> inspect -> aparado sources.
+
+Para depurar (debuggear) mejor los componentes LWC en el navegador: En la consola se verán 
+	caracteres raros en lugar de los valores reales de las variables. Se hace esto para 
+	darles el formato correcto a los valroes.
+	*En devtools* -> click sobre el engrane -> palomear Custom formatters.
+
+Localizar los componentes web Lightning: 
+	 
+
+
 
 
 /////////////////////////////////////////PRUEBAS/////////////////////////////////////////
@@ -722,7 +751,20 @@ Si no se creo la carpeta se debe crear manualmente.
 Crear una prueba: Dentro del paquete de un componente -> click derecho sobre la carpeta 
 	__test__ -> darle nombre al archivo y la extensión .test.js.
 
+Hay 3 tipos de formas para hacer las pruebas y esto dependerá de que se uso para leer datos:
+1. ápex, 2. wire y 3 lds.
 
+Los stubs se instalan en el directorio dentro del directorio. src/lightning-stubs.
+
+Anular los stubs predeterminados: 
+	Crear la raíz de los stubs de Lightning Base Component: crear la carpeta llamada test 
+	dentro de force-app, dentro de test crear la carpeta jest-mocks y dentro de esta crear 
+	la carpeta lightning.
+	Anular la configuración de Jest actualizando el archivo que aparece en la raíz de tu 
+	proyecto DX de Salesforce (jest.config.js): Abre el archivo. jest.config.js -> Ingresar
+	este cacho de código después del '..jestConfig,': moduleNameMapper: {
+    '^lightning/button$': '<rootDir>/force-app/test/jest-mocks/lightning/button'
+  },
 
 
 
