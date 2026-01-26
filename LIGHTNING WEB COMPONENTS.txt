@@ -221,24 +221,35 @@ Incorporar datos de Salesforce a nuestros componentes -----------------
 
 El servicio "wire" incorpora datos en su aplicación.
 Este servicio forma parte de nuestra plataforma y proporciona una transmisión de datos.
+Unicmante se usa esta forma para leer datos de Salesforce.
+Llamamos al servicio de cable reactivo en parte porque soporta variables reactivas, que tienen el prefijo $. Si cambia una variable reactiva, el servicio de noticias proporciona nuevos datos.
 
-@wire(tipoAdaptador, { parametros })
+import NOMBRE_CAMPO1 from '@salesforce/schema/NombreTablaX__c.NombreCampo1'; 
+import NOMBRE_CAMPO2 from '@salesforce/schema/NombreTablaX__c.NombreCampo2';
+import NOMBRE_CAMPON from '@salesforce/schema/NombreTablaX__c.NombreCampoN'; -> Para importar
+	determinados campos archivo js.
+
+import { nombreAdaptador } from 'lightning/uiRecordApi'; -> Para importar determinado
+	adaptadore(s).
+	Adaptadores:
+	- getRecord -> Para traerse registros.
+	- getRecordUi -> Para metadatos del registro.
+	- getObjectInfo -> Metadatos del objeto.
+
+@wire(tipoAdaptador, { objeto })
 nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
 	devuelve el adaptador (UI API o Apex).	
 	El atributo contendrá dos atributos el primero (data) contiene la info solicitada y 
 	el segundo (error) un posible mensaje de error.
-	Tipos de adaptadores:
-	Cada uno de estos se deben importar desde diferentes paquetes.
-	Adaptadores para LDS ------------------
-	- getRecord -> Para traerse en un registro individual.
-	- getRecordUi -> Para metadatos del registro.
-	- getObjectInfo -> Metadatos del objeto.
 	Valores para el segundo parámetro:
 	- Si se uso getRecord: Se debe pasar un objeto con dos atributos los cuales define QUÉ 
 		datos traes y CÓMO los traes.
-		En el primer atributos se coloca el id del registro (Es obligatorio) y en el 
+		En el primer atributo se coloca el id del registro (Es obligatorio) y en el 
 		segundo atributo se especifica un array de campos que deseamos traernos del 
 		registro.
+		E:
+			{ recordId: '$recordId', fields: [fields] }
+
 
 @wire(tipoAdaptador, { parametros })
 wiredNombreObjeto({data, error}) {
@@ -433,6 +444,9 @@ escribir Apex, usando datos “en caché” y respetando seguridad, permisos y F
 
 ||||||| Usando el componente form |||||||
 
+Este componente proporcionan un diseño de formulario y gestionan los cambios CRUD de registros 
+sin necesidad de código Ape
+
 <lightning-record-form
     *atributos*>
 </lightning-record-form> -> Permite crear, ver o editar un registro.
@@ -468,6 +482,9 @@ escribir Apex, usando datos “en caché” y respetando seguridad, permisos y F
 	- onerror={nombreFuncion} -> Funcion que se manda a llamar después la función onsubmit
 		fallara.
 
+Para casos de uso más avanzados que requieren diseños de campos personalizados y renderizado 
+personalizado de datos de registros, usar los componentes lightning-record-view-form y 
+lightning-record-edit-form.
 
 ||||||| Usando la anotación wire |||||||
 
@@ -477,12 +494,48 @@ Ya se explico en otra sección como usarlo.
 
 ||||||| Usando UI Record API en modo imperativo |||||||
 
-Es un conjunto de funciones JS que te permite: Crear, Actualizar y Eliminar (y obtener info de 
-metadata).
-Se llama imperativo porque tú decides cuándo ejecutar la acción (click, evento, lógica).
+Es un conjunto de funciones JS que te permite: Crear, Actualizar, Eliminar y obtener info de 
+metadata.
+Se llama imperativo porque tú decides cuándo ejecutar la acción (por un click, evento o
+cierta lógica).
 
 Usa UI Record API cuando: Necesitas botones personalizados, Quieres lógica antes/después del
 guardado y No quieres depender de layouts.
+
+import { nombreAccion } de 'lightning/uiRecordApi'; -> Para importar una accion al archivo js.
+	Acciones:
+	Para crear / actualizar / borrar registros -----
+	- createRecord. Si todo sales bien se nos devolverá el objeto recién insertado con su
+		respectivo nuevo id.
+  	- updateRecord
+ 	- deleteRecord
+	Para obtener datos (LDS) -----------------------
+	- getRecord
+ 	- getRecords
+  	- getRecordUi
+	- getRecordCreateDefaults
+	Para trabajar con campos -----------------------
+	- getFieldValue
+	- getFieldDisplayValue
+	
+{
+  apiName: 'NombreTabla',
+  fields: {
+    nombreCampo1: valor1,
+    nombreCampo2: valor2,
+    nombreCampoN: valorN
+  }
+} -> Las funcion: createRecord recibe un objeto como este.
+	La función updateRecord no usa apiName y el id va dentro de fields.
+
+createRecord(recordInput)
+  .then(record => { ... })
+  .catch(error => { ... }); -> Intenta guardar un registro.
+	Se ejecuta el bloque then si el registro se creo con éxito y se ejecutara el bloque catch
+	si se rechazo la creación por ejemplo por falta de permisos, se intenta insertar en un
+	campo que no permite valores, falta insertar campos obligatorios, algún trigger se lanzo
+	y rechazo la inserción, tipos de datos invalidos.
+
 
 Ejemplo de guardar un registro:
 
@@ -491,14 +544,14 @@ handleCreate() {
         Name: 'Cuenta creada por LWC',
         Phone: '555-1234',
         Industry: 'Technology'
-    };
+    }; // Datos hardcodeados: el valor para cada campo a insertar.
 
     const recordInput = {
         apiName: 'Account',
         fields
-    };
+    }; // se crea el objeto que necesita la accion
 
-    createRecord(recordInput)
+    createRecord(recordInput) // Llamar a la accion.
         .then(record => {
             console.log('ID creado:', record.id);
         })
@@ -689,15 +742,55 @@ Para depurar (debuggear) mejor los componentes LWC en el navegador: En la consol
 	darles el formato correcto a los valroes.
 	*En devtools* -> click sobre el engrane -> palomear Custom formatters.
 
-Localizar los componentes web Lightning: 
-	 
+Buscar los componentes de uan aplicación: *En devtools* -> En el apartado sources -> en la 
+	pestaña page -> Buscar el símbolo e cuadrado con el nombre de la aplicación en la 
+	que estemos y expandirla -> después expandir lightning/n y modules/c.
 
+lista de elementos ignorados: La lista de elementos ignorados permite ignorar los archivos 
+	JavaScript seleccionados cuando se use DevTools, de esta forma solo vera los archivos de
+	interés.
+	*En devtools* -> click sobre el engrane -> apartado izq ignore list -> click en 
+	Add regex rule.
+	 
+Colocar breakpoints: *En devtools* -> Dentro de un archivo js se pueden poner breakpoints.
+	Agregar un breakpoint condicional: sirve para detener la ejecución del código solo 
+		cuando se cumple una condición específica, en lugar de detenerse siempre que se
+		llega a esa línea. 
+		Cuando El código pasa muchas veces por la misma línea (loops, triggers, streams,
+		etc.) y el El bug ocurre solo en ciertos casos, Un breakpoint normal te obligaría 		a avanzar paso a paso muchas veces. El breakpoint condicional te deja:
+		“Detente solo cuando pase esto”. ****
+		Click derecho sobre el numero de linea de código -> seleccionar la opcion: 
+		agregar un breakpoint condicional -> agregar la expresión.
+	Gestionar los puntos de interrupción: En el apartado puntos de interrupción se enlistan
+		por archivos los puntos de interrupción y se pueden activar o desactivar al 
+		palomerarlos.
+		Ver mas opciones: clic con el botón derecho en cualquier parte y dentro del
+			apartado breakpoints.
+
+
+COMPONENES AURA
+
+Es el framework viejo de Salesforce para crear interfaces en Lightning, anterior a LWC.
+Funciona, pero es más pesado y más lento
+Hoy Salesforce recomienda LWC para todo lo nuevo.
+
+Los componentes de aura pueden contener componentes de telaraña de rayo.
+Los componentes de la telaraña eléctrica no pueden contener componentes de Aura.
+
+Es muy recomendable migrar el componente aura a lwc cuando el componente aura se renderiza 
+lento. ****
+
+Aura se desarrolla con:
+JavaScript (controladores y helpers)
+Markup propio de Aura (.cmp, parecido a HTML)
+css
+Apex (para lógica del servidor).
 
 
 
 /////////////////////////////////////////PRUEBAS/////////////////////////////////////////
 
-Se utiliza jest como herramientas para realizr las pruebas y para usarlo se deb tener nstalado
+Se utiliza jest como herramientas para realizar las pruebas y para usarlo se debe tener instalado
 node.js.
 Verificarlo con 
 	node --versión
