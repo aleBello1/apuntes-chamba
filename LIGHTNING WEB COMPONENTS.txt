@@ -596,16 +596,17 @@ handleDelete() {
 Cuando quieres personalizar una transacción de datos de un solo registro, o realizar operaciones
 multi-registro en una sola transacción, Apex es la mejor opción.
 
+Si ya tienes código Apex que desarrollaste para componentes de Aura, puedes reutilizarlo en los 
+componentes web de Lightning. Alternativamente, si necesitas una consulta SOQL para acceder a
+datos personalizados, tienes que usar un método Apex.
+
 
 ||||||| Usar métodos ápex |||||||
 
-La anotación pone el método Apex a disposición de los componentes de Lightning (tanto los componentes 
-web lightning como los de Aura).
-
 *En apex*
-public with sharing class nombreClaseController {} -> Se crea una clase de manera especial: la 	
-parte de with sharing es para Respeta las reglas de sharing del usuario (Solo devuelve registos que
-el usuario tiene permiso de ver).
+public with sharing class nombreClaseController {} -> Se crea una clase de manera especial: la 
+	parte de with sharing es para Respetar las reglas de sharing del usuario (Solo devuelve 
+	registos que el usuario tiene permiso de ver).
 
 *En apex*
 @AuraEnabled(cacheable=true)
@@ -615,8 +616,11 @@ public static tipoDato nombreMetodoApex(parametros) {
 	Componentes Aura.
 	- cacheable=true -> Indica que: El método NO modifica datos y Salesforce puede cachear 
 		el resultado
-		Cuando un método es cacheable, las versiones nuevas o modificadas de los 			
+		Cuando un método es cacheable, las versiones nuevas o modificadas de los 	
 		registros no pueden devolverse hasta que la caché se actualice.
+	Ejemplo del contenido de la función: 
+		return [SELECT Id, Nombre DE cuenta
+			WHERE Ingresos Anuales > 1000000];
 
 *xml*
 <?xml version="1.0" encoding="UTF-8"?>
@@ -632,14 +636,16 @@ public static tipoDato nombreMetodoApex(parametros) {
 		Builder
 		Si fuera false: No podrías arrastrarlo a ninguna página.
 	- <targets> -> Define en qué tipos de páginas puede usarse el componente.
-		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.		
+		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.	
 			NO podría usarse en: Record Pages y Home Pages
 
-
-Hay dos formas de interactuar con los métodos Apex de los componentes de Lightning: o bien 
-cablear el método o llamarlo imperativamente. 
+Hay dos formas de interactuar con los métodos Apex desde los componentes web Lightning: 1.
+cablear el método o 2. llamarlo imperativamente. 
 
 Utilizando cables:
+
+Esta forma se utiliza cuando los datos se pueden cachear, es decir, si la operación es únicamente
+de lectura. *******
 
 Forma para metodos: 
 
@@ -647,11 +653,22 @@ Forma para metodos:
 import { LightningElement, wire } from 'lwc';
 import nombreMetodoApex from '@salesforce/apex/nombreClaseController.nombreMetodoApex';
 export default class nombreClaseY extends LightningElement {
- @wire(nombreMetodoApex, { birthDate: '$minBirthDate' })
+ @wire(nombreMetodoApex, { nombreParametro: '$valor' })
  nombreAtributo;
-} -> Para llamar el método ápex en js para usarlo n lwc
+} -> Para llamar el método de ápex en js y usarlo en la vista.
 	El segundo parámetro de la anotación wire es el objeto que se envia como parámetro al 
-	método nombreMetodoApex.
+	método nombreMetodoApex. Si el método ápex no se le pasa parámetros el objeto se 
+	envia vacio ({}).
+
+*En js*
+import { LightningElement, wire } from 'lwc';
+import nombreMetodoApex from '@salesforce/apex/nombreClaseController.nombreMetodoApex';
+export default class nombreClaseY extends LightningElement {
+ @wire(nombreMetodoApex, { nombreParametro: '$valor' })
+ wireFunction({error, data}){
+   // logica
+ }
+} -> Forma alternativa a la anterior. Usando una función con lógica.
 
 Forma para mostrar una tabla en la vista: 
 
@@ -694,20 +711,19 @@ nombreArregloDeRegistros; -> Para crear la tabla con los registros.
 
 Utilizando forma imperativa:
 
-Llama a Apex imperativamente cuando necesites controlar la invocación de las operaciones de 
-lectura y cuando modifiques registros. 
+Esta forma se utiliza cuando los datos no son cacheables, es decir, cuando la operación no 
+es de lectura (entonces cuando se crean, actualizan o eliminan datos).
 
 *En js*
 import { LightningElement, api, wire } from 'lwc';
 importar nombreMetodoApex desde '@salesforce/apex/ContactController.nombreMetodoApex';
 export default class nombreComponente extends LightningElement {
-    @api nombreParameto;
     nombreFuncionEvento() {
         nombreMetodoApex({ 
             nombreParameto: this.nombreParameto
         })
         .then(records => {
-            // Codigo si se presenta el error
+            // Codigo si se logro el insert, update o delete.
         })
         .catch(error => {
             // Codigo si hay error
