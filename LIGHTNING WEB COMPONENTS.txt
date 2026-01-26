@@ -172,7 +172,9 @@ Instrucciones en archivos HTML --------------------
 
 <c-nombreComponenteHijoX></c-nombreComponenteHijoX> -> Para que un componente padre 
 	pueda mostrar a su componente hijo.
-	- onproductselected={handleProductSelected} -> 
+	El nombre del componente hijo, por sintaxis, se separa por guiones y no por camelCase,
+	todas las letras son en minúsculas y además se le antepone el 'c-', el cual indica que 
+	es un componente.
 
 <template for:each={nombreArregloX} for:item="elementoX">
   // n instrucciones html
@@ -183,7 +185,7 @@ Comunicaciones entre componentes -----------------------------
 
 Los componentes se pueden comunicar entre un padre y un hijo en ambos sentidos.
 
-     Comunicación ascendente 
+°°°°°°°° Comunicación ascendente °°°°°°°°
 
 Para llevar a cabo una comunicación hacia arriba se usan eventos y/o agentes de escucha de eventos.
 El componente secundario envía el evento y el principal lo escucha. 
@@ -198,7 +200,7 @@ nombreEventoPadreY() {
    // n instrucciones
 } 
 
-     Comunicación descendente
+°°°°°°°° Comunicación descendente °°°°°°°°
 
 La información se puede comunicar en sentido descendente mediante propiedades públicas y métodos públicos.
 
