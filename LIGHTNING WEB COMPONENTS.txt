@@ -40,6 +40,10 @@ Autorizar determinado playgroud desde cli: Usamos el comando: sf org login web -
  	Para determinar el usuiairo y contraseña de un playground deberemos restablecer la
  	contraseña de determinado playground.
 
+Autorizar determinado playgroud desde vsc: Ctrl + Shift + P -> escribir 'SFDX: autorize an org'
+	-> production -> ingresar el alias de la org -> el navegador se abrirá y nos pedirá
+	ingresar las creenciales del playground con el que deseamos vincular el proyecto. 
+
 Restablecer la contraseña para su organización de trailhead playgroud: La integración entre
  	Trailhead y la organización de Playground hace que la contraseña predeterminada sea
  	inaccesible. Necesita una contraseña para acceder a la organización desde fuera de
@@ -196,8 +200,9 @@ El componente secundario envía el evento y el principal lo escucha.
 	Por nomeclatura el nombre del atributo se le antepone el prefijo on.
 
 *En el archivo js del padre*
-nombreEventoPadreY() {
-   // n instrucciones
+nombeAtributo = null;
+nombreEventoPadreY(event) {
+   this.nombreAtributo = evento.devail.value;
 } 
 
 °°°°°°°° Comunicación descendente °°°°°°°°
@@ -786,6 +791,9 @@ Colocar breakpoints: *En devtools* -> Dentro de un archivo js se pueden poner br
 			apartado breakpoints.
 
 
+COMPONENTES PREDEFINIDOS EN LWC
+
+
 COMPONENES AURA
 
 Es el framework viejo de Salesforce para crear interfaces en Lightning, anterior a LWC.
@@ -803,6 +811,15 @@ JavaScript (controladores y helpers)
 Markup propio de Aura (.cmp, parecido a HTML)
 css
 Apex (para lógica del servidor).
+
+
+VISUALFORCE
+
+Es una tecnología de Salesforce para crear interfaces de usuario personalizadas, usando un enfoque más “clásico” que LWC o Aura.
+
+En Visualforce, las propiedades se definen en un controlador Apex (un archivo de clase Apex) y se
+referencian en el marcado de página (la página de Visualforce). En los componentes web de 
+Lightning, las propiedades se definen en el archivo JavaScript del componente y se referencian en el marcado de página (el archivo HTML del componente). 
 
 
 
