@@ -743,12 +743,11 @@ CONFIGURAR DEV TOOLS PARA ESCRITORIO
 
 *Primero se debe activar el modo debug en el playground*
 
-Desactivar el almacenamiento en caché durante las tareas de desarrollo: se Desactive el 
-	almacenamiento en caché persistente y seguro en el navegador para ver el efecto de los 
-	cambios en el código sin tener que vaciar la caché.
+Desactivar el almacenamiento en caché durante las tareas de desarrollo: se desactiva la caché 	durante el desarrollo para ver el efecto de cualquier cambio en el código sin necesidad 
+	de vaciar la caché o esperar a que caduque.
 	En la parte superior der click en el logo de engrane -> apartado home -> buscar y 
 	seleccionar session settings -> Anular la casilla 'Enable secure and persistent browser 
-	caching to improve performance'
+	caching to improve performance' -> sabe.
 	Se debe volver a activar el almacenamiento en caché después de depurar el código.
 
 sf org assign permset -n nombrePermissionSet -> para asignar un Permission Set a un usuario en 

@@ -50,7 +50,7 @@ System.debug() -> Para escribir mensajes en el registro.
  	pantalla -> click en el apartado logs -> doble click en el registro de interés ->
  	palomear la opción debug only. **
  
-Crear una clase ápex en vsc: ctrl + shift + p -> escribir sfdx: créate ápex class -> ingresar 
+Crear una clase de apex en vsc: ctrl + shift + p -> escribir sfdx: create apex class -> ingresar 
 	el nombre de la clase -> dejar la ruta por defecto para la creación de la clase.
 
 

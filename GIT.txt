@@ -93,3 +93,6 @@ git flow release finish vx.y.z -> Fusiona la rama de release en main (master), C
 
 En este momento deberemos apuntar a prod y despues hacer el git push. ***
 
+git push origin --tags -> Para mandar todos los tags que están en local al remoto.
+
+
