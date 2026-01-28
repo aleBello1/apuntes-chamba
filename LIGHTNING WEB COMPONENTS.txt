@@ -1,4 +1,6 @@
 
+mgranados@playful-raccoon-g5utz3.com
+
 
 /////////////////////////////////////////DESARROLLO/////////////////////////////////////////
 
@@ -242,6 +244,10 @@ import { nombreAdaptador } from 'lightning/uiRecordApi'; -> Para importar determ
 	- getRecord -> Para traerse registros.
 	- getRecordUi -> Para metadatos del registro.
 	- getObjectInfo -> Metadatos del objeto.
+	- getFieldValue -> Sirve para leer fácilmente el valor de un campo que viene del 
+		getRecord, sin pelearte con la estructura JSON.
+		En vez de navegar algo horrible como: data.fields.Name.value, se usaría algo 
+		mas amigable como: getFieldValue(data, NAME_FIELD); ***
 
 @wire(tipoAdaptador, { objeto })
 nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
@@ -645,6 +651,10 @@ public static tipoDato nombreMetodoApex(parametros) {
 	- <targets> -> Define en qué tipos de páginas puede usarse el componente.
 		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.	
 			NO podría usarse en: Record Pages y Home Pages
+	- <targetConfigs> -> Opcional. Reglas especificas para cada target.
+		- targets="lightning__RecordPage" -> Estas configuraciones aplican SOLO cuando 
+			el componente esté en determinado target.
+		- <objects> -> Este componente SOLO puede agregarse a determinados objetos.
 
 Hay dos formas de interactuar con los métodos Apex desde los componentes web Lightning: 1.
 cablear el método o 2. llamarlo imperativamente. 
@@ -754,7 +764,9 @@ sf org assign permset -n nombrePermissionSet -> para asignar un Permission Set a
 	una org de Salesforce, normalmente a tu usuario actual.
 	Un Permission Set es un conjunto de permisos adicionales que se le pueden asignar a uno o
 	varios usuarios, sin cambiar su perfil.
-	- Solutions_Full_Access -> conjunto de permisos de acceso completo.
+	El nombrePermissionSet se debió haber definido en el proyecto local en la carpeta de 
+	permissionsets y posteriormente desplegado a la organización ó haber sido creado en la 
+	organización, el punto es que este debe existir en el playground. ***
 
 Abrir dev tools: *Esto solo funciona en chrome* -> *Estando en el playground* -> click derecho 
 	donde sea -> inspect -> aparado sources.
@@ -812,6 +824,46 @@ css
 Apex (para lógica del servidor).
 
 
+SERVICIO DE NAVEGACION LIGHTNING
+
+El servicio te permite generar URLs, navegar hasta una referencia de página, trabajar con parámetros de URL y abrir archivos.
+Se soportan muchos tipos de referencia de página, como App, Lightning Component, Navigation Item (tabulador) y Record Page.
+
+Para utilizar el Servicio de Navegación:
+
+import { NavigationMixin } from 'lightning/navigation'; -> Importa el módulo de navigation.
+
+export default class ClientSideNavigation extends NavigationMixin(LightningElement) {} -> Hacer
+	que la clase del componente extienda de NavigationMixin.
+
+this[NavigationMixin.Navigate]({
+    type: 'standard__objectPage',
+    attributes: {
+        objectApiName: 'Contact',
+        actionName: 'list'
+    }
+}); -> Para ir a determinada pagina.
+	- type: valor -> le dice a Salesforce qué clase de destino quieres abrir.
+		- standard__objectPage -> Para navegar a paginas relacionadas con un objeto.
+		- standard__recordPage -> Navega a un registro específico.
+			En attributes se pondría el id del registro que se desea ver.
+		- standard__navItemPage -> Navega a un Custom Tab.
+			En attributes se pondría el nombre del custom tab que se desea ver.
+		- standard__webPage -> Navega a una URL externa o interna.
+			En attributes se pondría la url que se desea ver.
+		- standard__component -> Navega a otro componente LWC o Aura.
+			En attributes se pondría el nobmre del ocmponente que se desea ver.
+		- standard__app -> Cambiar de App.
+			En attributes se pondría el nombre de la app que se desea ver.
+	- actionName: Para indicar que accion del objeto se desea abrir.
+		- list → vista de lista.
+		- new → crear registro.
+		- view → ver registro.
+		Solo con estos dos type: standard__objectPage y standard__recordPage. ****
+	- objectApiName: nombreObjeto es el nombre del objeto/tabla al que quieres ir.
+		Solo se usa en standard__objectPage y en standard__recordPage. ***
+
+
 VISUALFORCE
 
 Es una tecnología de Salesforce para crear interfaces de usuario personalizadas, usando un enfoque más “clásico” que LWC o Aura.
@@ -819,6 +871,13 @@ Es una tecnología de Salesforce para crear interfaces de usuario personalizadas
 En Visualforce, las propiedades se definen en un controlador Apex (un archivo de clase Apex) y se
 referencian en el marcado de página (la página de Visualforce). En los componentes web de 
 Lightning, las propiedades se definen en el archivo JavaScript del componente y se referencian en el marcado de página (el archivo HTML del componente). 
+
+
+OTROS COMANDOS DE CLI
+
+sf data import tree -p data/plan.json -> Para subir datos relacionados (en árbol) desde el local
+	a Salesforce respetando relaciones entre registros.
+
 
 
 
