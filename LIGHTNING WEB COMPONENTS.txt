@@ -1,4 +1,7 @@
 
+mgranados@resilient-moose-ols29d.com
+
+
 
 /////////////////////////////////////////DESARROLLO/////////////////////////////////////////
 
@@ -132,10 +135,10 @@ Permitir que las variables de js que almacenan links de imágenes provenientes d
 
 Crear una nueva pagina para los componentes: *En salesforce* -> En la parte sup derecha buscar
 	el logo de settings -> opción setup -> busque y seleccione Lightning App Builder ->
-	new -> app page -> tipe of page: one región -> asginar nombe a la pagina -> *En la 
-	parte izq ya podremos ver los componentes y arrastrarlos* -> después ya nadamas 
-	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
-	seleccionar 
+	new -> app page -> type of page: *el tipo de pagina al gusto* -> asignar nombre a la 
+	pagina -> *En la parte izq ya podremos ver los componentes y arrastrarlos* -> después 
+	ya nadamas guardaremos la pagina y la activaremos -> desde app lancher ya podremos 
+	buscar y seleccionar 
 	- Cambiar el tipo de pagina: Si nos equivocamos sobre el tipo de pagina le damos en 
 		edit -> En la parte derecha de la pagina -> edit templates.
 
@@ -846,17 +849,49 @@ Comunicación ascendente -----------------------------
 Para llevar a cabo una comunicación hacia arriba se usan eventos y/o agentes de escucha de eventos.
 El componente secundario envía el evento y el principal lo escucha. 
 
+*En la vista del hijo*
+<template>
+    <lightning-button
+        label="Enviar mensaje al padre"
+        onclick={nombreEventoHijo}>
+    </lightning-button>
+</template> -> Se llama al evento hijo.
+
+*En el archivo js del hijo*
+nombreEventoHijo() {
+    const evento = new CustomEvent('nombreFuncionPadre', {
+        detail: {
+            nombreAtributo1: valor1,
+            nombreAtributo2: valor2,
+            nombreAtributoN: valorN
+        }
+    });
+
+    this.dispatchEvent(evento);
+} -> Esta es un evento que se ejecutara cuando se interactue con el componente hijo y que al 	ejecutarse llamara a la función padre.
+	Observese que cuando se crea el evento personalizado se especifica el nombre de la 	función padre que se desea ejecutar y como segundo parámetro se pasa un objeto con los 
+	datos que el padre espera recibir.
+	Si no hay datos que enviar, el segundo parámetro ni si quiera se pone. **
+	- bubles: true -> Permite que el evento suba por el árbol DOM.
+		Pe De hijo → padre → abuelo → bisabuelo…	
+		Se usa cuando el evento debe subir varios niveles, es decir, Cuando el padre no 
+		es el consumidor final
+
 *En la vista del padre*
-<c-nombreComponenteHijoX onNombreEventoPadreY={nombreEventoPadreY}></c-nombreComponenteHijoX> -> 
-	Se llama al componenete hijo y como atributo de la etiqueta se le pasa el nombre del 
-	evento del padre.
+<c-nombreComponenteHijoX 
+	onNombreFuncionPadreY={nombreFuncionPadreY}>
+</c-nombreComponenteHijoX> -> Se llama al componenete hijo y como atributo de la etiqueta se le 
+	pasa el nombre del evento del padre.
 	Por nomeclatura el nombre del atributo se le antepone el prefijo on.
 
 *En el archivo js del padre*
-nombeAtributo = null;
-nombreEventoPadreY(event) {
-   this.nombreAtributo = evento.devail.value;
-} 
+nombreFuncionPadre(event) {
+   // Modificar las variables del padre
+} -> Esta función se ejecutara en cuando se active el evento en la vista del hijo.
+	- evento.detail.nombreAtributoX -> Se usa dentro de esta función para extraer los datos
+		que envió el hijo.**
+		Solo se pasa como parámetro a la función si la función espera recibir datos. *
+
 
 Comunicación descendente -----------------------------
 
