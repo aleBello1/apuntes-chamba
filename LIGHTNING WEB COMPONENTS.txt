@@ -1,6 +1,4 @@
 
-mgranados@playful-raccoon-g5utz3.com
-
 
 /////////////////////////////////////////DESARROLLO/////////////////////////////////////////
 
@@ -83,8 +81,8 @@ sf project retrieve start -x manifest/package.xml -> Para traer (recuperar) meta
     		</types>
  	Donde el tipo objeto seria los flows, objetos, etc.
  
-
-A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de programación que puede usar, por ejemplo:
+A la hora de desarrollar en Salesforce Platform, existen numerosos lenguajes de programación 
+que puede usar, por ejemplo:
  	- El marco Lightning Web Components: un marco de trabajo de desarrollo de interfaz
  		de usuario basada en JavaScript.
  	- Apex: lenguaje de programación creado por Salesforce con una sintaxis similar a Java.
@@ -97,7 +95,8 @@ COMPONENTS WEB LIGHNING
 Desarrollo para dispositivos de escritorio y móviles basado en componentes para el desarrollo
 de interfaces de usuario.
 
-Proporciona únicamente los elementos necesarios para ejecutarse correctamente en los navegadores admitidos en Salesforce. 
+Proporciona únicamente los elementos necesarios para ejecutarse correctamente en los navegadores
+admitidos en Salesforce. 
 La mayoría de código que escribe es JavaScript y HTML estándar.
 
 Los componentes Aura pueden contener componentes web Lightning (pero no a la inversa). 
@@ -146,16 +145,6 @@ Agregar los componentes a una aplicación existente: *En salesforce* -> Buscar d
 	guardaremos la pagina y la activaremos -> desde app lancher ya podremos buscar y 
 	seleccionar 
 
-
-Otros ------------------------------
-
-Para poder personalizar especificamente la pagina home: Por personalización se refiere a 
-	a modificar qué ve el usuario cuando entra a Salesforce, usando Lightning App Builder, 
-	es decir, Qué componentes aparecen, Dónde aparecen y Para quién aparecen.
-	En la parte sup derecha buscar el logo de settings -> opción setup -> buscar y 	
-	seleccionar home -> en advanced seller home cambiar la configuración a inactivo.
-
-
 	
 Instrucciones en archivos HTML --------------------
 
@@ -185,91 +174,6 @@ Instrucciones en archivos HTML --------------------
 <template for:each={nombreArregloX} for:item="elementoX">
   // n instrucciones html
 </template> -> Para iterar un arreglo en la vista.
-	
-
-Comunicaciones entre componentes -----------------------------
-
-Los componentes se pueden comunicar entre un padre y un hijo en ambos sentidos.
-
-°°°°°°°° Comunicación ascendente °°°°°°°°
-
-Para llevar a cabo una comunicación hacia arriba se usan eventos y/o agentes de escucha de eventos.
-El componente secundario envía el evento y el principal lo escucha. 
-
-*En la vista del padre*
-<c-nombreComponenteHijoX onNombreEventoPadreY={nombreEventoPadreY}></c-nombreComponenteHijoX> -> 	Se llama al componenete hijo y como atributo de la etiqueta se le pasa el nombre del 
-	evento del padre.
-	Por nomeclatura el nombre del atributo se le antepone el prefijo on.
-
-*En el archivo js del padre*
-nombeAtributo = null;
-nombreEventoPadreY(event) {
-   this.nombreAtributo = evento.devail.value;
-} 
-
-°°°°°°°° Comunicación descendente °°°°°°°°
-
-La información se puede comunicar en sentido descendente mediante propiedades públicas y métodos públicos.
-
-*En el archivo js del hijo*
-@api nombreAtributo; -> Para recibir valores.
-
-*En el archivo html del padre*
-<c-nombreComponenteHijoX nombre-atributo={valor}></c-nombreComponenteHijoX> -> Para mandar 	valores desde el padre al hijo.
-	Observese que en la vista, el nombre del atributo usa la nomeclatura snake-case y en
-	js se ocupa camelCase.
-
-Estilos ---------------------------------------
-
-Salesforce tiene su propia macro de css (estilos propios de saelesorce que son usados para 
-que nuestros componentes tengan los mismos estilos que las paginas de salesforce) conocido como
-Salesforce Lightning Design System (SLDS).
-
-
-Incorporar datos de Salesforce a nuestros componentes -----------------
-
-El servicio "wire" incorpora datos en su aplicación.
-Este servicio forma parte de nuestra plataforma y proporciona una transmisión de datos.
-Unicmante se usa esta forma para leer datos de Salesforce.
-Llamamos al servicio de cable reactivo en parte porque soporta variables reactivas, que tienen el prefijo $. Si cambia una variable reactiva, el servicio de noticias proporciona nuevos datos.
-
-import NOMBRE_CAMPO1 from '@salesforce/schema/NombreTablaX__c.NombreCampo1'; 
-import NOMBRE_CAMPO2 from '@salesforce/schema/NombreTablaX__c.NombreCampo2';
-import NOMBRE_CAMPON from '@salesforce/schema/NombreTablaX__c.NombreCampoN'; -> Para importar
-	determinados campos archivo js.
-
-import { nombreAdaptador } from 'lightning/uiRecordApi'; -> Para importar determinado
-	adaptadore(s).
-	Adaptadores:
-	- getRecord -> Para traerse registros.
-	- getRecordUi -> Para metadatos del registro.
-	- getObjectInfo -> Metadatos del objeto.
-	- getFieldValue -> Sirve para leer fácilmente el valor de un campo que viene del 
-		getRecord, sin pelearte con la estructura JSON.
-		En vez de navegar algo horrible como: data.fields.Name.value, se usaría algo 
-		mas amigable como: getFieldValue(data, NAME_FIELD); ***
-
-@wire(tipoAdaptador, { objeto })
-nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
-	devuelve el adaptador (UI API o Apex).	
-	El atributo contendrá dos atributos el primero (data) contiene la info solicitada y 
-	el segundo (error) un posible mensaje de error.
-	Valores para el segundo parámetro:
-	- Si se uso getRecord: Se debe pasar un objeto con dos atributos los cuales define QUÉ 
-		datos traes y CÓMO los traes.
-		En el primer atributo se coloca el id del registro (Es obligatorio) y en el 
-		segundo atributo se especifica un array de campos que deseamos traernos del 
-		registro.
-		E:
-			{ recordId: '$recordId', fields: [fields] }
-
-
-@wire(tipoAdaptador, { parametros })
-wiredNombreObjeto({data, error}) {
- // logica
-} -> Ahora en vez de ser un atributo es una función que se ejecuta automaticamnte y recibe 
-	como objeto los atributos data y errr.
-	Se usa para procesar datos y manejar errores.
 
 
 js ------------------------
@@ -281,21 +185,27 @@ Debe incluir como mínimo este código:
 
 import { LightningElement } from 'lwc';
 export default class nombreComponenteX extends LightningElement {
-}
+} -> Esqueleto de un componente cualquiera.
+	
 
+HOOKS
 
-Hooks ---------------------------------
-
-connectedCallback() -> Se ejecuta automáticamente cuando el componente se inserta en el DOM 	
-	(cuando aparece en la página).
+connectedCallback() {...} -> Se ejecuta automáticamente cuando el componente se inserta en el 
+	DOM (cuando aparece en la página).
 	Usado para inicializar variables, llamar a ápex o a servicios externos, lógica que 
 	debe ejecutarse una sola vez al cargar.
 
-Decoradores ----------------------------
+disconnectedCallback() {} -> Se ejecuta automáticamente cuando el componente se elimina del 
+	DOM (cuando ya no se muestra en la pagina)
+	
 
-Los decoradores se suelen usar en JavaScript para modificar el comportamiento de una propiedad o función.
-Para usar un decorador, impórtelo desde el módulo lwc y colóquelo delante de la propiedad o función.
-una propiedad o función solo puede tener un decorador y no mas. *
+DECORADORES
+
+Los decoradores se suelen usar en JavaScript para modificar el comportamiento de una 
+propiedad o función.
+Para usar un decorador, impórtelo desde el módulo lwc y colóquelo delante de la propiedad 
+o función.
+Una propiedad o función solo puede tener un decorador y no mas. *
 
 @api -> Hace que una propiedad o método sea público.
 	Usado para:
@@ -313,7 +223,8 @@ una propiedad o función solo puede tener un decorador y no mas. *
 	Para conectar un componente LWC a una fuente de datos de Salesforce y mantener la UI 
 	sincronizada automáticamente cuando los datos cambian.
 
-Archivo de configuración ---------------------------
+
+ARCHIVO DE CONFIGURACION
 
 El archivo que tiene la extensión .js-meta.xml, es el archivo de configuración de un 
 componente. Este archivo proporciona metadatos para Salesforce, incluida la configuración de 
@@ -321,19 +232,29 @@ diseño de los componentes que se van a usar en Lightning App Builder
 
 Configuraciones de este archivo:
 
-apiVersion -> vincula el componente a una versión de API de Salesforce.
+*xml*
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__AppPage</target>
+    </targets>
+</LightningComponentBundle> -> Al configurar el XML se define dónde y cómo puede usarse tu 
+	Lightning Web Component dentro de Salesforce.
+	- <isExposed>true</isExposed> -> Hace que el componente sea visible en el Lightning App 
+		Builder
+		Si fuera false: No podrías arrastrarlo a ninguna página.
+	- <targets> -> Define en qué tipos de páginas puede usarse el componente.
+		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.	
+			NO podría usarse en: Record Pages y Home Pages
+	- <targetConfigs> -> Opcional. Reglas especificas para cada target.
+		- targets="lightning__RecordPage" -> Estas configuraciones aplican SOLO cuando 
+			el componente esté en determinado target.
+		- <objects> -> Este componente SOLO puede agregarse a determinados objetos.
 
-isExposed -> Si vale false el componente no se expone en Lightning App Builder ni Experience 
-	Builder.
 
-targets -> Especifica los tipos de páginas Lightning a las que se puede agregar el componente 
-	en Lightning App Builder.
-
-targetConfigs -> permite especificar comportamiento específico para cada tipo de página 
-	Lightning, incluidas cosas como los objetos que respaldan el componente.
-
-
-Dev hub --------------------------------------------------
+DEV HUB
 
 local dev: es una herramienta de CLI de Salesforce que te permite ejecutar una vista previa 
 en tiempo real de tus componentes web de Lightning en tu navegador. La vista previa se actualiza 
@@ -342,7 +263,8 @@ código ni actualizar manualmente la página del navegador.
 
 Para poder incorporar esta herramienta es necesario instalarla y hacer todo lo relacionado
 con dev hub.
-Doc para su instalación: https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html
+Doc para su instalación: 
+https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html
 
 Es una funcionalidad especial que se habilita en una org y que permite:
 Crear, administrar y controlar Scratch Orgs
@@ -403,8 +325,7 @@ sf lightning dev app --target-org nombreAliasOrgZero --device-type tipoDevice ->
 	Se nos pediría seleccionar una app para previsualizar.
 
 
-
-Configurar herramienta de mobile app simulator ----------------------------------
+CONFIGURAR HERRAMIENTA DE MOBILE APP SIMULATOR
 
 El simulador de apps móviles para ios solo se puede hacer en mac. ****
 
@@ -440,9 +361,10 @@ conectar Chrome con dev tools para Android: En el dispositivo Android emulado ->
 	Lightning -> Abre Chrome en tu escritorio -> introduce chrome://inspect/#devices 
 	-> clic en Inspeccionar en el emulador de Target remoto con el que estás trabajando.
 
-Trabajar con datos ---------------------------------------
 
-°°°°°°°° Usando lightning data service °°°°°°°°°
+TRABAJAR CON DATOS
+
+Usando lightning data service ---------------------------------------
 
 Es la forma preferida (y más sencilla) de trabajar con datos de Salesforce.
 Se usa JavaScript para conectar componentes a los datos de Salesforce.
@@ -455,7 +377,7 @@ automáticamente esa actualización.
 Es la forma recomendada en Salesforce (LWC) para leer, crear, actualizar y eliminar registros sin
 escribir Apex, usando datos “en caché” y respetando seguridad, permisos y FLS automáticamente.
 
-||||||| Usando el componente form |||||||
+°°°°°°°° Usando el componente form °°°°°°°°
 
 Este componente proporcionan un diseño de formulario y gestionan los cambios CRUD de registros 
 sin necesidad de código Ape
@@ -499,13 +421,55 @@ Para casos de uso más avanzados que requieren diseños de campos personalizados
 personalizado de datos de registros, usar los componentes lightning-record-view-form y 
 lightning-record-edit-form.
 
-||||||| Usando la anotación wire |||||||
 
-Unicmanete se usa para leer registros.
-Ya se explico en otra sección como usarlo.
+°°°°°°°° Usando la anotación wire °°°°°°°°
+
+El servicio "wire" incorpora datos en su aplicación.
+Este servicio forma parte de nuestra plataforma y proporciona una transmisión de datos.
+Unicmante se usa esta forma para leer datos de Salesforce. ********
+
+Llamamos al servicio de cable reactivo en parte porque soporta variables reactivas, que tienen 
+el prefijo $. Si cambia una variable reactiva, el servicio de noticias proporciona nuevos datos.
+
+import NOMBRE_CAMPO1 from '@salesforce/schema/NombreTablaX__c.NombreCampo1'; 
+import NOMBRE_CAMPO2 from '@salesforce/schema/NombreTablaX__c.NombreCampo2';
+import NOMBRE_CAMPON from '@salesforce/schema/NombreTablaX__c.NombreCampoN'; -> Para importar
+	determinados campos archivo js.
+
+import { nombreAdaptador } from 'lightning/uiRecordApi'; -> Para importar determinado
+	adaptadore(s).
+	Adaptadores:
+	- getRecord -> Para traerse registros.
+	- getRecordUi -> Para metadatos del registro.
+	- getObjectInfo -> Metadatos del objeto.
+	- getFieldValue -> Sirve para leer fácilmente el valor de un campo que viene del 
+		getRecord, sin pelearte con la estructura JSON.
+		En vez de navegar algo horrible como: data.fields.Name.value, se usaría algo 
+		mas amigable como: getFieldValue(data, NAME_FIELD); ***
+
+@wire(tipoAdaptador, { objeto })
+nombreAtributo; -> Para llenar automáticamente una propiedad de tu componente con los datos que 
+	devuelve el adaptador (UI API o Apex).	
+	El atributo contendrá dos atributos el primero (data) contiene la info solicitada y 
+	el segundo (error) un posible mensaje de error.
+	Valores para el segundo parámetro:
+	- Si se uso getRecord: Se debe pasar un objeto con dos atributos los cuales define QUÉ 
+		datos traes y CÓMO los traes.
+		En el primer atributo se coloca el id del registro (Es obligatorio) y en el 
+		segundo atributo se especifica un array de campos que deseamos traernos del 
+		registro.
+		E:
+			{ recordad: '$recordId', fields: [fields] }
+
+@wire(tipoAdaptador, { parametros })
+wiredNombreObjeto({data, error}) {
+ // logica
+} -> Ahora en vez de ser un atributo es una función que se ejecuta automaticamnte y recibe 
+	como objeto los atributos data y errr.
+	Se usa para procesar datos y manejar errores.
 
 
-||||||| Usando UI Record API en modo imperativo |||||||
+°°°°°°°° Usando UI Record API en modo imperativo °°°°°°°°
 
 Es un conjunto de funciones JS que te permite: Crear, Actualizar, Eliminar y obtener info de 
 metadata.
@@ -604,7 +568,7 @@ handleDelete() {
 }
 
 
-°°°°°°°° Usando apex °°°°°°°°°
+Usando apex ---------------------------------------
 
 Cuando quieres personalizar una transacción de datos de un solo registro, o realizar operaciones
 multi-registro en una sola transacción, Apex es la mejor opción.
@@ -614,7 +578,7 @@ componentes web de Lightning. Alternativamente, si necesitas una consulta SOQL p
 datos personalizados, tienes que usar un método Apex.
 
 
-||||||| Usar métodos ápex |||||||
+°°°°°°°° Usar métodos ápex °°°°°°°°
 
 *En apex*
 public with sharing class nombreClaseController {} -> Se crea una clase de manera especial: la 
@@ -635,31 +599,10 @@ public static tipoDato nombreMetodoApex(parametros) {
 		return [SELECT Id, Nombre DE cuenta
 			WHERE Ingresos Anuales > 1000000];
 
-*xml*
-<?xml version="1.0" encoding="UTF-8"?>
-<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>64.0</apiVersion>
-    <isExposed>true</isExposed>
-    <targets>
-        <target>lightning__AppPage</target>
-    </targets>
-</LightningComponentBundle> -> Al configurar el XML se define dónde y cómo puede usarse tu 
-	Lightning Web Component dentro de Salesforce.
-	- <isExposed>true</isExposed> -> Hace que el componente sea visible en el Lightning App 
-		Builder
-		Si fuera false: No podrías arrastrarlo a ninguna página.
-	- <targets> -> Define en qué tipos de páginas puede usarse el componente.
-		- lightning__AppPage -> Indica que el componente puede colocarse en: App Pages.	
-			NO podría usarse en: Record Pages y Home Pages
-	- <targetConfigs> -> Opcional. Reglas especificas para cada target.
-		- targets="lightning__RecordPage" -> Estas configuraciones aplican SOLO cuando 
-			el componente esté en determinado target.
-		- <objects> -> Este componente SOLO puede agregarse a determinados objetos.
-
 Hay dos formas de interactuar con los métodos Apex desde los componentes web Lightning: 1.
 cablear el método o 2. llamarlo imperativamente. 
 
-Utilizando cables:
+||||||||| Utilizando cables |||||||||
 
 Esta forma se utiliza cuando los datos se pueden cachear, es decir, si la operación es únicamente
 de lectura. *******
@@ -726,7 +669,7 @@ nombreArregloDeRegistros; -> Para crear la tabla con los registros.
 	escritorio y no en móvil. Para móvil se necesita crear un componente personalizado.
 
 
-Utilizando forma imperativa:
+||||||||| Utilizando forma imperativa |||||||||
 
 Esta forma se utiliza cuando los datos no son cacheables, es decir, cuando la operación no 
 es de lectura (entonces cuando se crean, actualizan o eliminan datos).
@@ -753,7 +696,8 @@ CONFIGURAR DEV TOOLS PARA ESCRITORIO
 
 *Primero se debe activar el modo debug en el playground*
 
-Desactivar el almacenamiento en caché durante las tareas de desarrollo: se desactiva la caché 	durante el desarrollo para ver el efecto de cualquier cambio en el código sin necesidad 
+Desactivar el almacenamiento en caché durante las tareas de desarrollo: se desactiva la caché 	
+	durante el desarrollo para ver el efecto de cualquier cambio en el código sin necesidad 
 	de vaciar la caché o esperar a que caduque.
 	En la parte superior der click en el logo de engrane -> apartado home -> buscar y 
 	seleccionar session settings -> Anular la casilla 'Enable secure and persistent browser 
@@ -791,7 +735,8 @@ Colocar breakpoints: *En devtools* -> Dentro de un archivo js se pueden poner br
 		cuando se cumple una condición específica, en lugar de detenerse siempre que se
 		llega a esa línea. 
 		Cuando El código pasa muchas veces por la misma línea (loops, triggers, streams,
-		etc.) y el El bug ocurre solo en ciertos casos, Un breakpoint normal te obligaría 		a avanzar paso a paso muchas veces. El breakpoint condicional te deja:
+		etc.) y el El bug ocurre solo en ciertos casos, Un breakpoint normal te obligaría
+		a avanzar paso a paso muchas veces. El breakpoint condicional te deja:
 		“Detente solo cuando pase esto”. ****
 		Click derecho sobre el numero de linea de código -> seleccionar la opcion: 
 		agregar un breakpoint condicional -> agregar la expresión.
@@ -803,6 +748,8 @@ Colocar breakpoints: *En devtools* -> Dentro de un archivo js se pueden poner br
 
 
 COMPONENTES PREDEFINIDOS EN LWC
+
+*Faltaria investigar bien cuales hay*
 
 
 COMPONENES AURA
@@ -826,8 +773,10 @@ Apex (para lógica del servidor).
 
 SERVICIO DE NAVEGACION LIGHTNING
 
-El servicio te permite generar URLs, navegar hasta una referencia de página, trabajar con parámetros de URL y abrir archivos.
-Se soportan muchos tipos de referencia de página, como App, Lightning Component, Navigation Item (tabulador) y Record Page.
+El servicio te permite generar URLs, navegar hasta una referencia de página, trabajar con 
+parámetros de URL y abrir archivos.
+Se soportan muchos tipos de referencia de página, como App, Lightning Component, Navigation 
+Item (tabulador) y Record Page.
 
 Para utilizar el Servicio de Navegación:
 
@@ -866,11 +815,13 @@ this[NavigationMixin.Navigate]({
 
 VISUALFORCE
 
-Es una tecnología de Salesforce para crear interfaces de usuario personalizadas, usando un enfoque más “clásico” que LWC o Aura.
+Es una tecnología de Salesforce para crear interfaces de usuario personalizadas, usando 
+un enfoque más “clásico” que LWC o Aura.
 
-En Visualforce, las propiedades se definen en un controlador Apex (un archivo de clase Apex) y se
-referencian en el marcado de página (la página de Visualforce). En los componentes web de 
-Lightning, las propiedades se definen en el archivo JavaScript del componente y se referencian en el marcado de página (el archivo HTML del componente). 
+En Visualforce, las propiedades se definen en un controlador Apex (un archivo de clase
+Apex) y se referencian en el marcado de página (la página de Visualforce). En los componentes 
+web de Lightning, las propiedades se definen en el archivo JavaScript del componente y se 
+referencian en el marcado de página (el archivo HTML del componente). 
 
 
 OTROS COMANDOS DE CLI
@@ -879,6 +830,145 @@ sf data import tree -p data/plan.json -> Para subir datos relacionados (en árbo
 	a Salesforce respetando relaciones entre registros.
 
 
+OTROS 
+
+Para poder personalizar especificamente la pagina home: Por personalización se refiere a 
+	a modificar qué ve el usuario cuando entra a Salesforce, usando Lightning App Builder, 
+	es decir, Qué componentes aparecen, Dónde aparecen y Para quién aparecen.
+	En la parte sup derecha buscar el logo de settings -> opción setup -> buscar y 	
+	seleccionar home -> en advanced seller home cambiar la configuración a inactivo.
+
+
+COMUNICACION ENTRE COMPONENTES
+
+Comunicación ascendente -----------------------------
+
+Para llevar a cabo una comunicación hacia arriba se usan eventos y/o agentes de escucha de eventos.
+El componente secundario envía el evento y el principal lo escucha. 
+
+*En la vista del padre*
+<c-nombreComponenteHijoX onNombreEventoPadreY={nombreEventoPadreY}></c-nombreComponenteHijoX> -> 
+	Se llama al componenete hijo y como atributo de la etiqueta se le pasa el nombre del 
+	evento del padre.
+	Por nomeclatura el nombre del atributo se le antepone el prefijo on.
+
+*En el archivo js del padre*
+nombeAtributo = null;
+nombreEventoPadreY(event) {
+   this.nombreAtributo = evento.devail.value;
+} 
+
+Comunicación descendente -----------------------------
+
+La información se puede comunicar en sentido descendente mediante propiedades públicas y métodos
+públicos.
+
+*En el archivo js del hijo*
+@api nombreAtributo; -> Para recibir valores.
+
+*En el archivo html del padre*
+<c-nombreComponenteHijoX nombre-atributo={valor}></c-nombreComponenteHijoX> -> Para mandar 
+	valores desde el padre al hijo.
+	Observese que en la vista, el nombre del atributo usa la nomeclatura snake-case y en
+	js se ocupa camelCase.
+
+comunicación entre componentes hermanos ----------------
+
+°°°°°°°° Crear la estructa del mensaje °°°°°°°° 
+
+En el local, en la ruta: nombreProyectoX/force-app/main/default/messageChannel se debe crear 
+un XML donde se define la estructura del mensaje.
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata"> 
+	…
+</LightningMessageChannel> -> Elemento raíz del archivo.
+	Le dice a Salesforce que Este archivo define un Lightning Message Channel.
+
+*Etiquetas dentro de la anterior etiqueta*
+	
+<description>desc</description> -> Es para mera documentación.
+
+<isExposed>ValorBoolean</isExposed> -> Define quién puede usar este canal.
+	- true -> LWC y Aura pueden usarlo.
+	- false -> Solo uso interno (no accesible).
+
+<lightningMessageFields>
+	…
+</lightningMessageFields> -> contenedor para los campos del mensaje.
+	Define la estructura del payload que se puede enviar/recibir.
+	- <fieldName>nombreAtributo</fieldName> -> Crea un campo para el mensaje.
+		Esto significa que el payload DEBE verse así: {nombreAtributo: valor}.
+	- <description>desc</description> -> Documenta qué representa el campo.
+
+En el siguiente ejemplo, el mensaje es un objeto que contien un solo atirbuto llamado bears:
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>BearListUpdate</masterLabel>
+    <description>This message is fired when the bear list is updated.</description>
+    <lightningMessageFields>
+        <fieldName>bears</fieldName>
+        <description>List of bear records.</description>
+    </lightningMessageFields>
+</LightningMessageChannel>
+
+
+°°°°°°°° Para mandar un mensaje °°°°°°°° 
+
+En el componente 1:
+
+import { publish, MessageContext } from 'lightning/messageService'; -> Trae utilidades del 
+	Lightning Messaging Service (LMS). Este servicio te permite publicar mensajes entre 
+	componentes hermanos en una página de Lightning sobre un canal de mensajes
+	de Lightning.
+
+import MY_CHANNEL from '@salesforce/messageChannel/MyChannel__c'; -> Importa la estructura que
+	debe tener el mensaje mensaje.
+
+@wire(MessageContext)
+messageContext; -> Inyecta el contexto de mensajería.
+	Sin esto, no puedes usar publish ni subscribe. ****
+	MessageContext es un contexto obligatorio que necesita LMS para saber: desde qué 
+	componente, en qué página y en qué scope se está enviando o recibiendo un mensaje.
+
+publish(this.messageContext, MY_CHANNEL, payload); -> se usa para enviar (publicar)
+	un mensaje a través de Lightning Message Service.
+	permite que un componente se comunique con otros componentes SIN relación directa (no 
+	padre-hijo).
+
+
+°°°°°°°° Para recibir mensajes °°°°°°°° 
+
+En el componente 2:
+
+import {
+  subscribe,
+  unsubscribe,
+  MessageContext,
+} from "lightning/messageService"; -> Trae utilidades del Lightning Messaging Service (LMS). 
+
+import MY_CHANNEL from '@salesforce/messageChannel/MyChannel__c'; -> Importa la estructura que
+	debe tener el mensaje mensaje.
+
+@wire(MessageContext)
+messageContext; -> Inyecta el contexto de mensajería.
+
+subscription = null; -> Para gestionar la suscripción.
+
+this.subscription = subscribe(
+  this.messageContext,
+  MY_CHANNEL,
+  (message) => {
+    // n acciones
+  },
+); -> Para recibir mensajes.
+	Cada que se recibe un mensaje, se ejecuta en automatico el callback que esta en el tercer
+	parámetro.
+
+unsubscribe(this.subscription);
+this.subscription = null; -> Cancela la suscripción al canal y limpia la referencia.
+	Comúnmente estas instrucciones iran dentro del hook: disconnectedCallback.
 
 
 /////////////////////////////////////////PRUEBAS/////////////////////////////////////////
@@ -890,11 +980,15 @@ Verificarlo con
 	npm --versión
 
 Los Jest tests no se ejecutan en un navegador ni se conectan a una organización, así que van rápido. 
-Usa Jest para escribir pruebas unitarias para todos tus componentes web de Lightning. Para ejecutar pruebas Jest para componentes web de Lightning, necesitas el módulo Node @salesforce/sfdx-lwc-jest en tu proyecto Salesforce DX.
+Usa Jest para escribir pruebas unitarias para todos tus componentes web de Lightning. Para ejecutar 
+pruebas Jest para componentes web de Lightning, necesitas el módulo Node @salesforce/sfdx-lwc-jest 
+en tu proyecto Salesforce DX.
 
-Las pruebas Jest solo funcionan con componentes web de Lightning en proyectos de Salesforce DX, no funcionan con componentes de Aura. ****
+Las pruebas Jest solo funcionan con componentes web de Lightning en proyectos de Salesforce DX, no 
+funcionan con componentes de Aura. ****
 
-Las pruebas Jest para un componente web de Lightning deberían probar el comportamiento de un solo componente de forma aislada, con dependencias mínimas de componentes o servicios externos.
+Las pruebas Jest para un componente web de Lightning deberían probar el comportamiento de un solo 
+componente de forma aislada, con dependencias mínimas de componentes o servicios externos.
 
 Instalar el módulo node sfdx-lwc-jest: sf force lightning lwc test setup.
 
@@ -955,4 +1049,9 @@ Anular los stubs predeterminados:
 
 
 
+///////////////////////////////////////////ESTILOS/////////////////////////////////////////////
+
+Salesforce tiene su propia macro de css (estilos propios de saelesorce que son usados para 
+que nuestros componentes tengan los mismos estilos que las paginas de salesforce) conocido como
+Salesforce Lightning Design System (SLDS).
 
