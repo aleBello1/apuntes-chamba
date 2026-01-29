@@ -895,17 +895,34 @@ nombreFuncionPadre(event) {
 
 Comunicación descendente -----------------------------
 
-La información se puede comunicar en sentido descendente mediante propiedades públicas y métodos
-públicos.
+El hijo debe exponer una propiedad o función para que sea pública. De esta manera, el padre podrá actualizar la propiedad pública del hijo o llamar a la función pública del hijo.
+
+El hijo no debe modificar los datos aunque estas sean sus variables, pero si puede
+mostrar sus variables en su vista. ****
 
 *En el archivo js del hijo*
-@api nombreAtributo; -> Para recibir valores.
+@api 
+nombreAtributo; -> Para recibir valores.
+	También en lugar de ser atributo podría ser una función. **
 
 *En el archivo html del padre*
 <c-nombreComponenteHijoX nombre-atributo={valor}></c-nombreComponenteHijoX> -> Para mandar 
 	valores desde el padre al hijo.
 	Observese que en la vista, el nombre del atributo usa la nomeclatura snake-case y en
 	js se ocupa camelCase.
+
+*En el archivo js del padre*
+atributoPadre = valorInicial;
+nombreFuncionPadre(event) {
+    this.atributoPadre = event.target.value;
+} -> Opcional. Para actualizar una variable del padre con los datos de la variable del hijo.
+
+*En el archivo js del padre*
+nombreFuncionPadre() {
+    this.template.querySelector('c-nombre-componente-hijo').nombreFuncionHijo();
+} -> Opcional. Para usar en el código del padre, la funcion del hijo.
+	Esta funcion se debe llamar como un evento en la vista del padre.
+
 
 comunicación entre componentes hermanos ----------------
 
