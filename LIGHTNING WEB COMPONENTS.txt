@@ -752,7 +752,79 @@ Colocar breakpoints: *En devtools* -> Dentro de un archivo js se pueden poner br
 
 COMPONENTES PREDEFINIDOS EN LWC
 
+<lightning-formatted-number 
+	value={valor}>
+</lightning-formatted-number> -> Sirve para mostrar números ya formateados, sin que tú tengas 
+	que hacerlo a mano en JavaScript.
+	Mostrar números de forma legible
+	Respetar localización (idioma / región del usuario)
+	Evitar que tú hagas toFixed(), Intl.NumberFormat, etc.
+	Atributos:
+	- format-style="formato"
+		- percent
+		- currency. Se debe usar en conjunto con el atributo currency-code.
+	- currency-code="TipoMoneda"
+		- MXN
+	- minimum-fraction-digits="n" -> Minima cantidad de decimales a mostrar.
+	- maximum-fraction-digits="m" -> Maxima cantidad de decimales a mostrar.
+
+<lightning-card>
+	...
+</lightning-card> -> Sirve para agrupar contenido visualmente dentro de una “tarjeta” con el 
+	estilo estándar de Salesforce (SLDS).
+	Es básicamente un contenedor con: Título, Ícono opcional, Cuerpo (body) y Opcionalmente 
+	acciones.
+	Atributos:
+	- title="" -> Texto del encabezado 
+	- icon-name="tipoIcono" -> Define qué ícono de Salesforce (SLDS) aparece en el header 
+		del lightning-card.
+		Formato del icon-name: <categoria>:<nombreDelIcono>
+		nombreDelIcono: Tiene que existir en la librería de íconos de Salesforce (SLDS).
+			Salen del Salesforce Lightning Design System (SLDS), que ya trae listas 
+			predefinidas de íconos por categoría.
+			Buscar en internet slds icons y ahí aparecerán las listas de valores 
+			permitidos.
+		Categorías:
+		- utility -> Acciones pequeñas (editar, cerrar, settings)
+		- action -> Acciones destacadas
+		- standard -> Objetos estándar (Account, Contact)
+		- custom -> Objetos custom (custom:custom14)
+		- doctype -> Tipos de archivo
+		- social -> Redes sociales	
+	- variant="" -> Controla el estilo visual del lightning-card, principalmente el ancho y 
+		la densidad.
+		- base -> Estilo normal, Padding estándar, Es el que ves casi siempre, Si no 				pones nada → este se usa.
+		- narrow -> Tarjeta más compacta, Menos padding horizontal, Ideal para: 
+			Sidebars, Layouts apretados, Columnas pequeñas.
+
+<lightning-button>
+</lightning-button> -> Representa un botón interactivo.
+	Sirve para: Ejecutar acciones, Disparar eventos (onclick) y Interactuar con el usuario 
+	(guardar, enviar, resetear, etc.).
+	Atributos:
+	- label="txt" -> Texto que aparece en el botón. 
+	- onclick={handleClick} -> Método JS que se ejecuta al hacer click.
+	- variant="variant" -> Define el estilo visual del botón.
+		- neutral (default) -> Botón normal
+		- brand -> Acción principal
+		- destructive -> Acciones peligrosas
+		- success -> Confirmación
+		- outline-brand -> Alternativa visual
+		- text -> Acción secundaria
+	- icon-name="tipoIcono" -> Define qué ícono de Salesforce (SLDS) aparece en el button
+	- disabled={condicion} -> Desactiva el button si la expresión esta en true.
+	- icon-position="position" -> Define dónde aparece el ícono con respecto al texto del 
+		botón.
+		Positions: left, right.
+	- type="type" -> Define el comportamiento del button.
+		- button -> Solo ejecuta onclick, El más seguro y usado.
+			Si no se esta en un formulario se usa este. *
+		- submit -> Solo se usa dentro de un formulario.
+		- reset -> Restablece los campos del formulario
+			Vuelve a los valores iniciales
+		
 *Faltaria investigar bien cuales hay*
+Pe falta el componente de tabla
 
 
 COMPONENES AURA
@@ -926,10 +998,13 @@ nombreFuncionPadre() {
 
 comunicación entre componentes hermanos ----------------
 
+LSM es un servicio de publicación y suscripción que facilita la comunicación entre componentes web Lightning, componentes de Aura y páginas de Visualforce.  
+
 °°°°°°°° Crear la estructa del mensaje °°°°°°°° 
 
-En el local, en la ruta: nombreProyectoX/force-app/main/default/messageChannel se debe crear 
-un XML donde se define la estructura del mensaje.
+En el local, en la ruta: nombreProyectoX/force-app/main/default/ se debe crear la carpeta llamada
+messageChannels, dentro de esta carpeta se crean los XML's donde se definen la estructura de los mensajes.
+Los archivos deben tener la extensión: .messageChannel-meta.xml. 
 
 <?xml version="1.0" encoding="UTF-8" ?>
 <LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata"> 
@@ -938,6 +1013,9 @@ un XML donde se define la estructura del mensaje.
 	Le dice a Salesforce que Este archivo define un Lightning Message Channel.
 
 *Etiquetas dentro de la anterior etiqueta*
+
+<masterLabel>nombreArchivoCanal</masterLabel> -> Es un nombre descriptivo, se coloca el nombre 
+	del archivo.
 	
 <description>desc</description> -> Es para mera documentación.
 
@@ -952,6 +1030,8 @@ un XML donde se define la estructura del mensaje.
 	- <fieldName>nombreAtributo</fieldName> -> Crea un campo para el mensaje.
 		Esto significa que el payload DEBE verse así: {nombreAtributo: valor}.
 	- <description>desc</description> -> Documenta qué representa el campo.
+	Por cada campo que se desee agregar al mensaje, se debe crear un bloque de 
+	lightningMessageFields. ****
 
 En el siguiente ejemplo, el mensaje es un objeto que contien un solo atirbuto llamado bears:
 
@@ -975,8 +1055,9 @@ import { publish, MessageContext } from 'lightning/messageService'; -> Trae util
 	componentes hermanos en una página de Lightning sobre un canal de mensajes
 	de Lightning.
 
-import MY_CHANNEL from '@salesforce/messageChannel/MyChannel__c'; -> Importa la estructura que
-	debe tener el mensaje mensaje.
+import MY_CHANNEL from '@salesforce/messageChannel/nombreArchivoCanal__c'; -> Importa la 
+	estructura que debe tener el mensaje mensaje.
+	El __c siempre se agrega para indicar que es custom. **
 
 @wire(MessageContext)
 messageContext; -> Inyecta el contexto de mensajería.
@@ -984,10 +1065,15 @@ messageContext; -> Inyecta el contexto de mensajería.
 	MessageContext es un contexto obligatorio que necesita LMS para saber: desde qué 
 	componente, en qué página y en qué scope se está enviando o recibiendo un mensaje.
 
+*Se crea una funcion ó funciónEvento y dentro se coloca este codigo*
+*Se llena el objeto payload*
 publish(this.messageContext, MY_CHANNEL, payload); -> se usa para enviar (publicar)
 	un mensaje a través de Lightning Message Service.
 	permite que un componente se comunique con otros componentes SIN relación directa (no 
 	padre-hijo).
+	- event.detail -> Si la función que ó funciónEvento recibira datos, entonces tiene que 
+		recibir al objeto event como parametro de esta función y este objeto lo 
+		utilizamos para sacar el valor que recibimos.
 
 
 °°°°°°°° Para recibir mensajes °°°°°°°° 
@@ -1000,8 +1086,8 @@ import {
   MessageContext,
 } from "lightning/messageService"; -> Trae utilidades del Lightning Messaging Service (LMS). 
 
-import MY_CHANNEL from '@salesforce/messageChannel/MyChannel__c'; -> Importa la estructura que
-	debe tener el mensaje mensaje.
+import MY_CHANNEL from '@salesforce/messageChannel/nombreArchivoCanal__c'; -> Importa la 
+	estructura que debe tener el mensaje mensaje.
 
 @wire(MessageContext)
 messageContext; -> Inyecta el contexto de mensajería.
@@ -1017,6 +1103,7 @@ this.subscription = subscribe(
 ); -> Para recibir mensajes.
 	Cada que se recibe un mensaje, se ejecuta en automatico el callback que esta en el tercer
 	parámetro.
+	Comúnmente esta instrucción se coloca dentro del hook connectedCallback. **
 
 unsubscribe(this.subscription);
 this.subscription = null; -> Cancela la suscripción al canal y limpia la referencia.
