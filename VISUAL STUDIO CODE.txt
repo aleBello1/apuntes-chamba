@@ -1,0 +1,6 @@
+Subir a producción la app con vsc: Esto solo se usa mostrar a otra persona la app, en si no se
+	ocupa para producción.
+	*En la terminal de vsc* -> click en el apartado ports -> click forward a port -> ingresar
+	el numero de puerto donde corre la app -> meter las credenciales de nuestro git hub (vsc
+	despliega nuestra app ahi) -> cambiar el tipo de visibilidad de nuestra url a public
+	-> compartir la url.
