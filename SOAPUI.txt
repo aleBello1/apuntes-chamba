@@ -1,0 +1,10 @@
+Técnicamente se puede usar otros clientes como postman para consumir una api soap, pero auqnue
+parezca increíble hay api's soap que aunque sean consumidas correctamente (request valido,
+url y credenciales correctas) no se obtendrá respuesta alguna.
+Es por eso que es mejor que al intentar consumir una api soap, de plano usar este cliente. *****
+
+*En este escenario se asume que se 
+extrajo una url de una api soap desde 
+un proeycto* 
+Integrar una api soap a la aplicación: *En soapUI* -> En la parte sup click en el button soap 
+	-> asginar nombre a la api -> En initial wsdl: pegar la url pero agregarle '?wsdl'

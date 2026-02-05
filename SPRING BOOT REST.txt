@@ -1,0 +1,13 @@
+/////////////////////////////////////REDIS CON SPRING BOOT/////////////////////////////////////
+
+
+Ejmeplo de la implementación del Cache-aside pattern ---------------------
+
+if( !stringRedisTemplate.hasKey(nombreClave) ) {
+	...
+} -> Preguntar si no existe la clave, si es el caso entonces buscar en la db los datos 
+	solicitados y estos datos guardarlos como un jsonString en redis y darle un ttl.
+
+else {
+   ...
+} -> Buscar los datos en redis por su clave y convertirlos de jsonString a objetos java.
