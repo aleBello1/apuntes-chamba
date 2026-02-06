@@ -7,4 +7,5 @@ Es por eso que es mejor que al intentar consumir una api soap, de plano usar est
 extrajo una url de una api soap desde 
 un proeycto* 
 Integrar una api soap a la aplicación: *En soapUI* -> En la parte sup click en el button soap 
-	-> asginar nombre a la api -> En initial wsdl: pegar la url pero agregarle '?wsdl'
+	-> asginar nombre a la api -> En initial wsdl: pegar la url (esta url tiene 
+	terminación .asmx) pero agregarle '?wsdl'.
