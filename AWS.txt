@@ -207,6 +207,11 @@ Task: es una instancia en ejecución de uno o más contenedores definidos previa
 
 Servicio: Controlan como se deben ejecutar las tareas.
 
+Auto-escalado: Es un sistema que responde a esta pregunta, todo el tiempo: “¿Con los recursos 
+	que tengo ahora, sigo aguantando bien la carga?”
+	Si la respuesta es no → escalo.
+	Si la respuesta es sí y me sobra → reduzco.
+
 Crear un cluster: Apartado izq clusters -> créate cluster -> networking only -> asignarle un 
 	nombre al cluster -> palomear créate vpc y dejar los valores por defecto -> créate.
 
@@ -234,11 +239,41 @@ Crear una definicion de tarea: Apartado izq task definitions -> créate new task
 	-> add.
 
 Crear un servicio: apartado izq task definitions -> actions -> créate service -> fargate ->
-	SO: Linux -> en task definition elegir la tarea -> sig -> load balancer: none -> click
-	en security groups (aquí se definen las reglas de entrada y salida para los puertos) ->
-	créate new security group -> type: custom tcp, asignar el puerto donde corre la app ->
-	auto-assign public ip: enabled (para que podamos acceder desde afuera) -> next step -> 
-	service auto scaling: do not -> next -> créate service
+	SO: Linux -> en task definition elegir la tarea -> asignar nombe al sericio -> sig -> 
+	Asignar un cluster vpc y subred -> load balancer: application load balancer (*ver 
+	la teoria de como crear un load balancer*) -> 
+		- Las siguientes instrucciones solo se aplican si se uso un load balancer: de
+			todos los contenedores que tiene el servicio seleccionar cual contenedor
+			nos conectaremos -> add load balancer -> seleccionar el target group
+			->  
+		- Las siguientes instrucciones solo se aplican si NO se uso un load balancer: 				click en security groups (aquí se definen las reglas de entrada y salida
+			para los puertos) -> créate new security group -> type: custom tcp, 
+			asignar el puerto donde corre la app -> save- > auto-assign public ip: 
+			enabled (para que podamos acceder desde afuera). 
+	-> next step -> service auto scaling: si el servicio es para una preuba con poner
+	do not es suficiente pero si es para producción es configure service with auto scaling
+	-> next -> créate service.
+
+Crear un load balancer: Seleccionar application load balancer (Si es la priemra vez que se creara 	un load balancer y se nos redirigirá a otra pagina) -> créate -> asignarle un nombre ->
+	internet-facing (para acceder desde afuera) -> En cluster vpc asignar el que crearmos
+	y no el que viene por defecto -> palomear las subredes -> en security groups seleccionar
+	que hemos creado anteriormente y no el que viene por defecto -> En listeners and routing
+	asignar el target group que creamos (ver la instrucciones de como crear uno si no lo
+	tenemos) -> créate load balancer.
+
+Crear un target group: Dar click sobre créate target group en las opciones dentro de listeners
+	and routing -> ip addresses -> asginarle un nombre al target -> protocolo: http y el 
+	puerto o puertos sean los mismos que los de security group (los que usamos para 
+	conectarnos a la app) -> asginar la vpc del cluster y no que viene por defecto -> next
+	-> créate target group.
+	 
+Si no se crea un load balancer se generara y se usara una ip_publica y el puerto para consumir la app. * Cada que se levante el servicio, la ip cambiara. Evidentemtne esto no sucederá si se tuviera un dominio.  ***
+Si se creo y uso un load balancer se genera un dns el cual ese no cambiara no importa cuantas
+veces se cree, detenga o reinicie el servicio. Evidnemten también le podríamos poner un dominio.
+
+
+
+
 
 Resolver problema de conexión entre un contenedor app y un contenedor db ----------------
 
@@ -258,7 +293,7 @@ este levantado.
 Es hacer que el contedor con la app tarde en ejecutar/levantar la app. Nuevamente no se garantiza
 en un 100% que funcione.
 
-*En el Docker-compose*
+*En el dockerfile*
 CMD sleep n && java -jar nombre-microservicioX-0.0.1-SNAPSHOT.jar -> Para levantar la app con
 	cierta cantiad de segundos de delay. 
 
@@ -277,6 +312,14 @@ depends_on:
       db:
         condition: service_healthy
 
+
+°°°°°° Usando configuraciones en el perfil °°°°°
+
+spring.datasource.hikari.initialization-fail-timeout=valor -> Controla qué pasa si la BD no está 
+	disponible al arrancar la app.
+	Posibles valores:
+	- -1 -> NO fallar el arranque. La app arranca aunque la BD esté caída.
+		Intentará conectarse más tarde, cuando alguien pida una conexión.
 
 
 

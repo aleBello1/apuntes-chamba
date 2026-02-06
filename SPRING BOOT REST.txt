@@ -3,11 +3,35 @@
 
 Ejmeplo de la implementación del Cache-aside pattern ---------------------
 
+@Autowired
+private StringRedisTemplate stringRedisTemplate;
+@Autowired
+private ObjectMapper objectMapper;
+
+
 if( !stringRedisTemplate.hasKey(nombreClave) ) {
 	...
+    String json = objectMapper.writeValueAsString(distinctBrands);
+    stringRedisTemplate
+        .opsForValue()
+        .set(key, value, n, TimeUnit.UNIDAD_TIEMPO);
 } -> Preguntar si no existe la clave, si es el caso entonces buscar en la db los datos 
 	solicitados y estos datos guardarlos como un jsonString en redis y darle un ttl.
-
+	- n: Es la cantidad de tiempo.
+	
 else {
-   ...
+  System.out.println("Busqueda en redis");
+
+  String json = stringRedisTemplate.opsForValue().get(idNegocio);
+
+  if (json == null || json.isEmpty()) {
+      return Collections.emptyList();
+  }
+
+  List<CatalogDto> brands = objectMapper.readValue(
+          json,
+          new com.fasterxml.jackson.core.type.TypeReference<List<CatalogDto>>() {}
+  );
+
+  return brands;
 } -> Buscar los datos en redis por su clave y convertirlos de jsonString a objetos java.
