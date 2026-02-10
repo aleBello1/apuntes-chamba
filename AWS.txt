@@ -223,6 +223,16 @@ Crear un role con permisos de ejecución para ecs: *Ir la pagina de inicio* -> b
 	-> crear role -> asignar un nombre al role (este nombre es importante por que se usara
 	despues) -> crear role.
 
+Crear un security group (para el elastic file system): Son exactamente la misma configuración
+	que para un security group pero en la regla de entrada en lugar de agregar un tipo
+	tcp personalizado seria tipo nfs -> source: anywhere ipv4 -> créate security group.
+
+Crear un elastic file system (el que se usa para el volumne): Buscar el servicio llamado elastic 	file system -> crear un sistema de archivos -> asginarle un nombre > seleccionar como 
+	vpc el que creamos para el cluster y no el que viene por defecto -> disponibilidad y 
+	durabiliad: regional -> personalizar -> sig -> en los grupos de seguridad le colocamos
+	en todos lados el grupo de seguridad que creamos (Todos los volúmenes puede ocupar el 
+	mismo grupo de seguridad) -> sig -> sig -> créate.
+
 Crear una definición de tarea: Apartado izq. task definitions -> créate new task definition -> 
 	fargate (esta opción es serverless, es la mas económica) -> sig. -> asignar nombre a la
 	tarea -> elegir el role que creamos en el paso anterior -> operation system family: 
@@ -241,7 +251,9 @@ Crear una definición de tarea: Apartado izq. task definitions -> créate new ta
 	Si un contenedor se comunicara con otro contendor que esta en otra tarea, para
 	comunicarse idealmente se usara el nombre del dns que se obtiene al asignarle un 
 	balanceador de carga a la otra tarea. **
-	-> create.
+	-> add volumen -> asignarle un nombre al volumen (idealmente se saca este nombre del 
+	Docker compose) -> volumen type: efs -> seleccionar el file system id (crear uno antes,
+	por cada nuevo volumen se debe usar un único efs) -> add -> regresarse un poco arriba y 	darle click sobre el contenedor que almacena la db -> *en el apartado storage and 	logging* -> mount points: selccionar el elastic file system que creamos -> conitainer 	path: va la ruta donde se almacena lo que queremos guardar en el volumen (se saca del 	Docker compose) -> update -> create.
 
 Crear un servicio: apartado izq task definitions -> actions -> créate service -> fargate ->
 	SO: Linux -> en task definition elegir la tarea -> asignar nombre al servicio -> sig -> 
@@ -269,7 +281,7 @@ Crear un load balancer: Dirigirse al servicio de ec2 (aunque no lo parezca en es
 
 Crear un security group: Dirigirse al servicio de ec2 (aunque no lo parezca en este servicio se
 	crea el load balancer) -> apartado izq. panel de ec2 -> security group -> nuevo -> 
-	asginarle un nombre al target -> seleccionar el vpc que creamos y no el que viene por 	defecto -> agregar una nueva regla de entrada -> tcp personalizado -> asignar el puerto	
+	asginarle un nombre al group -> seleccionar el vpc que creamos y no el que viene por 	defecto -> agregar una nueva regla de entrada -> tcp personalizado -> asignar el puerto	
 	donde corre la app -> source: anywhere -> crear grupo de seguridad.	 
 
 Crear un target group: Dirigirse al servicio de ec2 (aunque no lo parezca en este servicio se
@@ -285,6 +297,10 @@ veces se cree, detenga o reinicie el servicio. Evidentemente también le podría
 Determinar la DNS de una servicio: *Aunque no lo parezca, nos debemos de ir al servicio de ec2*
 	-> apartado izq. panel de EC2 -> click en balanceadores de carga -> seleccionar 
 	determinado balanceador de carga y abajo se mostrara la info de el mismo.
+
+Reiniciar un servicio: aparado izq. task definitions -> seleccionar determinada tarea -> 	seleccionar determinada versión -> click en actions -> update service -> palomear la 
+	opción forcé new deployment -> especificar el service name para que coincida con el 
+	nombre de la tarea -> next step -> next -> update.
 
 
 Resolver problema de conexión entre un contenedor app y un contenedor db ----------------
@@ -332,6 +348,31 @@ spring.datasource.hikari.initialization-fail-timeout=valor -> Controla qué pasa
 	Posibles valores:
 	- -1 -> NO fallar el arranque. La app arranca aunque la BD esté caída.
 		Intentará conectarse más tarde, cuando alguien pida una conexión.
+
+
+Eliminar todos los servicios para que no nos cobre ---------------------
+
+No será necesario eliminar los task definitions porque solo son plantillas que por si solas
+no se ejecutan. **
+
+Eliminacion de servicios: ingresar al servicio de ecs -> apartado izq cluster -> click sobre 
+	determinado cluster -> seleccionar todos los servicios -> delete.
+
+Eliminar los load balancer: ingresar al servicio de ec2 -> apartado izq. panel de control ->
+	load balancer -> seleccionar todos los load balancer -> actions -> eliminar.
+
+Eliminar los elastic file system: ingresar al servicio de efs -> seleccionar todos y elminarlos.
+
+Eliminar los grupos de seguridad: ingresar al servicio de ec2 -> apartado izq. panel de 	control -> grupos de seguridad -> seleccionar todos los grupos de seguridad con excepción
+	de los default 
+
+Eliminar los targets group: ingresar al servicio de ec2 -> apartado izq. equilibrio de carga
+	-> grupos de destino -> palomearlos -> actions -> delete.
+
+Eliminar cluster: ingresar al servicio de ecs -> apartado izq cluster -> click sobre 
+	determinado cluster -> delete cluster.
+
+
 
 
 
