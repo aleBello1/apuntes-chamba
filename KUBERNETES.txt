@@ -1,0 +1,49 @@
+
+
+////////////////////////////////////////TEORIA///////////////////////////////////////////////////
+
+Es una plataforma opensource ara automatizar la implementación, el escalado y la administración 
+de aplicaciones en contenedores.
+
+El principal propósito de kubernetes es llevar varios contenedores en producción.
+
+Se abrevia como k8s porque entre la letra k y la letra s hay 8 letras.
+
+El problemas que resuelve kubernetes
+
+Problema 1: En un escenario donde los contenedores se ejecutan en una misma máquina virtual, si 
+uno de ellos se detiene o falla, puede pasar un tiempo considerable antes de que el equipo lo 
+detecte. Además, el reinicio del contenedor tendría que realizarse de manera manual.
+Cuando el número de contenedores es elevado, el monitoreo y la recuperación manual se vuelve 
+extremadamente tedioso. Kubernetes soluciona este problema al detectar automáticamente los fallos
+y reiniciar los contenedores sin intervención humana.
+
+Problema 2: En un escenario donde cada componente de la aplicación se ejecuta en un contenedor 
+dentro de la misma máquina virtual, un incremento significativo de tráfico puede provocar que un 
+solo contenedor se sature.
+Kubernetes resuelve este problema mediante el autoescalado, creando automáticamente múltiples 
+réplicas de los contenedores que requieren mayor capacidad de procesamiento. También, cuando 
+kubernetes tenga que crear las replicas de contenedores, se encargara de distribuir uniformemente
+el trafico entrante entre los diferentes contenedores.
+
+A pesar de estos problemas, el servicio en la nube de aws llamado ecs si puede combatir estos
+situaciones porque provee reemplazo de contenedores en caso de problemas, auto-escalado y 
+balanceo de carga. **
+Pero la desventaja de usar un servicio como este, es que si algún dia queremos migrarnos a 
+otro provedoor de servicios en la nube como gcp, azure, etc. tendríamos que aprender como se usa
+ese servicio en la nube.
+Al usar kubernets, es como tener una solución portable entre las nubes, es decir lo que hagamos
+en kubernetes se puede migrar fácilmente entre aws, gcp, azure, etc. ******
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////PRACTICA//////////////////////////////////////////////////
+
