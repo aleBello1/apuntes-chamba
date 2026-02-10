@@ -2,14 +2,14 @@
 
 ////////////////////////////////////////TEORIA///////////////////////////////////////////////////
 
-Es una plataforma opensource ara automatizar la implementación, el escalado y la administración 
-de aplicaciones en contenedores.
+Es una software opensource usado para automatizar la implementación, el escalado y la 
+administración de aplicaciones en contenedores.
 
 El principal propósito de kubernetes es llevar varios contenedores en producción.
 
 Se abrevia como k8s porque entre la letra k y la letra s hay 8 letras.
 
-El problemas que resuelve kubernetes
+El problemas que resuelve kubernetes: 
 
 Problema 1: En un escenario donde los contenedores se ejecutan en una misma máquina virtual, si 
 uno de ellos se detiene o falla, puede pasar un tiempo considerable antes de que el equipo lo 
@@ -33,7 +33,48 @@ Pero la desventaja de usar un servicio como este, es que si algún dia queremos 
 otro provedoor de servicios en la nube como gcp, azure, etc. tendríamos que aprender como se usa
 ese servicio en la nube.
 Al usar kubernets, es como tener una solución portable entre las nubes, es decir lo que hagamos
-en kubernetes se puede migrar fácilmente entre aws, gcp, azure, etc. ******
+en kubernetes se puede migrar fácilmente entre aws, gcp, azure, etc porque es un software 
+que se puede intslar en cualquier MV de los provedores de la nube antes mencionados ******
+
+Worker node: es una máquina (VM o física).
+	Ejecuta a los pods.
+	Reportan su estado al control plane
+	Dentro de este viven: pods, kubletet y contenedores.
+	
+pod: Es la unidad más pequeña que Kubernetes puede crear, administrar y Ejecutar contenedores.
+	Los contenedores dentro de un pod: Comparten IP, Comparten puertos y comparten volúmenes.
+	Normalmente solo contiene un contendor pero si puede contener mas de uno.
+
+Kubelet: Es un agente que corre en cada worker node.
+	Se encarga de Crear y destruir pods, Verificar que los contenedores estén vivos.
+	Administra los pods dentro de un worker node.
+
+kube-proxy: es un componente de Kubernetes que corre en cada worker node y se encarga de que el 
+	tráfico de red llegue al Pod correcto.
+	Encargado del tráfico de entrada y salida ademas balanceo interno.
+
+Master node: Se encarga de administrar a los worker node mediante un panel de control.
+	El master node siempre debe estar en una MV distinta a los worker node, porque si la	
+	MV donde este el master node se cae, ya no se podrá gestionar los woker node. ***
+	Decide qué se ejecuta, dónde y cómo.
+	Componentes: 
+	- Scheduler: Decide en qué worker node se ejecuta cada pod
+		Considera CPU, memoria, afinidad, etc.
+	- kube Controller Manager: Vigila que el estado real coincida con el deseado.
+		Ejemplo: “Quiero 3 pods”, Hay 2 → crea 1 más
+	- cloud controller manager: Permite que Kubernetes se integre con un proveedor de nube 
+		(AWS, GCP, Azure, etc.).
+	- etcd: Base de datos (clave - valor) donde se guarda todas las configuraciones de 
+		kubernets y nuestro estado final deseado.
+
+Cluster: es un conjunto de máquinas que trabajan juntas como un solo sistema para ejecutar 
+	aplicaciones.
+	Un cluster esta conformado por un solo master node y varios worker nodes. Todas las 
+	MV están en la misma red.	
+	Permite: Escalar aplicaciones, Alta disponibilidad y Auto-recuperación. Ejemplo: 
+	Se cae un pod → se crea otro; Hay mucho tráfico → se crean más pods; Se cae un node → los
+	pods se mueven a otro.
+
 
 
 
