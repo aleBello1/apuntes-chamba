@@ -9,7 +9,8 @@ El principal propósito de kubernetes es llevar varios contenedores en producci�
 
 Se abrevia como k8s porque entre la letra k y la letra s hay 8 letras.
 
-El problemas que resuelve kubernetes: 
+
+PROBLEMAS QUE RESUELVE
 
 Problema 1: En un escenario donde los contenedores se ejecutan en una misma máquina virtual, si 
 uno de ellos se detiene o falla, puede pasar un tiempo considerable antes de que el equipo lo 
@@ -36,6 +37,9 @@ Al usar kubernets, es como tener una solución portable entre las nubes, es deci
 en kubernetes se puede migrar fácilmente entre aws, gcp, azure, etc porque es un software 
 que se puede intslar en cualquier MV de los provedores de la nube antes mencionados ******
 
+
+ARQUITECTURA DE KUBERNETES
+
 Worker node: es una máquina (VM o física).
 	Ejecuta a los pods.
 	Reportan su estado al control plane
@@ -45,10 +49,12 @@ pod: Es la unidad más pequeña que Kubernetes puede crear, administrar y Ejecut
 	Los contenedores dentro de un pod: Comparten IP, Comparten puertos y comparten volúmenes.
 	Normalmente solo contiene un contendor pero si puede contener mas de uno.
 
-Kubelet: Es un agente que corre en cada worker node.
-	Se encarga de Crear y destruir pods, Verificar que los contenedores estén vivos.
-	Administra los pods dentro de un worker node.
-
+Kubelet: Es un proceso que se ejecuta en cada worker node y es el encargado de comunicarse con 
+	el control plane.
+	Administra los pods dentro de un worker node: Se encarga de Crear y destruir pods, 
+	verifica la salud de los contenedores dentro de los pods y se encarga de autogerar
+	a los contenedores si fallan, según la política de reinicio del Pod. También mueve a 	los pods dentro de los worker nods.
+	
 kube-proxy: es un componente de Kubernetes que corre en cada worker node y se encarga de que el 
 	tráfico de red llegue al Pod correcto.
 	Encargado del tráfico de entrada y salida ademas balanceo interno.
@@ -58,7 +64,8 @@ Master node: Se encarga de administrar a los worker node mediante un panel de co
 	MV donde este el master node se cae, ya no se podrá gestionar los woker node. ***
 	Decide qué se ejecuta, dónde y cómo.
 	Componentes: 
-	- Scheduler: Decide en qué worker node se ejecuta cada pod
+	- Scheduler: Decide en qué worker node se ejecuta cada pod.
+		Si los pods se deben cambiar de nodo, se eliminan y se crean nuevos en otro nodo.
 		Considera CPU, memoria, afinidad, etc.
 	- kube Controller Manager: Vigila que el estado real coincida con el deseado.
 		Ejemplo: “Quiero 3 pods”, Hay 2 → crea 1 más
@@ -74,6 +81,66 @@ Cluster: es un conjunto de máquinas que trabajan juntas como un solo sistema pa
 	Permite: Escalar aplicaciones, Alta disponibilidad y Auto-recuperación. Ejemplo: 
 	Se cae un pod → se crea otro; Hay mucho tráfico → se crean más pods; Se cae un node → los
 	pods se mueven a otro.
+
+kubctl: Kube control. Es la herramienta de línea de comandos que usas para comunicarte con 
+	Kubernetes.
+	es un CLI (Command Line Interface) que te permite enviar instrucciones al cluster de
+	Kubernetes a través del API Server.
+	kubectl es el cliente
+	API Server es el servidor
+	Se comunican por HTTP/REST
+
+
+
+HERRAMIENTAS NECESARIAS
+
+Estas herramientas se necesitan instalar en cada MV.
+
+Minikube: Herramienta que nos permite desarrollar con kubernetes.
+	Permite crear un cluster de Kubernetes local en tu máquina.
+	Se usa para: Aprender Kubernetes, Probar deployments, Hacer pruebas antes de producción
+	y Desarrollo local. 
+	No se usa para producción y No es un cluster multi-nodo real (aunque puede simular)
+
+Documentación para la instalación de kube-ctl:
+https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
+
+Se debe tener instalado chocolatey.
+
+choco -v -> versificarlo con este comando.
+
+choco upgrade chocolatey -> Para actualizar chocolatey.
+
+choco install kubernetes-cli -> Instalar kubectl
+
+kubectl version --client -> Verificar que este instalado.
+
+Documentación para la instalación de mini-kube:
+https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download
+
+Es puro next la instalación.
+
+*Lo siguietne se hace en cmd*
+
+Dirigirse a esta ruta:
+cd %USERPROFILE%
+
+crear la carpeta
+mkdir .kube
+
+Ingresar y crear este archivo:
+cd .kube
+New-Item config -type file
+
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -> Para habilitar 
+	hyper-v en caso de que este deshabilitado.
+
+minikube start --driver=hyperv -> Iniciar mini-kube con hyper-v.
+	Comenzara a descargar todos los componentes de la arquitectura de kubernetes.
+
+minikube status -> Para verificar que todo este corriendo correctamente.
+
+
 
 
 
