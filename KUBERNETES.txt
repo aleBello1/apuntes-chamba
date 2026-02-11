@@ -135,8 +135,12 @@ New-Item config -type file
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -> Para habilitar 
 	hyper-v en caso de que este deshabilitado.
 
-minikube start --driver=hyperv -> Iniciar mini-kube con hyper-v.
+minikube start --driver=hyperv ó 
+minikube start --driver=Docker -> Iniciar mini-kube con hyper-v.
+	Usar Docker es buena alternativa en Windows 10 pro u 11 pro.
 	Comenzara a descargar todos los componentes de la arquitectura de kubernetes.
+	Hacer esto consume bastante ram. ***
+	- minikube start --driver=hyperv --memory=2048 --cpus=2 -> Para iniciarlo con menos ram.
 
 minikube status -> Para verificar que todo este corriendo correctamente.
 
