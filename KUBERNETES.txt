@@ -38,16 +38,14 @@ en kubernetes se puede migrar fácilmente entre aws, gcp, azure, etc porque es u
 que se puede intslar en cualquier MV de los provedores de la nube antes mencionados ******
 
 
-ARQUITECTURA DE KUBERNETES
+ARQUITECTURA Y COMPONENTES PRINCIPALES DE KUBERNETES
 
 Worker node: es una máquina (VM o física).
 	Ejecuta a los pods.
 	Reportan su estado al control plane
 	Dentro de este viven: pods, kubletet y contenedores.
 	
-pod: Es la unidad más pequeña que Kubernetes puede crear, administrar y Ejecutar contenedores.
-	Los contenedores dentro de un pod: Comparten IP, Comparten puertos y comparten volúmenes.
-	Normalmente solo contiene un contendor pero si puede contener mas de uno.
+pod *Hay mas teoría adelante de esto*
 
 Kubelet: Es un proceso que se ejecuta en cada worker node y es el encargado de comunicarse con 
 	el control plane.
@@ -89,7 +87,6 @@ kubctl: Kube control. Es la herramienta de línea de comandos que usas para comu
 	kubectl es el cliente
 	API Server es el servidor
 	Se comunican por HTTP/REST
-
 
 
 HERRAMIENTAS NECESARIAS
@@ -139,23 +136,117 @@ minikube start --driver=hyperv ó
 minikube start --driver=Docker -> Iniciar mini-kube con hyper-v.
 	Usar Docker es buena alternativa en Windows 10 pro u 11 pro.
 	Comenzara a descargar todos los componentes de la arquitectura de kubernetes.
-	Hacer esto consume bastante ram. ***
+	Hacer esto consume bastante ram y la seguirá consumiendo aun cuando este comando
+	se haya realizado correctamente porque corre en segundo plano. ***
 	- minikube start --driver=hyperv --memory=2048 --cpus=2 -> Para iniciarlo con menos ram.
 
 minikube status -> Para verificar que todo este corriendo correctamente.
 
+minikube stop -> detener Minikube (sin borrarlo).
+	Esto se hace para liberar RAM temporalmente.
 
 
+OBJETOS DE KUBERNETES
 
+pod: Es la unidad más pequeña que Kubernetes puede crear. Un pod contiene, administra y Ejecuta
+	contenedores.
+	Todos los contenedores dentro de un pod se pueden comunicar mediante el localhost.
+	Los contenedores dentro de un pod: Comparten IP, Comparten puertos y comparten volúmenes.
+	Normalmente solo contiene un contendor pero si puede contener mas de uno.
+	Cada pod tiene su propia ip.
+	Debido a que los pods son efímeros: son eliminados, reemplazados según se requiere es
+	por eso que los volúmenes no están dentro de un pod.
 
+Deployments: Controla a los pods de manera automatizada.
+	Lo ideal no es crear los pods manualmente si no usar deplyomente para que lo cree 
+	por nosotros.	
+	Aqui se configura el estado deseado del despligue y kubenerest se encarga de mantener ese
+	estado.
+	Puede ser eliminados, modificados, detenidos y revertirdos a una versión anterior.
 
+servicios: Nos permite conectarnos a la aplicación que corre dentro del contenedor mediante una
+	ruta fija. 
+	Ademas, agrupa un conjunto de pods que contiene la misma parte de la app para aplicarles
+	un load balancer asi que también aplica auto-escalado.
 
+namespace: Permite organizar el espacio de trabajo.
 
+volumen: Sirve para mantener persistentes los datos en un repositorio externo.
 
-
+Hay dos formas de crear objetos: 1. la imperativa (usando comandos) y 2. declarativa 
+(supuestamente esta es la mejor forma porque se puede reutilizar los archivos de configuración
+yaml).
 
 
 
 
 ///////////////////////////////////////PRACTICA//////////////////////////////////////////////////
+
+
+CREAR DEPLOYMENT (FORMA CON COMANDOS)
+
+Al igual que con los contenedores, se crea primero el deployment de un pod que almacena un
+contendor que almacena una db y después el que almacena la app. **
+
+*Se debe tener encendido el minikube*
+
+kubctl create deployment nombreDeployment --image=nombreImagen:version --port=numPuertoInterno ->
+	Crea un deployment.
+	Este comando no maneja variables de ambiente asi que para crear un deploymente para
+	una db como mysql no seria posible. Para lograr una funcionalidad asi se 
+	usaría la forma declarativa (con un archivo yaml).
+	Usalmente el nombre del deployment será igual al nombre del contenedor.
+	La imagen siempre se descargara de Docker hub. *** 
+	El puerto interno es el puerdo donde tu aplicación está escuchando.
+	- --dry-run=client -o yaml > nombreArchivo.yaml -> Si se pasa esta opcion se crea el
+		esqueleto de un manifiesto (archivo de configuracion yaml) pero no lo crea en 
+		el cluster si no en nuestra maquina local. 
+		Este archivo se usa para definir todas las configuracion del deploymente pero
+		es usado principalmente para especificar y pasarle valores a las variables de 
+		ambiente que necesite un contenedor. ***
+
+kubctl get deployments ó
+kubectl get deploy -> Muestra todos los deployments.
+	No muestra informacion detallada.
+	Si un deploytmnet en la columna ready esta en 1 se levanto ok.
+
+kubctl get pods -> Muestra todos los pods.
+	Muestra el status y nombre de cada pod.
+
+kubectl describe pods nombrePod -> Muestra la información de determinado pod.
+	Mostra el nombre, ip (se recuerda que esta cambia a cada rato) del pod y la información
+	del contenedor que almacena mostarando datos como: la imagen, el puerto, el status, etc.
+	Tambien pareciera que muestra los logs de un pod (del pod, mas no de la app) porque 	muestra ciertos sucesos en su ciclo de vida. *****
+
+kubectl logs nombrePod -> Muestra los logs de la aplicación que esta dentro de cierto pod.
+
+kubectl delete deployment nombreDeploy -> Elimina determinado deployment.
+
+kubectl apply -f .\nombreArchivo.yaml -> Lee determinado archivo yaml y con base en este crea o 	actualiza los recursos en el cluster para que coincidan con lo que dice el archivo.
+
+
+Archivo de configuración para el pod ---------------------------
+
+spec: -> Especificaciones del deployment
+	Opciones para esta configuración.
+	- replicas: n -> Cantidad de replicas de los pods.
+	- select:
+		- matchLabels:
+			- app: nombreDeployment -> Selecciona un conjunto de pods mediante el 
+				nombre de una etiqueta.
+				Este nombre tiene que hacer match con template: metadata: labels:
+				app: nombreDeployment.
+	- template: Especifica la configuración del pod.
+		- spec: -> Especificaciones del contenedor.
+			- containers:
+				- - image: nombreImagen:version
+				- name: nombreContenedor
+				- ports:	
+					- - containerPort: numPuertoInterno
+				- env:
+					- - name: nombreVariableAmbiente
+					- value: valor -> Para pasarle variables de ambiente.
+						Se crea un par como este por cada variable de 
+						ambiente que necesitemos.
+	 
 
