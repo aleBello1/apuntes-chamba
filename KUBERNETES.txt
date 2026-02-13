@@ -134,12 +134,14 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -> Par
 
 minikube start --driver=hyperv ó 
 minikube start --driver=Docker -> Iniciar mini-kube con hyper-v.
+	Esto provocara que minkube cree una sola mv, es decir, habrá un solo nodo para el 	cluster.
 	Usar Docker es buena alternativa en Windows 10 pro u 11 pro.
 	Comenzara a descargar todos los componentes de la arquitectura de kubernetes.
 	Hacer esto consume bastante ram y la seguirá consumiendo aun cuando este comando
 	se haya realizado correctamente porque corre en segundo plano. ***
 	- minikube start --driver=hyperv --memory=2048 --cpus=2 -> Para iniciarlo con menos ram.
-
+	- --nodes=n -> Para iniciar minikube con una cantidad de nodos diferente al defaultat (1)
+		
 minikube status -> Para verificar que todo este corriendo correctamente.
 
 minikube stop -> detener Minikube (sin borrarlo).
@@ -164,8 +166,8 @@ Deployments: Controla a los pods de manera automatizada.
 	estado.
 	Puede ser eliminados, modificados, detenidos y revertirdos a una versión anterior.
 
-servicios: Nos permite conectarnos a la aplicación que corre dentro del contenedor mediante una
-	ruta fija. 
+servicios: Nos permite conectarnos a la aplicación que corre dentro del contenedor que esta
+	dentro de un pod mediante una ruta fija. 
 	Ademas, agrupa un conjunto de pods que contiene la misma parte de la app para aplicarles
 	un load balancer asi que también aplica auto-escalado.
 
@@ -182,6 +184,14 @@ yaml).
 
 ///////////////////////////////////////PRACTICA//////////////////////////////////////////////////
 
+PUERTOS
+
+Hay 3 puertos distintos y pertenecen a diferentes objetos: port, targetPort y containerPor.
+		Cliente  →  Service (port)  →  Pod (targetPort)  →  containerPort
+containerPort → donde tu app escucha dentro del contenedor (ej: 8080)
+targetPort → puerto del Pod (normalmente 8080)
+port → puerto del Service (ej: 80)
+
 
 CREAR DEPLOYMENT (FORMA CON COMANDOS)
 
@@ -191,7 +201,7 @@ contendor que almacena una db y después el que almacena la app. **
 *Se debe tener encendido el minikube*
 
 kubctl create deployment nombreDeployment --image=nombreImagen:version --port=numPuertoInterno ->
-	Crea un deployment.
+	Crea un deployment, el cual crea un replicaSet y su propósito es crear a los pods.
 	Este comando no maneja variables de ambiente asi que para crear un deploymente para
 	una db como mysql no seria posible. Para lograr una funcionalidad asi se 
 	usaría la forma declarativa (con un archivo yaml).
@@ -208,7 +218,8 @@ kubctl create deployment nombreDeployment --image=nombreImagen:version --port=nu
 kubctl get deployments ó
 kubectl get deploy -> Muestra todos los deployments.
 	No muestra informacion detallada.
-	Si un deploytmnet en la columna ready esta en 1 se levanto ok.
+	La columna ready muestra la cantidad de pods que están listos del un total de pods 
+	deseados.
 
 kubctl get pods -> Muestra todos los pods.
 	Muestra el status y nombre de cada pod.
@@ -250,3 +261,54 @@ spec: -> Especificaciones del deployment
 						ambiente que necesitemos.
 	 
 
+CREAR SERVICE (FORMA CON COMANDOS)
+
+Todos los pods con la misma etiqueta pertenecen al mismo servicio.
+
+kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -> Para crear un 
+	Service	a partir de un Deployment, es decir, Expone tu aplicación para que pueda ser 	accedida dentro o fuera del cluster.
+	Si nos damos cuenta se crea un service con el mismo nombre que el deployment. ***
+	- --port=numPuertoService -> El valor que le asignamos al puerto es el puerto que 
+		usaremos para conectarnos al Service.
+	- --target-port=numPuertoPod -> Es el puerto del pod.
+		Es muy normal que multiples pdos tengan el mismo targetPort porque cada pod
+		tiene su propia ip interna.
+	Tipos:
+	- ClusterIP -> Permite solo comunicación interna entre los pods pertenecientes al mismo
+		cluster.
+		Se usa para Comunicación entre microservicios o para comunicar un backend con
+		su db.
+	- NodePort -> Permite que alguien fuera del cluster pueda entrar. Mas específicamente
+		cada nodo (MV en el clúster) tendrá abierto el mismo puerto para recibir 
+		conexiones.
+		NO se usa para producción, se usa para desarrollo.
+	- LoadBalancer -> 
+
+Para conectarse al service dependerá del type. 
+
+
+Caso 1: ClusterIP ---------------------------------
+
+Solo accesible dentro del cluster.
+
+Desde otro Pod podrías hacer:
+
+curl http://nombreDeployment:80
+
+
+Caso 2: NodePort ----------------------------------
+
+Se ejecuta kubectl get services
+
+se Verá algo como:
+mi-app   NodePort   10.96.1.5   <none>   80:nodePort/TCP
+
+minikube ip -> Devuelve la ip del único nodo en minikube.
+	Por defecto minikube solo tiene un nodo, a menos que se haya especificado distinto cuando
+	se levanto.
+*ó si se esta ocupando una nube (aws, azure, gcp)*
+kubectl get nodes -o wide -> Muestra información de todos los nodos en el cluster.
+	
+curl http://ipNodo:nodePort -> La ip del nodo, puede ser la ip de cualquier nodo (MV) porque 
+	todos 
+	los nodos tienen abiertos el mismo puerto. **
