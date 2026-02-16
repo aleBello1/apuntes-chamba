@@ -268,12 +268,17 @@ spec: -> Especificaciones del deployment
 CREAR SERVICE (FORMA CON COMANDOS)
 
 Todos los pods con el mismo nombre de etiqueta pertenecen al mismo servicio.
+Service hace balanceo automático. Cada vez que llega una petición:
+	Service → selecciona un Pod disponible
 
 kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -> Para crear un 
 	Service	a partir de un Deployment, es decir, Expone tu aplicación para que pueda ser 	accedida dentro o fuera del cluster.
 	Si nos damos cuenta se crea un service con el mismo nombre que el deployment. ***
 	- --port=numPuertoService -> El valor que le asignamos al puerto es el puerto que 
 		usaremos para conectarnos al Service.
+		Si el tipe es clusterIp se usara el valor de esta opción pero si el type es 
+		nodePort se usara otro numero de puerto que kubernetes asigna por si solo, 
+		aunque aun asi es obligatorio configurar esta opción.
 	- --target-port=numPuertoPod -> Es el puerto del pod.
 		Es muy normal que multiples pdos tengan el mismo targetPort porque cada pod
 		tiene su propia ip interna.
@@ -288,12 +293,22 @@ kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -
 		cada nodo (MV en el clúster) tendrá abierto el mismo puerto para recibir 
 		conexiones.
 		NO se usa para producción, se usa para desarrollo.
-	- LoadBalancer -> 
+	- LoadBalancer -> crea un balanceador externo en la nube (AWS, Azure, GCP) y asigna 
+		una IP pública.
+		LoadBalancer usa NodePort por debajo porque Internamente utiliza un NodePort 
+		para enrutar el tráfico hacia los Pods.
 
 kubectl get services ó
-kubectl get svc -> Muestra todos los objetos serviciosjunto con su información.
+kubectl get svc -> Muestra todos los objetos servicios junto con su información.
+	De cada service mostrara su nombre, type, ports (portService y nodePort (si aplica)),
+	tiempo de existencia, external-ip (Solo aparece cuando el Service es tipo: 
+	loadbalancer. Es creada por aws, azure o gcp. Se usa para que los usuarios externos
+	accedan)
 
-kubectl describe service nombreServicio -> Muestra información detallada de dterminado servicio.
+kubectl describe service nombreServicio -> Muestra información detallada de determinado servicio.
+	Pe mostra el nombre del selector (El Service enviará tráfico a todos los Pods que tengan
+	el mismo selector), los enpoints (las ips de los pods al que el service enviara el 
+	trafico), nodePort (si aplica) y los events (los eventos de ciclo de vida del service).
 
 Para conectarse al service dependerá del type. 
 
@@ -304,7 +319,7 @@ Solo accesible dentro del cluster.
 
 Desde otro Pod podrías hacer:
 
-curl http://nombreDeployment:80
+curl http://nombreServicio:puertoService
 
 
 Caso 2: NodePort ----------------------------------
