@@ -267,7 +267,7 @@ spec: -> Especificaciones del deployment
 
 CREAR SERVICE (FORMA CON COMANDOS)
 
-Todos los pods con la misma etiqueta pertenecen al mismo servicio.
+Todos los pods con el mismo nombre de etiqueta pertenecen al mismo servicio.
 
 kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -> Para crear un 
 	Service	a partir de un Deployment, es decir, Expone tu aplicación para que pueda ser 	accedida dentro o fuera del cluster.
@@ -277,6 +277,8 @@ kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -
 	- --target-port=numPuertoPod -> Es el puerto del pod.
 		Es muy normal que multiples pdos tengan el mismo targetPort porque cada pod
 		tiene su propia ip interna.
+	- --name=otroNombre -> Para especificar un nombre al serivice y sea distinto al del
+		deployment.
 	Tipos:
 	- ClusterIP -> Permite solo comunicación interna entre los pods pertenecientes al mismo
 		cluster.
@@ -292,9 +294,6 @@ kubectl get services ó
 kubectl get svc -> Muestra todos los objetos serviciosjunto con su información.
 
 kubectl describe service nombreServicio -> Muestra información detallada de dterminado servicio.
-
-
-
 
 Para conectarse al service dependerá del type. 
 
@@ -324,3 +323,7 @@ kubectl get nodes -o wide -> Muestra información de todos los nodos en el clust
 curl http://ipNodo:nodePort -> La ip del nodo, puede ser la ip de cualquier nodo (MV) porque 
 	todos 
 	los nodos tienen abiertos el mismo puerto. **
+
+
+
+revisar lo ultimo que le pregunte a chatgpt
