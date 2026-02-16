@@ -204,6 +204,10 @@ contendor que almacena una db y después el que almacena la app. **
 
 *Se debe tener encendido el minikube*
 
+minikube image pull name-image -> Para que minikube descargue cierta imagen de Docker hub.
+	En teoría, el comando de abajo por defecto baja descarga la imagen, pero en ocasiones
+	no lo hace y es mejor bajar la imagen por separado con este comando. 
+
 kubctl create deployment nombreDeployment --image=nombreImagen:version --port=numPuertoInterno ->
 	Crea un deployment, el cual crea un replicaSet y su propósito es crear a los pods.
 	Este comando no maneja variables de ambiente asi que para crear un deploymente para
@@ -221,17 +225,25 @@ kubctl create deployment nombreDeployment --image=nombreImagen:version --port=nu
 
 kubctl get deployments ó
 kubectl get deploy -> Muestra todos los deployments.
-	No muestra informacion detallada.
+	No muestra información detallada.
 	La columna ready muestra la cantidad de pods que están listos del un total de pods 
 	deseados.
 
 kubctl get pods -> Muestra todos los pods.
-	Muestra el status y nombre de cada pod.
+	Muestra el status y nombre de cada pod. También la cantidad de veces que se ha 
+	auto-regenerado el contenedor (en la columna restart).
 
 kubectl describe pods nombrePod -> Muestra la información de determinado pod.
 	Mostra el nombre, ip (se recuerda que esta cambia a cada rato) del pod y la información
-	del contenedor que almacena mostarando datos como: la imagen, el puerto, el status, etc.
+	del contenedor que almacena mostarando datos como: la imagen, el puerto, el status, las
+	variables de ambiente ****, etc.
 	Tambien pareciera que muestra los logs de un pod (del pod, mas no de la app) porque 	muestra ciertos sucesos en su ciclo de vida. *****
+
+kubtcl describe deployement nombreDeploy ó 
+kubtcl describe deploy nombreDeploy -> Muestra la información de determinado deployment.
+	Mostrara el nombre, selector (qué etiquetas debe tener un Pod para pertenecer a este 
+	Deployment), replicas: desired → cuántos Pods quiere, total → cuántos existen, available
+	→ cuántos están listos, unavailable → cuántos fallaron.
 
 kubectl logs nombrePod -> Muestra los logs de la aplicación que esta dentro de cierto pod.
 
@@ -293,22 +305,31 @@ kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -
 		cada nodo (MV en el clúster) tendrá abierto el mismo puerto para recibir 
 		conexiones.
 		NO se usa para producción, se usa para desarrollo.
-	- LoadBalancer -> crea un balanceador externo en la nube (AWS, Azure, GCP) y asigna 
+	- LoadBalancer -> Crea un balanceador externo en la nube (AWS, Azure, GCP) y asigna 
 		una IP pública.
 		LoadBalancer usa NodePort por debajo porque Internamente utiliza un NodePort 
 		para enrutar el tráfico hacia los Pods.
-
+		Crea un loadbalancer para distribuir las solicitudes entre los diferentes pods.
+		Sirve para comunicación interna y externa, este tipo se asigna a las apps
+		a las cuales nos queramos comunicar desde afuera pe con postman o un fron. ***
+		
 kubectl get services ó
 kubectl get svc -> Muestra todos los objetos servicios junto con su información.
 	De cada service mostrara su nombre, type, ports (portService y nodePort (si aplica)),
 	tiempo de existencia, external-ip (Solo aparece cuando el Service es tipo: 
 	loadbalancer. Es creada por aws, azure o gcp. Se usa para que los usuarios externos
-	accedan)
+	accedan), cluster-ip (la ip que los nodos utilzan para comunicarse entre ellos, no
+	se puede usar para acceder desde afuera).
 
 kubectl describe service nombreServicio -> Muestra información detallada de determinado servicio.
 	Pe mostra el nombre del selector (El Service enviará tráfico a todos los Pods que tengan
 	el mismo selector), los enpoints (las ips de los pods al que el service enviara el 
 	trafico), nodePort (si aplica) y los events (los eventos de ciclo de vida del service).
+
+minikube service nombreServiceApp --url -> Para conocer la ip externa de un servicio con el 
+	type loadBalancer.
+	Este comando solo se aplica a servicios que almancenan pods que alamcenan contenedores
+	que almacenan apps y no dbs.
 
 Para conectarse al service dependerá del type. 
 
@@ -325,7 +346,6 @@ curl http://nombreServicio:puertoService
 Caso 2: NodePort ----------------------------------
 
 Se ejecuta kubectl get services
-
 se Verá algo como:
 mi-app   NodePort   10.96.1.5   <none>   80:nodePort/TCP
 
@@ -336,9 +356,65 @@ minikube ip -> Devuelve la ip del único nodo en minikube.
 kubectl get nodes -o wide -> Muestra información de todos los nodos en el cluster.
 	
 curl http://ipNodo:nodePort -> La ip del nodo, puede ser la ip de cualquier nodo (MV) porque 
-	todos 
-	los nodos tienen abiertos el mismo puerto. **
+	todos los nodos tienen abiertos el mismo puerto. **
 
 
+Caso 3: LoadBalancer ---------------------------------
 
-revisar lo ultimo que le pregunte a chatgpt
+°°°°°°°°° en ambiente productivo °°°°°°°°°
+
+El debe ser seria ejecutar este comando: kubectl get services y de ahí extraer el external-ip
+del serivioc que deseamos consumir.
+	
+	http://ipServiceExterno:puertoService
+
+
+°°°°°°°°° En local con minikube °°°°°°°°° 
+
+No existe un Load Balancer real, entonces al ejecutar el comando kubectl get services, el EXTERNAL-IP queda en: <pending>
+
+*Abrir una terminal extra y ejecutar*
+minikube tunnel -> crear una interfaz de red virtual en tu sistema.
+	Crea una ruta de red en tu máquina local para simular lo que haría un 
+	proveedor cloud.
+	Después de ejcutarlo se deja esa terminal abierta y se regresa a la principal.
+
+Ejecutar el kubectl get services para que ahora si muestre una external-ip del servicio.
+Y ahora si podremos consumirlo como:
+	
+	http://ipServiceExterno:puertoService
+
+
+ACTUALIZAR IMAGEN DE UN DEPLOYMENT
+
+Esto es necesario cuando se actualiza algo en el código de la app y se necesita desplegar una
+nueva versión de la app.
+
+Primero se reconstruye la imagen (con Docker build...)
+Despues asignarle un nuevo tag a la imagen (con docker tag...). Estamos obligados a ponerle una
+nueva version a la imagen, si no kubernetes no nos dejara setearle una nueva imagen. ******
+Al final, subir esa nueva imagen (docker push...).
+
+Listar todos los pods que hay para encontrar el pod que necesita la actualizacion de 
+imagen (kubectl get pods).
+Obtener todos los detalles del pods que creemos tiene la imagen (docker describe pod nombrePod),
+de esto extraeremos el nombre del contenedor y la imagen que esta usando actualmente.
+
+kubectl set image deployment nombreDeploy 
+	nombreContenedor=nombreUserDockerHub/nombreImagen:version -> Actualiza la imagen que usa 
+		determinado contenedor.
+		
+Confirmar que ese pod se volvió a levantar pero con la imagen nueva (kubecl get pods).
+
+ 
+
+///////////////////////////////////////IMPLMENTACION/////////////////////////////////////////////
+
+FORMA COMANDOS
+
+1. Crear el deploymente de las db.
+2. Crear el service de las db el tipo de red que tendrá será la interna (clusterIp).
+3. Crear el deploymente de las apps.
+4. Crear el service de las apps el tipo de red que tendrá será la comunicación interna y externa (LoadBalancer).
+
+

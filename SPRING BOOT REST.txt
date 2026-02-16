@@ -35,3 +35,22 @@ else {
 
   return brands;
 } -> Buscar los datos en redis por su clave y convertirlos de jsonString a objetos java.
+
+
+
+///////////////////////////////////////////OTROS///////////////////////////////////////////
+
+@Autowired
+private ApplicationContext context; -> Inyecta el bean de spring que se encarga de crear
+	beans, inyectar dependencias y manejar el ciclo de vida de la aplicación.
+
+((ConfigurableApplicationContext) context).close(); -> Apagar la aplicación de manera ordenada.
+	Esto se ha usado para simular un quiebre en la application y ver como kubernetes 
+	auto-regenera la application.
+
+
+
+
+
+
+
