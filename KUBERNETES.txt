@@ -179,6 +179,8 @@ namespace: Permite organizar el espacio de trabajo.
 
 volumen: Sirve para mantener persistentes los datos en un repositorio externo.
 
+ReplicaSet: Su responsabilidad es Mantener corriendo exactamente N Pods para cada label.
+
 Hay dos formas de crear objetos: 1. la imperativa (usando comandos) y 2. declarativa 
 (supuestamente esta es la mejor forma porque se puede reutilizar los archivos de configuración
 yaml).
@@ -216,12 +218,14 @@ kubctl create deployment nombreDeployment --image=nombreImagen:version --port=nu
 	Usalmente el nombre del deployment será igual al nombre del contenedor.
 	La imagen siempre se descargara de Docker hub. *** 
 	El puerto interno es el puerdo donde tu aplicación está escuchando.
-	- --dry-run=client -o yaml > nombreArchivo.yaml -> Si se pasa esta opcion se crea el
-		esqueleto de un manifiesto (archivo de configuracion yaml) pero no lo crea en 
+	- --dry-run=client -o yaml > nombreArchivo.yaml -> Si se pasa esta opción se crea el
+		esqueleto de un manifiesto (archivo de configuración yaml) pero no lo crea en 
 		el cluster si no en nuestra maquina local. 
-		Este archivo se usa para definir todas las configuracion del deploymente pero
+		Este archivo se usa para definir todas las configuración del deploymente pero
 		es usado principalmente para especificar y pasarle valores a las variables de 
 		ambiente que necesite un contenedor. ***
+		Con esta configuración el deployment no será creado en el cluster, únicamente 
+		se creara el archivo de configuración yaml.
 
 kubctl get deployments ó
 kubectl get deploy -> Muestra todos los deployments.
@@ -250,31 +254,6 @@ kubectl logs nombrePod -> Muestra los logs de la aplicación que esta dentro de 
 kubectl delete deployment nombreDeploy -> Elimina determinado deployment.
 
 kubectl apply -f .\nombreArchivo.yaml -> Lee determinado archivo yaml y con base en este crea o 	actualiza los recursos en el cluster para que coincidan con lo que dice el archivo.
-
-
-Archivo de configuración para el pod ---------------------------
-
-spec: -> Especificaciones del deployment
-	Opciones para esta configuración.
-	- replicas: n -> Cantidad de replicas de los pods.
-	- select:
-		- matchLabels:
-			- app: nombreDeployment -> Selecciona un conjunto de pods mediante el 
-				nombre de una etiqueta.
-				Este nombre tiene que hacer match con template: metadata: labels:
-				app: nombreDeployment.
-	- template: Especifica la configuración del pod.
-		- spec: -> Especificaciones del contenedor.
-			- containers:
-				- - image: nombreImagen:version
-				- name: nombreContenedor
-				- ports:	
-					- - containerPort: numPuertoInterno
-				- env:
-					- - name: nombreVariableAmbiente
-					- value: valor -> Para pasarle variables de ambiente.
-						Se crea un par como este por cada variable de 
-						ambiente que necesitemos.
 	 
 
 CREAR SERVICE (FORMA CON COMANDOS)
@@ -283,7 +262,7 @@ Todos los pods con el mismo nombre de etiqueta pertenecen al mismo servicio.
 Service hace balanceo automático. Cada vez que llega una petición:
 	Service → selecciona un Pod disponible
 
-kubctl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -> Para crear un 
+kubectl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -> Para crear un 
 	Service	a partir de un Deployment, es decir, Expone tu aplicación para que pueda ser 	accedida dentro o fuera del cluster.
 	Si nos damos cuenta se crea un service con el mismo nombre que el deployment. ***
 	- --port=numPuertoService -> El valor que le asignamos al puerto es el puerto que 
@@ -390,21 +369,140 @@ ACTUALIZAR IMAGEN DE UN DEPLOYMENT
 Esto es necesario cuando se actualiza algo en el código de la app y se necesita desplegar una
 nueva versión de la app.
 
-Primero se reconstruye la imagen (con Docker build...)
-Despues asignarle un nuevo tag a la imagen (con docker tag...). Estamos obligados a ponerle una
+Primero se reconstruye la imagen (con docker build...)
+Después asignarle un nuevo tag a la imagen (con docker tag...). Estamos obligados a ponerle una
 nueva version a la imagen, si no kubernetes no nos dejara setearle una nueva imagen. ******
 Al final, subir esa nueva imagen (docker push...).
 
-Listar todos los pods que hay para encontrar el pod que necesita la actualizacion de 
+Listar todos los pods que hay para encontrar el pod que necesita la actualización de 
 imagen (kubectl get pods).
-Obtener todos los detalles del pods que creemos tiene la imagen (docker describe pod nombrePod),
+Obtener los detalles de pod que creemos tiene la imagen (docker describe pod nombrePod),
 de esto extraeremos el nombre del contenedor y la imagen que esta usando actualmente.
 
 kubectl set image deployment nombreDeploy 
 	nombreContenedor=nombreUserDockerHub/nombreImagen:version -> Actualiza la imagen que usa 
 		determinado contenedor.
 		
-Confirmar que ese pod se volvió a levantar pero con la imagen nueva (kubecl get pods).
+Confirmar que ese pod se volvió a levantar pero con la imagen nueva (kubeclt get pods).
+
+
+REPLICAS (FORMA CON COMANDOS)
+
+Consiste en poder aumentar la cantidad de instancias de pods de un mismo deployment.
+
+kubectl scale deployment nombreDeploy --replicas=n -> Escala el numero de instancias de un pod
+	para un deployment.
+	Al tener muchas injstancias de un pod, para el usuario la aplicación aparentara como
+	si nunca estuviera caída porque siempre habrá una replica que atienda las solicitudes. *
+	Cada que una replica se muera por culpa del mismo enpoint y la misma razón, cada que 
+	kubernetes levante a la replica tardara mas y mas porque kubernetes lo considera un 
+	error repetitivo. Entonces el status de un pod que se murió y revivio multiples veces por
+	la misma razón, tendrá el status CrashLoopBackOff y eso significa que tardara en 
+	revivir. **
+
+
+CEAR DEPLOYMENT (FORMA DECLARATIVA)
+
+apiVersion: apps/v1 -> Especifica la versión de api.
+	Este valor es para los objetos deployment.
+
+kind: Deployment -> Especifica el tipo de objeto a crear.
+
+metadata: -> Configura información descriptiva del objeto.
+	Configuraciones para esta opción:
+	- name: nombreDeploy -> Define nombre del Deployment dentro del cluster.
+	- namespace: nombre -> En qué espacio lógico vive el recurso.
+
+spec: -> Especificaciones del deployment. 
+	Le dices a Kubernetes cómo quieres que funcione ese Deployment.
+	Configuraciones para esta opción:
+	- replicas: n -> Cantidad de replicas de los pods.
+		Para especificar la cantidad de pods que queremos que esten corriendo siempre.
+		Si uno se cae Kubernetes crea otro automáticamente.
+	- selector:
+		- matchLabels:
+			- app: nombreTag -> Indica el nombre de etiqueta que deben tener los pods
+				para que este deployment los administré.
+				Este nombre tiene que hacer match en los pods en la configuración
+				de template: metadata: labels: app: nombreTag.
+	- template: Especifica la configuración de los pods.
+		Cada réplica será creada usando EXACTAMENTE lo que está dentro de template.
+		Si cambias algo dentro de template, Kubernetes crea un nuevo ReplicaSet 
+		automáticamente.
+		Configuraciones para esta opción:
+		- metadata:		
+			- labels
+				- app: nombreTag -> Especifica el label que se le pondrá a cada
+					pod que el deploymente queda.
+					Debe coincidir con selector: matchLabels: app: 
+					nombreTag. ***+
+		- spec: -> Realiza las especificaciones de los pods.
+			- containers: -> Para definir los contendores que contendrá cada pod.
+				- - image: nombreImagen:version -> Imagen del contendor.
+				- name: nombreContenedor -> Nombre del contenedor.
+				- ports:	
+					- - containerPort: numPuertoInterno -> Puerto donde 
+						escucha la aplicación.
+				- env:
+					- - name: nombreVariableAmbiente
+					- value: valor -> Para pasarle variables de ambiente
+						al contenedor.
+						Se crea un par como este por cada variable de 
+						ambiente que necesite el contenedor.
+						En producción normalmente NO se definen valores 
+						sensibles de esta forma, en su lugar se usan 
+						configMaps y secrets.
+	
+
+CREAR SERVICE (FORMA DECLARATIVA)
+
+kubectl expose deployment nombreDeployment --port=numPuertoService --type=tipoX 
+	--target-port=numPuertoPod -o yaml > nombreArchivo.yaml -> Crear un Service.
+		No lo va a crear en el cluster.
+		Solo va a generar el YAML y guardarlo en un archivo.
+
+kubectl get service nombreServicio -o yaml > nombreArchivo.yaml -> Para crear el archivo de 	
+	configuración yaml a partir de un objeto service.
+	Exportar la definición actual de un objeto Service que ya existe en el cluster y con
+	base a esa definición crea un archivo de configuración yaml.
+
+apiVersion: v1 -> Especifica la versión de api.
+	Este valor es para los objetos service.
+
+kind: Service -> Especifica el tipo de objeto a crear.
+
+metadata: -> Configura información descriptiva del objeto.
+	Configuraciones para esta opción:
+	- name: nombreService -> Define nombre del service dentro del cluster.
+	- namespace: nombre -> En qué espacio lógico vive el recurso.
+
+spec: -> Especificaciones del service. 
+	Le dices a Kubernetes cómo quieres que funcione ese service.
+	Configuraciones para esta opción:
+	- ports: 
+		- - port: puertoService -> Especifica el puerto del service.
+			Es el puerto por el cual el Service será accesible dentro del cluster (o
+			externamente si aplica).
+		- protocol: TCP -> Especifica el protocolo tcp.
+		- targetPort: puertoPod -> Especifica el puerto del pod.
+	- type: nombreTipo -> Para especificar el tipo de servicio (ClusterIp, NodePort o 	
+		LoadBalancer).
+		Cuando el type es nodeport o loadbalancer se puede especificar el valor de 
+		nodeport
+	- selector: 
+		app: nombreTag -> Para seleccionar un grupo de pods, los cuales deben tener este
+			nombre.
+			Este Service enviará tráfico a todos los Pods que tengan este nombre. ***
+			
+
+
+
+
+
+
+ 
+
+
 
  
 
