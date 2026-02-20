@@ -1,5 +1,11 @@
 
 
+*EN SI ES EN GIT HUB*
+TAGS
+
+git push --tags --dry-run -> En lista los tags que esta pendientes por subirse al repositorio
+	remoto, es decir, muestra cuales tags están en local pero en remoto no.
+
 
 GIT FLOW
 
@@ -96,28 +102,6 @@ En este momento deberemos apuntar a prod y despues hacer el git push. ***
 git push origin --tags -> Para mandar todos los tags que están en local al remoto.
 
 
-
-Solucionar problemas tras hacer el merge ------------------------
-
-El problema surge cuando un compañero trabajo en un rama y uno trabaja en otra rama, el compañero
-hace merge primero y a él no le surgen problemas, sube sus cambios. Cuando uno esta apunto de
-finalizar la rama hacemos pull de la rama con la que haremos fusión y notamos que hay varios 
-cambios, ahora nosotros finalizamos la rama y nos aparece que hay conflictos.
-Se creara una rama auxiliar que dice merged.
-
-°°°°°°°° En inteliJ °°°°°°°°
-
-Corregir los conflictos: En la parte sup habran dos botones presionar el button verde que tiene 
-	dos flechas hacia la derecha -> Se enlistaran todas las clases donde hay confictos ->
-	dar doble click en cierta clase para corregir sus conflictos -> se abrirá una ventana con
-	3 columnas: columna izq es lo que hizo el compañero, la columna derecha es lo que
-	hicimos nosotros y la columna de en medio será el resultado final de haber solucionado
-	los conflictos.
-	Cerca de donde debe aparecer el numero de linea de código aparecerán unas flechas o equis
-	si presionamos las flechas ese código se enviara al resultado final o si presionaros
-	la equis se eliminara ese cambio.
-	Finalizamos dando apply.
-	Después de solucionar los conflctos y deberemos hacer un commit y el push.
 
 
 

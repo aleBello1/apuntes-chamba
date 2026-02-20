@@ -162,6 +162,9 @@ pod: Es la unidad más pequeña que Kubernetes puede crear. Un pod contiene, adm
 	Cada pod tiene su propia ip.
 	Debido a que los pods son efímeros: son eliminados, reemplazados según se requiere es
 	por eso que los volúmenes no están dentro de un pod.
+	En Kubernetes, los Pods son efímeros e inmutables; cuando se requieren cambios 
+	importantes, se reemplazan en lugar de modificarse, es decir, Los Pods no se actualizan;
+	se recrean.
 
 Deployments: Controla a los pods de manera automatizada.
 	Lo ideal no es crear los pods manualmente si no usar deplyomente para que lo cree 
@@ -215,7 +218,7 @@ kubctl create deployment nombreDeployment --image=nombreImagen:version --port=nu
 	Este comando no maneja variables de ambiente asi que para crear un deploymente para
 	una db como mysql no seria posible. Para lograr una funcionalidad asi se 
 	usaría la forma declarativa (con un archivo yaml).
-	Usalmente el nombre del deployment será igual al nombre del contenedor.
+	Usalmente el nombre del deployment será igual al nombre del contenedor. ***
 	La imagen siempre se descargara de Docker hub. *** 
 	El puerto interno es el puerdo donde tu aplicación está escuchando.
 	- --dry-run=client -o yaml > nombreArchivo.yaml -> Si se pasa esta opción se crea el
@@ -241,7 +244,8 @@ kubectl describe pods nombrePod -> Muestra la información de determinado pod.
 	Mostra el nombre, ip (se recuerda que esta cambia a cada rato) del pod y la información
 	del contenedor que almacena mostarando datos como: la imagen, el puerto, el status, las
 	variables de ambiente ****, etc.
-	Tambien pareciera que muestra los logs de un pod (del pod, mas no de la app) porque 	muestra ciertos sucesos en su ciclo de vida. *****
+	Tambien pareciera que muestra los logs de un pod (del pod, mas no de la app) porque 	
+	muestra ciertos sucesos en su ciclo de vida. *****
 
 kubtcl describe deployement nombreDeploy ó 
 kubtcl describe deploy nombreDeploy -> Muestra la información de determinado deployment.
@@ -253,8 +257,22 @@ kubectl logs nombrePod -> Muestra los logs de la aplicación que esta dentro de 
 
 kubectl delete deployment nombreDeploy -> Elimina determinado deployment.
 
-kubectl apply -f .\nombreArchivo.yaml -> Lee determinado archivo yaml y con base en este crea o 	actualiza los recursos en el cluster para que coincidan con lo que dice el archivo.
+kubectl apply -f .\nombreArchivo.yaml -> Lee determinado archivo yaml y con base en esta 
+	configuración crea o actualiza el recurso en el cluster para que coincida con lo que 
+	dice el archivo de configuración.
+	Los Pods son mayormente inmutables; cambios importantes (como imagen o volúmenes) 
+	requieren eliminar y recrear el Pod. Entonces este comando no es el ideal si se 
+	necesitan actualizar características importantes de los pods.
 	 
+kubectl delete -f .\nombreDeploy.yaml -> Elimina del cluster todos los recursos definidos en 
+	ese archivo YAML.
+
+kubectl rollout restart deployment nombreDeployment -> Crea de nuevo los pods definidos en 
+	el deployment, los cuales seguramente tienen cosas nuevas que se definieron en el 
+	archivo nombreDeploy.yaml y cuando estos pods esten listos eliminará los antiguos pods.
+	De este modo no se tendrá que hacer un delete y después un apply para que haya pods
+	con nuevos cambios en el archivo nombreDeploy.yaml. ***
+
 
 CREAR SERVICE (FORMA CON COMANDOS)
 
@@ -262,24 +280,30 @@ Todos los pods con el mismo nombre de etiqueta pertenecen al mismo servicio.
 Service hace balanceo automático. Cada vez que llega una petición:
 	Service → selecciona un Pod disponible
 
+Los pods se comunican internamente en un cluster usando el nombre del servicio como hostname.***
+
 kubectl expose deployment nombreDeployment --port=numPuertoService --type=tipoX -> Para crear un 
-	Service	a partir de un Deployment, es decir, Expone tu aplicación para que pueda ser 	accedida dentro o fuera del cluster.
-	Si nos damos cuenta se crea un service con el mismo nombre que el deployment. ***
+	Service	a partir de un Deployment, es decir, Expone tu aplicación para que pueda ser 	
+	accedida dentro o fuera del cluster.
+	Si nos damos cuenta se crea un service con el mismo nombre que el deployment y a su vez
+	el nombre del deployment es igual al nombre del contenedor. ***
 	- --port=numPuertoService -> El valor que le asignamos al puerto es el puerto que 
 		usaremos para conectarnos al Service.
 		Si el tipe es clusterIp se usara el valor de esta opción pero si el type es 
 		nodePort se usara otro numero de puerto que kubernetes asigna por si solo, 
 		aunque aun asi es obligatorio configurar esta opción.
 	- --target-port=numPuertoPod -> Es el puerto del pod.
-		Es muy normal que multiples pdos tengan el mismo targetPort porque cada pod
+		Es muy normal que múltiples pods tengan el mismo targetPort porque cada pod
 		tiene su propia ip interna.
+		Debe tener el mismo valor que el puerto donde escucha la aplicación, es decir,
+		que también tendrá el mismo valor que el containerPort. ********
 	- --name=otroNombre -> Para especificar un nombre al serivice y sea distinto al del
 		deployment.
 	Tipos:
 	- ClusterIP -> Permite solo comunicación interna entre los pods pertenecientes al mismo
 		cluster.
-		Se usa para Comunicación entre microservicios o para comunicar un backend con
-		su db.
+		Comúnmente se le asiga este valor a un service que apunta a un pod que almacena
+		un contendor que almacena una db. **
 	- NodePort -> Permite que alguien fuera del cluster pueda entrar. Mas específicamente
 		cada nodo (MV en el clúster) tendrá abierto el mismo puerto para recibir 
 		conexiones.
@@ -452,6 +476,8 @@ spec: -> Especificaciones del deployment.
 						En producción normalmente NO se definen valores 
 						sensibles de esta forma, en su lugar se usan 
 						configMaps y secrets.
+
+Al finalizar de escribir el archivo de configuración usar el comando apply.
 	
 
 CREAR SERVICE (FORMA DECLARATIVA)
@@ -493,16 +519,117 @@ spec: -> Especificaciones del service.
 		app: nombreTag -> Para seleccionar un grupo de pods, los cuales deben tener este
 			nombre.
 			Este Service enviará tráfico a todos los Pods que tengan este nombre. ***
+
+
+ADMINISTRACION DE RECURSOS EN EL CLUSTER
+
+minikube dashboard -> Abre el Dashboard web oficial de Kubernetes conectado a tu cluster de 
+	Minikube.
+	Abre el Dashboard web oficial de Kubernetes conectado a tu cluster de Minikube.
+	Permite administrar tu cluster sin usar kubectl.
+	Desde el Dashboard puedes: Ver Deployments, Ver Pods, Ver Services, Ver ReplicaSets,
+	Escalar réplicas, Ver logs de Pods, Eliminar recursos y Crear recursos vía YAML.
+
+
+VOLUMENES
 			
+Un pod puede tener muchos contenedores y muchos volúmenes
+
+Hay muchos tipos -----------------------
+
+°°°°°°°° emptyDir °°°°°°°°
+
+Se monta en el pod.
+Se crea cuando el Pod inicia.
+Se destruye cuando el Pod muere.
+
+Uso típico:
+Archivos temporales
+Caché
+Compartir archivos entre contenedores del mismo Pod.
+
+Problema: cuando se escalan los pods, cada pod tendrá se propio emptyDir y entonces entre pods
+no tendrán la misma información.
+Es conveniente cuando es un pod de una sola instancia. Puede usarse incluso con múltiples réplicas, pero cada réplica tendrá su propio almacenamiento aislado.
+o cuando No necesitas compartir datos entre Pods
+o No importa perder la información
+
+
+°°°°°°°° hostPath °°°°°°°°
+
+Se monta sobre el worker node (la máquina física o VM donde corre el Pod), asi que el volumen
+vive mientras el nodo exista.
+
+El Problema es que el contenedor está escribiendo directamente en el disco del nodo. Entonces:
+Si el Pod se mueve a otro nodo → pierde acceso
+No es portable
+Es común en clusters de un solo nodo. En clusters multinodo puede usarse, pero: se debe fijar 
+el Pod a un nodo específico (nodeSelector, nodeAffinity) o aceptar el riesgo de pérdida de 
+acceso.
+No recomendado para producción
+
+Implementación:
+
+*En el archivo deployment-nombeDatabase.yaml*
+
+*Dentro de spec y a la misma altura que la opción containers*
+volumes: -> Para configurar el volumen.
+	Se puede tener mas de un volumen, por eso al inicio de cada grupo de opciones como
+	name, hostPath, etc se agrega un '-', porque eso indica el inicio de un volumen
+	y se puede agregar un arreglo de volúmenes, uno por cada símbolo -. ***
+	Los siguientes datos se pueden sacar del Docker compose. ***
+	- - name: nombreVolumen -> Indica el nombre del volumen.
+	- hostPath: 
+		- path: rutaGuardado -> Es una ruta dentro del host donde se almacenará lo que
+			contenga el volumen.
+			Esta valor bien podría ser el mismo que el valor que se le asigna a la
+			opción mountPath. **
+		- type: DirectoryOrCreate -> Si existe la ruta guardado ocupa esa ruta pero si
+			no existe la crea.
+			Este valor es el mas común pero existen otros.
+			Otros valores:
+			- Directory -> Ocupara el directorio de determinada ruta pero si no 
+				existe el pod fallara.
+			- FileOrCreate -> Si existe el archivo en la de ruta guardado ocupa ese
+				archivo pero si no existe lo crea.
+			- File -> Ocupara el archivo de determinada ruta pero si no 
+				existe el pod fallara.
+
+*Dentro de spec y dentro de la opción containers*
+volumeMounts:
+	Se agrega un grupo de opciones como estas por cada volumen a seleccionar.
+	- - name: nombreVolumen -> Para indicar los volúmenes que tendrá cierto contenedor.
+	- mountPath: rutaGuardado -> Es una ruta dentro del contenedor el cual contiene
+		lo que queremos almacenar en el volumen.
+
+Para probar que no se pierden los datos se tendría que elminar el archivo 
+deployment-nombreDb.yaml y los datos deberían estar intactos porque es como si se borrara el 
+pod. **
+
+
+°°°°°°°° network file system °°°°°°°°
+
+Es un sistema de archivos que podemos exponer en la red.
+Permite Compartir almacenamiento entre múltiples Pods
+
+Resumen:
+El emptyDir se instala en los pods.
+El hostPath se monta sobre un nodo.
+El nfs se monta sobre el cluster.
 
 
 
 
 
+°°°°°°°° container storage interface (csi) °°°°°°°°
 
- 
-
-
+Un estándar para conectar cualquier sistema de almacenamiento a Kubernetes.
+Es como un “adaptador universal”.
+Define:
+Cómo Kubernetes pide almacenamiento
+Cómo el proveedor lo crea
+Cómo lo monta
+Cómo lo desmonta
 
  
 
@@ -510,9 +637,16 @@ spec: -> Especificaciones del service.
 
 FORMA COMANDOS
 
-1. Crear el deploymente de las db.
+1. Crear el deployment de las db.
 2. Crear el service de las db el tipo de red que tendrá será la interna (clusterIp).
-3. Crear el deploymente de las apps.
-4. Crear el service de las apps el tipo de red que tendrá será la comunicación interna y externa (LoadBalancer).
+3. Crear el deployment de las apps.
+4. Crear el service de las apps el tipo de red que tendrá será la comunicación interna y externa 
+(LoadBalancer).
+
+
+FORMA DECLARATIVA
+
+
+
 
 
