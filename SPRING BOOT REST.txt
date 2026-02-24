@@ -1,0 +1,195 @@
+/////////////////////////////////////REDIS CON SPRING BOOT/////////////////////////////////////
+
+Configurar el proyecto -----------------------------
+
+*En application.properties*
+
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password= 
+spring.data.redis.timeout=time_ms -> Configuraciones necesarias para conectarse con redis.
+	Redis por defecto escucha en el puerto: 6379. ****
+	- spring.data.redis.host=localhost -> Para establecer la conexión con redis cuando 
+		redis esta en la maquina local.
+		Evidentemnte si redis estuviera en una mv se pondría la ip de esa mv. **
+	- spring.data.redis.database=numero -> Para especificar el numero de la db a la que se 
+		desea conectar.
+		Por defecto se conectara a la db numero 0.
+		Redis no maneja bases de datos por su nombre como MySQL, solo le asigna números
+		a sus db's, cuando no se especifica el numero de la db a la que se desea 			conectar, se conecta a la db No. 0. Por defecto solo vienen 16 db's.
+	- spring.data.redis.timeout=time_ms -> Es el tiempo máximo que Spring esperará una 
+		respuesta de Redis.
+		Si Redis no responde en ese tiempo → se lanza excepción.
+		Esto también se usa para que cuando se caiga redis, no retrase las demás 
+		operaciones pe consultar con la db de MySQL.
+		Si Redis se cae y no configuras timeout los request pueden quedarse esperando 
+		hasta ~60s.
+
+logging.level.org.springframework.data.redis=DEBUG
+logging.level.org.springframework.data.redis.core=DEBUG
+logging.level.org.springframework.data.redis.connection=DEBUG -> Para ver logs de las operaciones
+	hechas con redis.
+	No son tan detalladas.
+
+
+Patrón circuit breaker -----------------------------------------------
+
+Es un patrón que:
+Detecta que las llamadas a Redis están fallando.
+Deja de intentar llamadas inútiles.
+Se recupera cuando Redis vuelve.
+
+Se usa cuando se depende de un sistema externo que puede fallar o volverse lento. *****
+Para el caso de redis, el punto es poder manejar el caso en el que redis no este funcionado y podamos usar la db (MySQL, postresql, etc) en su lugar.
+
+Si no se implementa, las request serán lentas porque siempre se intentara llamar a Redis y como
+este podría tardar en responder entonces habrá timeouts largos (si se configura el timeout aun
+así será muy lento la request).
+
+Estados del circuit breaker:
+- closed: Significa que todo funciona correctamente (redis funcionando).
+- open: Significa que hay errores (redis esta fallando) y en este caso se deja de llamar a redis.
+- half-open: prueba de recuperación. 
+
+Resilience4j: Es una librería de resiliencia para Java/Kotlin. Se le llama resiliente porque 
+resiste fallos externos sin caerse. Implementa patrones de diseño para manejar fallos externos 
+de forma inteligente.
+Proporciona: Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time limiter.
+Resuelve problemas reales de producción: servicios lentos, dependencias caídas, cascadas de fallos, saturación de threads.
+
+Para aplicaciones con redis remoto se recomienda:
+
+mínimo aceptable:
+timeout corto
+try/catch
+
+Producción seria: 
+timeout
+Circuit Breaker + fallback
+métricas + monitoreo (De este modo con aplicaciones de monitoreo sabremos el estado del circuito)
+
+
+°°°°°°°° Configurar el circuit breaker °°°°°°
+
+<dependency>
+    <groupId>io.github.resilience4j</groupId>
+    <artifactId>resilience4j-spring-boot3</artifactId>
+</dependency> -> Dependencia para la resilience4J.
+	Usado para spring boot v3.
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      redisRemoteCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3 -> Configuración de resilience4J para el 
+		circuit breaker.
+		- instances:
+      			nombreInstancia: -> Crea una instancia de configuración.
+				Este nombre debe coincidir con el name de la anotación circuit
+				breaker. 
+				Si tuviéramos dos redis: uno local y otro remoto, se debería 
+				crear una instancia de configuración para cada redis.
+		- slidingWindowSize: n -> Analiza n llamadas.
+			Por defecto es una ventana basada en número de llamadas.
+			Pero puede configurarse como ventana basada en tiempo.
+		- failureRateThreshold: m -> si el m% de las llamadas fallan → abre circuito.
+			El valor m es un numero entre 1 y 100.
+		- waitDurationInOpenState: ps -> Configura Cuánto tiempo el circuito permanece 
+			ABIERTO antes de intentar probar otra vez.
+			Cuando el circuito esta abierto NO se intentan llamadas a Redis, todo
+			se va directo al fallback.
+			Después de este tiempo pasa a half open (prueba si redis volvió).
+			Si este valor es muy bajo la app seguirá intentando conectarse a cada
+			rato y será una saturación innecesaria y si lo pones muy alto puede que
+			redis este de regreso pero te quedes mucho tiempo sin usarlo.
+		- permittedNumberOfCallsInHalfOpenState: q -> Cuando el circuito pasa a 
+			HALF-OPEN Solo se permiten q llamadas reales para probar si el sistema 
+			ya se recuperó.
+			Si el porcentaje de fallos en HALF-OPEN supera el threshold → vuelve a 
+			OPEN.
+
+
+°°°°°°°° Implementación del circuit breaker °°°°°°
+
+Se crea la lase llamada RedisCacheRepository
+
+||||||||||| En RedisCacheRepository ||||||||||||
+
+@CircuitBreaker(name = "redisRemoteCB", fallbackMethod = "fallback")
+fun <T> get(key: String, typeRef: TypeReference<T>): T? {
+    val json = stringRedisTemplate.opsForValue().get(key)
+        ?: return null
+
+    return objectMapper.readValue(json, typeRef)
+} -> Método que se usa para recuperar datos de redis si es que la clave existe.
+	Si el método falla (por ejemplo porque no hay conexión con redis porque esta caído
+	o si simplmenete se supera el timeout), se lanzara una excepción y ejecutara el método
+	que se asigne al parámetro: 'fallbackMethod'.
+	- fallbackMethod = "fallback" -> El método fallback debe cumplir reglas estrictas: Debe 		estar en la misma clase, Debe tener los mismos parámetros que el método que se 
+		le pone la anotación CircuitBreaker y Debe agregar un parámetro extra al final
+		de tipo Throwable.
+		Cuando el circuito este abierto, el método con la anotación CircuitBreaker ni 			siquiera se ejecuta e inmediatamente se ejecuta su fallback.
+	- name = "redisRemoteCB" -> Identifica una instancia específica del Circuit Breaker (de 
+		los que se configuraron en el application en la opción instances: 				nombreInstancia).
+		La conecta con una configuración concreta.
+		Mantiene su propio estado independiente.
+
+import com.fasterxml.jackson.core.type.TypeReference // Tiene que venir de Jackson.
+
+fun <T> fallback(
+    key: String,
+    typeRef: TypeReference<T>,
+    ex: Throwable
+): T? {
+    println("No se encontro esta request en redis: ${ex.message}")
+    return null
+} -> Método que se ejecuta si el método get falla.
+	Si por alguna razón dentro de este método se pone un código que pueda lanzar una 
+	excepción, esa ya no lo intercepta el circuit breaker y esa excepción si se propaga hacia
+	arriba.
+
+@CircuitBreaker(name = "redisRemoteCB", fallbackMethod = "fallbackSet")
+fun set(key: String, value: Any, ttlHours: Long) {
+    val json = objectMapper.writeValueAsString(value)
+    stringRedisTemplate.opsForValue()
+        .set(key, json, ttlHours, TimeUnit.HOURS)
+} -> Método que se usa para insertar nuevos datos a redis con determinada clave.
+
+fun fallbackSet(key: String, value: Any, ttlHours: Long, ex: Throwable) {
+    println("No se pudo guardar esta request en redis: ${ex.message}")
+} ->  Método que se ejecuta si el método set falla.
+
+||||||||||| En NombreEntidadXCacheService ||||||||||||
+
+Aquí se hace una combinación de los métodos que se definieron previamente con los métodos 
+service que originalmente hacen la consulta hacia la db.
+
+fun getNombreRecurso(): List<tipoDatoX> {
+
+    val key = "nombreClave"
+
+    val cached = redisCacheRepository.get(
+        key,
+        object : TypeReference<List<tipoDatoX>>() {}
+    )
+
+    if (cached != null) return cached
+
+    val fromDb = nombreEntidadService.getNombreRecursoFromDb()
+
+    redisCacheRepository.set(key, fromDb, tiempo)
+
+    return fromDb
+} -> Método para aplicar Cache Aside (Lazy Loading).
+	Busca cierto recurso en redis si existe lo retornar pero si no lo busca en la db, lo 
+	guarda en redis le aplica un ttl y lo retorna.
+	Estos métodos a serian los que se mandarían a llamar en los controllers.
+
+
+
+
+
+

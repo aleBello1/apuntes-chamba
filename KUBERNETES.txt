@@ -618,20 +618,60 @@ El hostPath se monta sobre un nodo.
 El nfs se monta sobre el cluster.
 
 
+°°°°°°°° persistentVolume °°°°°°°°
 
+Es independiente del ciclo de vida de los Pods.
+Lo administra el cluster (no el Pod directamente).
+Es almacenamiento persistente, desacoplado del pod, portable entre nodos y gestionado 
+declarativamente.
+Se configura en un archivo yaml diferente al deployment y al service, el hecho de que se 
+configure este volumen en un archivo yaml ya lo hace reutilizable.
 
+Se crea un archivo llamado: nombreDb-pv.yaml
 
-°°°°°°°° container storage interface (csi) °°°°°°°°
+kubectl get sc -> sirve para listar las StorageClass del cluster.
+	Una StorageClass define cómo se aprovisiona almacenamiento dinámicamente para los 
+	PersistentVolume, es decir, Es la “receta” para crear discos automáticamente.
+	Este comando se usa para ver qué StorageClass existen, identificar la StorageClass por
+	defecto y saber qué tipo de almacenamiento ofrece el cluster.
+	Al ejecutar el comando Se muestra una tabla y en el campo nombre, el storage class que
+	diga (default) se usa automáticamente si el PVC no especifica una, la columna 	RECLAIMPOLICY dice qué pasa cuando se borra el PVC
 
-Un estándar para conectar cualquier sistema de almacenamiento a Kubernetes.
-Es como un “adaptador universal”.
-Define:
-Cómo Kubernetes pide almacenamiento
-Cómo el proveedor lo crea
-Cómo lo monta
-Cómo lo desmonta
+apiVersion: v1 -> Especifica la versión de api.
+	Este valor es para los objetos service.
 
+kind: PersistentVolume -> Especifica el tipo de objeto a crear.
  
+metadata: -> Configura información descriptiva del objeto.
+	Configuraciones para esta opción:
+	- name: nombreVolume -> Define nombre del volumen dentro del cluster.
+		Este archivo se mandara a llamar con base a este nombre.
+	- namespace: nombre -> En qué espacio lógico vive el recurso.
+
+spec: -> Especificaciones del volumen. 
+	Configuraciones para esta opción:
+	- storageClassName: tipoClaseStorage -> Especifica la clase de almacenamiento.
+		Esta configuración es opcional.
+		
+	- capacity: 
+		- storage: nGi -> Para definr la capacidad del volumen. La unidad debe ser en 
+			gigabytes.
+			Siempre se pone la unidad 'Gi'.
+	- accessModes: tipoAcceso -> Define el modo de acceso.
+		- - ReadWriteOnce -> Indica que se montara en un solo nodo y funciona para 
+			lectura y escritura.
+			Puede haber varios Pods en ese nodo.
+			Este se usa para un hostPath. ****
+		- - ReadOnlyMany -> Indica que se montara en varios nodos pero solo funciona
+			de lectura.
+		- - ReadWriteMany -> Indica que se montara en varios nodos y funciona para 
+			lectura y escritura.
+	- *Aqui se colocan las configuraciones del tipo de volumen que se vaya a implementar*
+		Para hostpath ----------------------
+		- hostPath: 
+			- path: rutaGuardado
+			- type: DirectoryOrCreate
+		
 
 ///////////////////////////////////////IMPLMENTACION/////////////////////////////////////////////
 
@@ -642,6 +682,7 @@ FORMA COMANDOS
 3. Crear el deployment de las apps.
 4. Crear el service de las apps el tipo de red que tendrá será la comunicación interna y externa 
 (LoadBalancer).
+De plano no vale la pena usar esta forma es mejor la forma declarativa. *
 
 
 FORMA DECLARATIVA
