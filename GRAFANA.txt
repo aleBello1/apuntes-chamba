@@ -1,0 +1,87 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+DASHBOARDS 
+
+Grafana tiene dashboards ya hechos por la comunidad. En lugar de crear gráficas desde cero, puedes importar esos dashboards.
+
+Uso del apartado izq. llamado explore: Sirve para Probar queries, Debuggear métricas, Ver
+	resultados rápidos y Experimentar. 
+	Aquí NO se guardan dashboards. ***
+
+Uso del apartado izq. llamado dashboards: Es donde sí puedes Crear paneles, Guardarlos, 	Compartirlos y Versionarlos. 
+
+Para visualizar en el tiempo el estado del circuito: Apartado izq. explore -> seleccionar
+	prometheus -> en metric buscar: 'resilience4j_circuitbreaker_state' -> run query.
+	Esto nos mostrara en el tiempo todos los estados del circuito: disable, half-open,
+	open and close.
+	Podremos dar click sobre determinada leyenda para observar solamente a ese vector.
+	- Para ver solo el estado activo del circuito: click en operations -> equal to -> value:
+		1 -> run query.
+	- Editar como aparecen las leyendas: click sobre el apartado desplegable llamado options
+		-> seleccionar custom ->  En el legend se debe usar interpolación para 				seleccionar el valor de determinado atirbuto de la leyenda. Pe si la leyenda 
+		original es: nombreMetrica(parametro1=valor1, parametro2=valor2, 
+		parametroN=valorN) si se desea seleccionar el valor asociado al parámetro 2, se 
+		debe escribir en legend {{parametro2}}.
+		Ademas se puede concatenar valores con la concatenación por ejemplo: El estado
+		del circuito es: {{state}}.
+
+Activar el autorefrescado en las queries: Apartado izq. explore -> Alado del button de run query
+	presionar la flecha hacia abajo y seleccionar cada cuantos segundos queremos el 
+	autorefrescado.
+
+Crear dashboard: Apartado izq. dashboards -> new -> Apartado izq. explore -> add visualization
+	-> hacer las queries al gusto -> en la parte sup derecha sabe dashboard -> asginar 
+	nombre y descripción al dashboard.
+
+Visualizar los dashboards existentes: Apartado izq. dashboards -> aquí se enlistaran todos los
+	dashboards existentes -> click sobre determinado dashboard.
+
+
+ALERTAS
+
+Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule ->
+
+Crear un punto de contacto: Es definir por cual medio grafna nos enviara alertas: email, sms,
+	slack, etc.
+	Apartado izq. alerting -> contact points:
+	- Crear el contacto point para email: Primero se debe crear un servidor SMTP (Simple Mail
+		Transfer Protocol), esto es un servicio que se encarga de enviar correos 
+		electrónicos.
+		Grafana no “envía correos”. Grafana le dice a un servidor SMTP: oye manda este
+		correo a tal persona. 
+		El SMTP es de paga y en teoría la empresa debe proporcionar las credenciales pero
+		para pruebas locales se puede usar nuestro propio correo.
+	- Crear el contacto point para slakc: Ingresar a este link: https://api.slack.com/apps -> 
+		créate new app -> Ingresar el nombre que tendrá la app -> sig -> En el menú
+		izquierdo: Incoming Webhooks -> activar Activate Incoming Webhooks -> Add New 
+		Webhook to Workspace -> Hasta aquí se dejo este paso porque se necesitaba que 
+		algún administrador de nuestro canal de slack aprobara a este bot/app.
+
+generar contraseña de aplicación en Gmail: Esto es para que desde nuestro correo se envíen las
+	alertas, nadamas es para pruebas, pero para producción lo ideal es usar un SMTP. **
+	Importante: necesitas tener activada la verificación en 2 pasos.
+	- Activar verificación en 2 pasos: Ir a Gmail -> click sobre nuestra foto -> click sobre
+		nuestrea cuenta -> seguridad y acceso -> verificación de 2 pasos.
+	Ir a este enlace:  https://myaccount.google.com/apppasswords -> asginar nobmre a la 
+	app -> crear -> nos arrjara la contraseña para esa app (se debe usar sin espacios en
+	blanco aunque Gmail nos la de con espacios en blanco***). xsyb zvvm kaem mlkp
+
+
+ADMINISTRACION DE USUARIOS
+
+Crear un usuario: Apartado izq. administration -> users and Access -> users -> new user -> 	asginar el nombre, email, username, password -> créate.
+	Opcionalmente después en la misma pagina se le puede otrogar permiso de admin, editor o 
+	viewer al usuario.
+
+
+
+
+docker run -d --name loki -p 3100:3100 --network red grafana/loki -> Crea a loki
+
+docker run -d --name promtail \
+  -v /var/log:/var/log \
+  --network red \
+  grafana/promtail
+
+
+

@@ -305,8 +305,33 @@ http://localhost:9090/query -> Muestra que métricas tenemos disponibles con bas
 
 ||||||||||| Levantar y configurar grafana ||||||||||||
 
-docker run -d --name grafana -p 3000:3000 --network red grafana/grafana -> Crear y ejecutar un 
-	contenedor con base a la imagen grafana/grafana.
+docker run -d --name grafana -p 3000:3000 --network red -v grafana_data:/var/lib/grafana 	grafana/grafana -> Crear y ejecutar un contenedor con base a la imagen grafana/grafana.
+	- /var/lib/grafana -> Los dashboards, usuarios y configuraciones se guardan en esta 
+		ruta.
+
+docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  --network red \
+  -e GF_SMTP_ENABLED=true \
+  -e GF_SMTP_HOST=smtp.gmail.com:587 \
+  -e GF_SMTP_USER=correo_personal_empresa \
+  -e GF_SMTP_PASSWORD=mi_contraseña \
+  -e GF_SMTP_FROM_ADDRESS=correo_personal_empresa \
+  -e GF_SMTP_FROM_NAME="Grafana Alerts" \
+  -e GF_SMTP_SKIP_VERIFY=false \
+  -v grafana_data:/var/lib/grafana \
+  grafana/grafana -> Manera en el que se debe crear el contendor si es que se usara para pruebas
+	locales el correo personal de Gmail.
+	- GF_SMTP_PASSWORD=mi_contraseña -> Es la contraseña que nos da Gmail especial para 
+		aplicaciones.
+	- GF_SMTP_HOST=smtp.gmail.com:587 -> Este es el especifico valor para Gmail, al usar
+		otro aplicación de correo este valor podría variar.
+	- GF_SMTP_FROM_NAME="Grafana Alerts" -> Define el nombre visible del remitente del 
+		correo.
+	- -e GF_SMTP_FROM_ADDRESS=alerts@empresa.com -> Define el nombre visible del correo 			remitente del correo.
+		De tal modo que esta configuración en combinación con la anterior, al usuario
+		le llegara el correo asi: Grafana Alerts <alerts@empresa.com>.
 
 Al ingresar el usuario y contraseña será admin, posteriormente nos pedirá cambiar la contraseña.
 
@@ -320,7 +345,5 @@ Para visualizar el tiempo en el que promethues ha estado consumiendo actuator: A
 	Es una métrica interna de Prometheus.
 	- 1 = el target está activo
 	- 0 = no puede conectarse
-	
-Grafana tiene dashboards ya hechos por la comunidad. En lugar de crear gráficas desde cero, puedes importar esos dashboards.
 
-
+*La demás teoria de grafana esta en su propio txt*
