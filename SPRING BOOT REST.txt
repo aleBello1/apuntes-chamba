@@ -189,7 +189,138 @@ fun getNombreRecurso(): List<tipoDatoX> {
 	Estos métodos a serian los que se mandarían a llamar en los controllers.
 
 
+°°°°°°°° Implementación de monitoreo + alerta (en local) °°°°°°
+
+Los que se implementa funciona para Ver cuánto tiempo el Circuit Breaker estuvo OPEN, Ver histórico de estados y Crear alertas si dura demasiado tiempo abierto.
+
+Micrometer es una librería de métricas para JVM. Es la capa intermedia entre tu aplicación y el sistema de monitoreo.
+Se encarga de Micrometer de Crear métricas (counter, gauge, timer), Las registra y Las exporta 
+al sistema que tú elijas.
+Desde Spring Boot 2, Micrometer viene integrado automáticamente.
+
+Prometheus es un sistema de monitoreo basado en scraping.
+Encargado de:
+- Hace requests HTTP a tu app
+- Lee métricas en formato especial
+- Las guarda en una base de datos de series temporales (Prometheus tiene su propia base de datos de series temporales (TSDB), No vuelve lenta tu app, sin embargo tener una cardinalidad alta
+puede ser peligroso porque puede matar al servidor de prometheus).
+- Permite hacer queries y alertas
+Prometheus NO recibe métricas.
+Él las consulta periódicamente.
+
+Grafana es una herramienta de visualización de métricas. NO guarda métricas y no recoleta 
+métricas.
+Encargado de:
+- conecta a una fuente de datos (ej: Prometheus)
+- Hace consultas
+- Construye dashboards
+- Muestra gráficas
+- Permite configurar alertas **
+
+Spring Boot usa:
+Micrometer → para generar métricas.
+Spring Boot Actuator → para exponerlas por HTTP.
+Prometheus → para recolectarlas.
+Grafana permite visualizarlas.
 
 
+||||||||||| Configuración de dependencias ||||||||||||
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency> -> Agregar spring actuator.
+
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency> -> Micrometer es multi-registry.
+	Puede exportar métricas a: Prometheus, Datadog, New Relic, CloudWatch, etc. Pero 
+	ncesita un “adaptador” para cada uno.
+	Esta dependencia es el adaptador que Traduce las métricas de Micrometer Al formato que
+	entiende Prometheus Y habilita /actuator/prometheus. 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus > Configurar spring actuator para exponer los enpoints
+		relacionados con health, métricas y prometheus.
+
+management:
+  endpoint:
+    prometheus:
+      enabled: true -> Esto habilita específicamente el endpoint Prometheus.
+	Estas configuraciones al estar dentro de la configuración management pueden y deben de ir
+	juntas, es decir, la configuración 'endpoints' y 'endpoint' deben esta dentro de 
+	managemnt.
+
+
+||||||||||| Levantar prometheus ||||||||||||
+
+En la raíz del proyecto se crea el archivo de configuración de prometheus llamado prometheus.yml.
+ 
+global: -> Para hacer configuraciones globales de prometheus.
+	Configuraciones para esta opción:
+  	- scrape_interval: ns -> Cada n segundos Prometheus hará una petición HTTP a tu 
+		aplicación para leer métricas.
+
+scrape_configs: -> Lista de cosas que Prometheus debe monitorear.
+	Se coloca una lista de Jobs, cada elemento nuevo empieza por el carácter '-'.
+  	- - job_name: "nombreJob" -> Asigna que monitoreo determinado job.
+		Un job puede ser uan app o una db.
+	- metrics_path: "/actuator/prometheus" -> Le dice a Prometheus la URL donde debe leer 
+		la métrica para este job.
+	- static_configs:
+		- - targets: ["host.docker.internal:puertoApp"] -> Indicarle a que servidor 
+			conectarse, es decir, indicarla donde esta la app que debe consumir para
+			recolectar las métricas.
+			Se hace la suposición que la app esta corriendo en local y proteus 
+			dentro de un contenedor, por eso se usa el 'host.docker.internal'.
+
+Hacer que promethus consuma las métricas: 
+
+docker network create red -> Se crea una red para que compartan prometheus y grafana.
+
+*En la terminal de power shell*
+docker run -d `
+  --name prometheus `
+  -p 9090:9090 `
+  -v ${PWD}\prometheus.yml:/etc/prometheus/prometheus.yml `
+  --network red `
+  prom/prometheus -> Crear y ejecutar un contenedor con base a la imagen prom/prometheus.
+	Prometheus corre en el puerto 9090 dentro del contenedor.
+	Si se ejeucta en la terminal de git bash el ${PWD} se convierte en algo como:
+	C:/Program Files/Git/… y Docker no lo interpreta como se espera por eso se ocupa 
+	forzosamente la terminal de power shel.
+	- -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml -> Es un volumen al cual se le
+		dice Usa MI prometheus.yml personalizado En lugar del default del contenedor.
+
+http://localhost:9090/targets -> En esta ruta prometheus enlista todas las rutas que esta 
+	scrapenado/consumiendo, si está up ó down y cada cuanto las consulta.
+
+http://localhost:9090/query -> Muestra que métricas tenemos disponibles con base a los endpoints
+	que esta consumiendo prometheus.
+
+
+||||||||||| Levantar y configurar grafana ||||||||||||
+
+docker run -d --name grafana -p 3000:3000 --network red grafana/grafana -> Crear y ejecutar un 
+	contenedor con base a la imagen grafana/grafana.
+
+Al ingresar el usuario y contraseña será admin, posteriormente nos pedirá cambiar la contraseña.
+
+Conectar grafana con prometheus: *Ingresar a prometheus y grafana antes para asegurarse que
+	funciona bien* -> menú izq. connections -> data sources -> add data source -> prometheus
+	-> Ingresar en la url el valor http://prometheus:9090, se usa el nombre del contenedor
+	que alamcena a prometheus y su puerto -> save and test.
+
+Para visualizar el tiempo en el que promethues ha estado consumiendo actuator: Apartado izq. 
+	explore -> seleccionar prometheus -> en metric buscar y seleccionar up -> run query.
+	Es una métrica interna de Prometheus.
+	- 1 = el target está activo
+	- 0 = no puede conectarse
+	
+Grafana tiene dashboards ya hechos por la comunidad. En lugar de crear gráficas desde cero, puedes importar esos dashboards.
 
 
