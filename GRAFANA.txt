@@ -76,6 +76,13 @@ Crear un usuario: Apartado izq. administration -> users and Access -> users -> n
 
 
 
+IMPLMENTACION DE LOKI + PROMTAIL
+
+Loki: Es un sistema de agregación de logs creado por Grafana Labs.
+Su objetivo es: Guardar, organizar y consultar logs Pero de una forma más ligera y barata que otros sistemas.
+
+Promtail: 
+
 docker run -d --name loki -p 3100:3100 --network red grafana/loki -> Crea a loki
 
 docker run -d --name promtail \
@@ -84,4 +91,7 @@ docker run -d --name promtail \
   grafana/promtail
 
 
+
+revisar la teoría de que es promtial y preguntar a chatgpt si es posible crear un job que 
+elimne cada mes los logs dentro de la instancia.
 
