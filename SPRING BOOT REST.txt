@@ -347,3 +347,148 @@ Para visualizar el tiempo en el que promethues ha estado consumiendo actuator: A
 	- 0 = no puede conectarse
 
 *La demás teoria de grafana esta en su propio txt*
+
+
+
+//////////////////////////////////////////////
+
+
+CONFIGURAR SPRING BOOT PARA QUE GUARDE LOS LOGS EN UN ARCHIVO
+
+Logback: sistema de logging por defecto en Spring Boot.
+
+rollover: es el proceso mediante el cual un sistema de logs archiva o renombra un archivo de
+log actual cuando alcanza un cierto tamaño o tiempo, y crea un nuevo archivo para seguir 
+registrando los logs.
+
+Niveles de log (de menor a mayor gravedad):
+Nivel	Descripción
+TRACE	Muy detallado. Se usa para depurar paso a paso el flujo del programa.
+DEBUG	Información útil para desarrolladores al depurar.
+INFO	Información general sobre el estado de la aplicación.
+WARN	Indica algo inesperado, pero la aplicación aún puede continuar.
+ERROR	Indica un problema que ha causado una falla en la aplicación o función.
+OFF	Desactiva completamente los logs.
+
+Ejems:
+
+log.trace("Inicializando servicio...");
+log.debug("Parámetros recibidos: {}", params);
+log.info("Servicio iniciado correctamente");
+log.warn("Tiempo de respuesta alto");
+log.error("No se pudo conectar a la base de datos");
+
+
+Configuración de logs configurando el application ---------------------
+
+*En aplication.properties*
+
+logging.file.path=rutaGuardado -> Indica a spring boot que debe guardar los logs en 
+	determinada ruta del proyecto.
+	Por defecto el nobmre del archivo log sera 'spring.log'.
+
+logging.file.name='rutaGuardado/nombreArchivo.log' -> Indica a spring boot que debe guardar 
+	los logs en determinada ruta del proyecto y con determinado nombre.
+	Se ocupa esta instruccion o la anterior.
+
+logging.file.max-size=tamanioMB -> Tamaño máximo del archivo antes de hacer rollover.
+
+logging.file.max-history=num -> Número máximo de archivos que se guardan.
+
+logging.level.root=NIVEL_LOG -> Configura que nivel de log se registrara.
+	Se regristraran los logs de toda la app. ****
+	Nivel de log: TRACE, DEBUG, INFO, WARN ó ERROR.
+	Si se usa el nivel de log INFO, solo veremos los logs de INFO, WARN y ERROR mientras
+	que los logs de TRACE y DEBUG serán ignorados, porque están por debajo del nivel 
+	INFO. ***
+
+logging.level.com.alejandro.proyecto.nombrePaqueteInteres=DEBUG
+logging.level.com.alejandro.proyecto.nombrePaqueteNoInteres1=ERROR
+logging.level.com.alejandro.proyecto.nombrePaqueteNoInteres2=ERROR
+logging.level.com.alejandro.proyecto.nombrePaqueteNoInteresN=ERROR -> Para mostrar los logs 
+	de solo determinado paquete y silenciar los logs de otros paquetes.
+
+
+Configuración de logs usando un archivo xml ---------------------
+
+En src/main/resources se crea un archivo llamado logback-spring.xml. Spring Boot ya trae una configuración interna por defecto.
+Si tú creas logback-spring.xml, la reemplazas completamente.
+
+Se puede usar configuración en application.yml o logback-spring.xml.
+Cuando se define logback-spring.xml, normalmente se deja de usar la configuración básica de logging en application.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	…
+</configuration> -> Para configurar todo lo relacionado a los logs, como propiedades, políticas
+	de rotación y niveles de logs.
+	Es el nodo raíz obligatorio del archivo de configuración de Logback.
+
+<springProfile name="nombrePerfil">
+    *Etiqueta de configuracion*
+</springProfile> -> Para que cierta etiqueta de configuración funcione solo cuando se tenga
+	activo determinado perfil.
+
+<property name="NOMBRE_VARIABLE" value="valor"/> -> Define una variable reutilizable.
+	Es común que el nombre la variable este escrita en mayúsculas.
+	Para utilizar esta variable en otro lado se usa asi: ${NOMBRE_VARIABLE}.
+	Las propiedades pueden ser reutilizadas en cualquier parte del archivo después de ser 
+	declaradas.
+
+<appender name="nombre" class="tipoAppender">
+	… 
+</appender> -> Indica el destino donde se escribiran los logs.
+	Atributos:
+	- name="nombre" -> Esto es solo un identificador.
+		No tiene un significado especial, sin embargo, el nombre que se ocupe aquí debe
+		ser único y coincidir con el que se coloque aquí: <appender-ref ref="..."/>.
+	- class="tipoAppender" -> Define el tipo de appender.
+		- ch.qos.logback.core.rolling.RollingFileAppender -> Para indicar que se 
+			Escribira en archivo y puede rotar automáticamente.
+		- ch.qos.logback.core.ConsoleAppender -> Para escribir en la terminal.
+		- ch.qos.logback.core.FileAppender -> Escribe en archivo PERO sin rotación.
+			No recomendado para producción porque el archivo crecerá infinito.
+	Configuraciones dentro de esta etiqueta: 
+	En caso de que se escriba en un file ----------------------
+	- <file>"rutaX/nombreARchivo.log"</file> -> Define la ruta y nombre del archivo.
+	- <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+		...
+	  </rollingPolicy> -> Define la o las reglas que controlan cuándo se crea un nuevo 
+		archivo.
+		Configuraciones dentro de esta etiqueta: 
+		- <fileNamePattern>...</fileNamePattern> -> Define cómo se llamarán los archivos
+			rotados.
+			El %d indica que se comenzara a escribir el formato de la fecha y el %i
+			representa el índice que se incrementará cuando el archivo supere el
+			maxFileSize.
+		- <maxFileSize>tamanio_y_unidad</maxFileSize> -> Si en un mismo día el archivo 
+			supera este tamaño se cierra y se crea uno nuevo con el índice + 1.
+			Esto para evitar archivos gigantes.
+		- <maxHistory>n</maxHistory> -> Mantiene máximo n días de logs.
+			El dia n + 1 automáticamente eliminará el mas antiguo.
+		- <totalSizeCap>tamanio_y_unidad</totalSizeCap> -> Define el Límite total 
+			acumulado de todos los archivos rotados si la suma supera este limite:
+			Empieza a borrar los más antiguos.
+			Este límite se aplica a los archivos rotados, no al archivo activo 
+			actual.
+	Se ocupa para file o console ----------------------
+	- <encoder>
+    		<pattern>*formato log*</pattern>
+	  </encoder> -> Define el formato del log.
+		Ejemplo de formato: %d{yyyy-MM-dd HH:mm:ss} %-5level %logger - %msg%n 
+		- %d{yyyy-MM-dd HH:mm:ss} → fecha y hora
+		- %-5level → nivel (INFO, WARN, ERROR)
+		- %logger → clase que genera el log
+		- %msg → mensaje
+		- %n → salto de línea
+	
+<root>
+    <appender-ref ref="nombre"/>
+</root> -> Aquí se meten el nombre de todos los appender configurads para poder registrar los 
+	logs en determinados destinos y con determinadas reglas.
+	- level="nombreNivel" -> sirve Para indicar los niveles que deben tener los logs 
+		para ser registrados, el nivel que se coloque indicara que se deben registrar 
+		los logs con ese nivel y niveles mas con mayor gravedad.
+		Si el root está en INFO, entonces se registran INFO, WARN y ERROR.
+	- name="rutaPaquete" -> Permite configurar niveles diferentes para paquetes específicos.
+

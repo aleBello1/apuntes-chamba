@@ -1,4 +1,59 @@
-///////////////////////////////////////////////////////////////////////////////////////////////
+METRICAS 
+
+http_server_requests_seconds_count -> Es un counter. Contiene el numero total acumulado de 
+	requests HTTP que tu aplicación ha recibido.
+	Empieza en 0 cuando arranca la app y nunca disminuye.
+	Cuando la app se reinicia, el counter vuelve a 0, Prometheus detecta ese reset 
+	automáticamente
+	Parámetros/labels que trae:
+	- method -> Método HTTP (GET, POST, etc.)
+	- status -> Codigo de status http de la request (200, 404, 500, etc)
+	- uri -> Url del servicio
+	- outcome -> Nombre del codigo http (SUCCESS, CLIENT_ERROR, SERVER_ERROR)
+	- exception -> Nombre de la excepción si ocurrió error (puede estar vacío)
+	
+
+CONSULTAS PROMQL
+
+Promql significa lenguaje de consultas de prometheus.
+
+nombreMetricaZ{nombreParametroX operador valorX} -> Para condicionar que la metrica deba tener 
+	cierto valor en determinado parámetro.
+	-  nombreParametro1 operador valor1, nombreParametro2 operador valor2, nombreParametroN 		operador valorN -> Se colocan comas para condicionar por varios labels, la coma
+			seria equivalente a un and.
+	Ejemplo: {status=~"4.."} seria para seleccionar todos los datos que en el parámetro 
+		status inicie con 4xx.
+	Operadores: 
+	- != → Diferente
+	- =~ -> Para indicar que lo siguiente será una expresión regular.
+
+nombreMetricaZ[tiempo] -> Para aplicar un range vector.
+	Significa Toma los valores de esta métrica en los últimos n unidad de tiempo.
+	Ejemplo: 5m seria los últimos 5 minutos.
+	Unidades:
+	- s	segundos
+	- m	minutos
+	- h	horas
+	- d	días
+	- w	semanas
+	- y	años
+
+Funciones -----------------------------
+
+rate(...) -> Calcula la velocidad promedio por segundo a la que está creciendo un contador.
+	Devuelve un valor por segundo.
+	Se usa principalmente para métricas tipo Counter.
+
+by() -> Permite hacer un group by.
+
+increase(metrica[tiempo]) -> Calcula cuánto aumentó el contador dentro del rango de tiempo que 
+	le pasas. **
+	Solo tiene sentido en metricas de tipo Counters.
+	Ejemplo si increase(contador[5m]) y si el primer valor es a las 10.00am y hubo 30 	mientras que a las 10.05am hubo 47 entonces se graficara a las 10.00am un 30 y a las 
+	10.05am se graficara un 17.
+
+
+/////////////////////////////////////INTERFAZ GRAFICA//////////////////////////////////////////
 
 DASHBOARDS 
 
@@ -34,7 +89,22 @@ Crear dashboard: Apartado izq. dashboards -> new -> Apartado izq. explore -> add
 	nombre y descripción al dashboard.
 
 Visualizar los dashboards existentes: Apartado izq. dashboards -> aquí se enlistaran todos los
-	dashboards existentes -> click sobre determinado dashboard.
+	dashboards existentes.
+
+Editar un dashboard existente: Apartado izq. dashboards -> aquí se enlistaran todos los
+	dashboards existentes -> click sobre determinado dashboar -> edit.
+
+Crear dashboard dinámico: En vez de crear 10 dashboards iguales (uno por endpoint o servicio) 
+	se crean dashboard con variables las cuales se encargan de cambiar ciertos datos 
+	específicos por cada dashboard.
+	*Estando en la edición de un dashboard* -> En la part sup derecha -> back to dashboard
+	-> parte sup settings -> apartado variables -> add variable -> asignarle nombre y label
+	(el label es como aparecerá en la gui) a la variable -> query type: label values -> 
+	metric: seleccionar determinada metrica -> label: seleccionar determinado label de la 
+	metrica (el cual significa dame todos los posibles valores que tenga determinado label 
+	de cierta metrica) -> ya después nos podemos regresar a determinado dashboard e irle 	implmentando a las queries la nueva variable. Para usar una variable es con la sintaxis 
+	$nombreVariable
+
 
 
 ALERTAS
@@ -74,6 +144,45 @@ Crear un usuario: Apartado izq. administration -> users and Access -> users -> n
 	viewer al usuario.
 
 
+///////////////////////////////MEDICION DE ERRORES EN APLICACIONES//////////////////////////////
+
+Existen 3 formas principales de medir errores: 
+- Contar logs de tipo ERROR (para ello se Loki + promtail). Evidentmente esto depende 100% de que realmente estés logueando errores.
+- Medir códigos HTTP. 
+- Desconocido aun.
+
+
+MEDIR CODIGOS HTTPS
+
+En si, en este punto ya todo estará configurado pero se pueden seguir unos pasos para comprobar
+que se esta consumiendo la metrica de interés.
+
+Ingresar a http://localhost:5000/actuator/prometheus y buscar que exista: http_server_requests_seconds_count.
+
+Ahora ir a prometheus (http://localhost:9090) y buscar lo mismo.
+
+Lo común es mostrar los códigos de status http 4xx y 5xx en un mismo dashboard y se crear un 
+dashboard por cada servicio que tenga la app.
+
+
+Crear un dashboard que muestre Total errores 4xx, total errores 5xx y Gráfica histórica de 
+ambos: Apartado izq. dashboards -> new -> new dashboard -> add visualization -> En datasource
+	prometheus -> apartado code: meter una consulta asi: 	increase(http_server_requests_seconds_count{status=~"5.."}[3m]) (esto para mostrar los
+	errores 5xx) y agregar una segunda query con la consulta: 
+	increase(http_server_requests_seconds_count{status=~"4.."}[3m]) (para mostrar los 
+	errores 4xx).
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 IMPLMENTACION DE LOKI + PROMTAIL
@@ -81,17 +190,77 @@ IMPLMENTACION DE LOKI + PROMTAIL
 Loki: Es un sistema de agregación de logs creado por Grafana Labs.
 Su objetivo es: Guardar, organizar y consultar logs Pero de una forma más ligera y barata que otros sistemas.
 
-Promtail: 
+Promtail: es el agente recolector de logs oficial de Loki.
+Su función es: Leer logs, Agregar etiquetas (labels) y Enviarlos a Loki.
+No guarda los logs, solo los transporta.
 
-docker run -d --name loki -p 3100:3100 --network red grafana/loki -> Crea a loki
+Flujo de los dos: App escribe en los logs → el Archivo cambia → Promtail detecta cambios → 
+Promtail agrega labels → se los Envía a Loki → Grafana consulta a Loki
+
+
+°°°°°°°°°° Activar el guardado de logs °°°°°°°°°
+
+Para que grafana pueda graficar los logs, estos deben ser enviados por loki y asu vez este se 
+los debe de enviar promtail pero para que promtail los recoga la app debe guardar los logs
+en un archivo.
+
+*Revisar los apuntes sobre como se hace esto*
+
+El archivo que se uso tiene este contenido:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- Ruta del archivo -->
+
+    <springProfile name="local">
+        <property name="LOG_PATH" value="./logs"/>
+    </springProfile>
+
+    <springProfile name="dev">
+        <property name="LOG_PATH" value="/var/log/miapp"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="LOG_PATH" value="/var/log/miapp"/>
+    </springProfile>
+
+    <!-- Nombre y ruta del archivo -->
+    <property name="LOG_FILE" value="${LOG_PATH}/app.log"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>${LOG_FILE}</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>200MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
+
+Ya no se siguió investigando porque se encontró que era mejor medir los http. *****
+
+docker run -d --name loki -p 3100:3100 --network red grafana/loki -> Crea y corre un contendor
+	con loki.
 
 docker run -d --name promtail \
   -v /var/log:/var/log \
   --network red \
   grafana/promtail
 
-
-
-revisar la teoría de que es promtial y preguntar a chatgpt si es posible crear un job que 
-elimne cada mes los logs dentro de la instancia.
 
