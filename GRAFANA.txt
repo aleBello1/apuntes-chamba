@@ -19,7 +19,8 @@ Promql significa lenguaje de consultas de prometheus.
 
 nombreMetricaZ{nombreParametroX operador valorX} -> Para condicionar que la metrica deba tener 
 	cierto valor en determinado parámetro.
-	-  nombreParametro1 operador valor1, nombreParametro2 operador valor2, nombreParametroN 		operador valorN -> Se colocan comas para condicionar por varios labels, la coma
+	-  nombreParametro1 operador valor1, nombreParametro2 operador valor2, nombreParametroN 
+		operador valorN -> Se colocan comas para condicionar por varios labels, la coma
 			seria equivalente a un and.
 	Ejemplo: {status=~"4.."} seria para seleccionar todos los datos que en el parámetro 
 		status inicie con 4xx.
@@ -49,7 +50,8 @@ by() -> Permite hacer un group by.
 increase(metrica[tiempo]) -> Calcula cuánto aumentó el contador dentro del rango de tiempo que 
 	le pasas. **
 	Solo tiene sentido en metricas de tipo Counters.
-	Ejemplo si increase(contador[5m]) y si el primer valor es a las 10.00am y hubo 30 	mientras que a las 10.05am hubo 47 entonces se graficara a las 10.00am un 30 y a las 
+	Ejemplo si increase(contador[5m]) y si el primer valor es a las 10.00am y hubo 30 	
+	mientras que a las 10.05am hubo 47 entonces se graficara a las 10.00am un 30 y a las 
 	10.05am se graficara un 17.
 
 
@@ -57,13 +59,15 @@ increase(metrica[tiempo]) -> Calcula cuánto aumentó el contador dentro del ran
 
 DASHBOARDS 
 
-Grafana tiene dashboards ya hechos por la comunidad. En lugar de crear gráficas desde cero, puedes importar esos dashboards.
+Grafana tiene dashboards ya hechos por la comunidad. En lugar de crear gráficas desde cero, 
+puedes importar esos dashboards.
 
 Uso del apartado izq. llamado explore: Sirve para Probar queries, Debuggear métricas, Ver
 	resultados rápidos y Experimentar. 
 	Aquí NO se guardan dashboards. ***
 
-Uso del apartado izq. llamado dashboards: Es donde sí puedes Crear paneles, Guardarlos, 	Compartirlos y Versionarlos. 
+Uso del apartado izq. llamado dashboards: Es donde sí puedes Crear paneles, Guardarlos, 	
+Compartirlos y Versionarlos. 
 
 Para visualizar en el tiempo el estado del circuito: Apartado izq. explore -> seleccionar
 	prometheus -> en metric buscar: 'resilience4j_circuitbreaker_state' -> run query.
@@ -73,7 +77,8 @@ Para visualizar en el tiempo el estado del circuito: Apartado izq. explore -> se
 	- Para ver solo el estado activo del circuito: click en operations -> equal to -> value:
 		1 -> run query.
 	- Editar como aparecen las leyendas: click sobre el apartado desplegable llamado options
-		-> seleccionar custom ->  En el legend se debe usar interpolación para 				seleccionar el valor de determinado atirbuto de la leyenda. Pe si la leyenda 
+		-> seleccionar custom ->  En el legend se debe usar interpolación para 
+		seleccionar el valor de determinado atirbuto de la leyenda. Pe si la leyenda 
 		original es: nombreMetrica(parametro1=valor1, parametro2=valor2, 
 		parametroN=valorN) si se desea seleccionar el valor asociado al parámetro 2, se 
 		debe escribir en legend {{parametro2}}.
@@ -102,7 +107,8 @@ Crear dashboard dinámico: En vez de crear 10 dashboards iguales (uno por endpoi
 	(el label es como aparecerá en la gui) a la variable -> query type: label values -> 
 	metric: seleccionar determinada metrica -> label: seleccionar determinado label de la 
 	metrica (el cual significa dame todos los posibles valores que tenga determinado label 
-	de cierta metrica) -> ya después nos podemos regresar a determinado dashboard e irle 	implmentando a las queries la nueva variable. Para usar una variable es con la sintaxis 
+	de cierta metrica) -> ya después nos podemos regresar a determinado dashboard e irle 	
+	implmentando a las queries la nueva variable. Para usar una variable es con la sintaxis 
 	$nombreVariable
 
 
@@ -139,7 +145,8 @@ generar contraseña de aplicación en Gmail: Esto es para que desde nuestro corr
 
 ADMINISTRACION DE USUARIOS
 
-Crear un usuario: Apartado izq. administration -> users and Access -> users -> new user -> 	asginar el nombre, email, username, password -> créate.
+Crear un usuario: Apartado izq. administration -> users and Access -> users -> new user -> 	
+	asginar el nombre, email, username, password -> créate.
 	Opcionalmente después en la misma pagina se le puede otrogar permiso de admin, editor o 
 	viewer al usuario.
 
@@ -147,7 +154,8 @@ Crear un usuario: Apartado izq. administration -> users and Access -> users -> n
 ///////////////////////////////MEDICION DE ERRORES EN APLICACIONES//////////////////////////////
 
 Existen 3 formas principales de medir errores: 
-- Contar logs de tipo ERROR (para ello se Loki + promtail). Evidentmente esto depende 100% de que realmente estés logueando errores.
+- Contar logs de tipo ERROR (para ello se Loki + promtail). Evidentmente esto depende 100% de 
+	que realmente estés logueando errores.
 - Medir códigos HTTP. 
 - Desconocido aun.
 
@@ -157,7 +165,8 @@ MEDIR CODIGOS HTTPS
 En si, en este punto ya todo estará configurado pero se pueden seguir unos pasos para comprobar
 que se esta consumiendo la metrica de interés.
 
-Ingresar a http://localhost:5000/actuator/prometheus y buscar que exista: http_server_requests_seconds_count.
+Ingresar a http://localhost:5000/actuator/prometheus y buscar que exista: 
+http_server_requests_seconds_count.
 
 Ahora ir a prometheus (http://localhost:9090) y buscar lo mismo.
 
@@ -167,7 +176,8 @@ dashboard por cada servicio que tenga la app.
 
 Crear un dashboard que muestre Total errores 4xx, total errores 5xx y Gráfica histórica de 
 ambos: Apartado izq. dashboards -> new -> new dashboard -> add visualization -> En datasource
-	prometheus -> apartado code: meter una consulta asi: 	increase(http_server_requests_seconds_count{status=~"5.."}[3m]) (esto para mostrar los
+	prometheus -> apartado code: meter una consulta asi: 	
+	increase(http_server_requests_seconds_count{status=~"5.."}[3m]) (esto para mostrar los
 	errores 5xx) y agregar una segunda query con la consulta: 
 	increase(http_server_requests_seconds_count{status=~"4.."}[3m]) (para mostrar los 
 	errores 4xx).
@@ -180,8 +190,114 @@ ambos: Apartado izq. dashboards -> new -> new dashboard -> add visualization -> 
 
 
 
+INSTRUMENTAR SPRING BOOT CON OPENTELEMETRY
 
+Instrumentar una aplicación significa: Agregarle la capacidad de medir y reportar lo que está haciendo 
+internamente.
+Si un servicio está instrumentado:
+- Mide cuánto tardó.
+- Mide cuántas veces se llamó.
+- Mide si fue error 500.
+- Guarda un trace con todos los pasos internos.
+- Puede reportar métricas, logs y trazas.
 
+OpenTelemetry es un estándar open source para instrumentar aplicaciones.
+Puede enviar logs, métricas y traces.
+
+Grafana tempo: Es la base de datos donde se guardan los requests de tu aplicación (las trazas).
+Una traza es El recorrido completo de una petición dentro del sistema.
+Span: Una operación individual dentro del trace
+
+Configuración e implmentacion de tempo -----------------------------------
+
+En la raíz del proyecto se debe crear un archivo llamado tempo.yaml y tener ciertas configuraciones.
+
+server:
+  http_listen_port: 3200 -> Abre un servidor HTTP en el puerto 3200.
+	Ese puerto sirve para: Que Grafana se conecte a Tempo, Consultar trazas y Hacer búsquedas
+	Este puerto NO es para que tu aplicación envíe trazas.
+
+distributor:
+  receivers:
+    otlp: -> Para decir que se recibirá trazas usando el protocolo OTLP (OpenTelemetry Protocol,
+	Es el protocolo estándar que usa OpenTelemetry para enviar trazas).
+	Configuraciones para esta opción:
+      - protocols:
+         grpc:
+         http: -> Habilitar dos formas de recibir trazas: via grpc (puerto 4317) y http (puerto 
+		4318).
+
+storage:
+  trace:
+    backend: local -> INdica donde se guardaran los logs.
+	Configuraciones para esta opción:
+	- path: /tmp/tempo/traces -> Indica la ruta donde físicamente se guardan los archivos.
+	
+compactor:
+  compaction:
+    block_retention: n[unidad_tiempo] -> Guarda trazas solo por n cantidad de tiempo después 
+	trazas que superen esta antigüedad será eliminado automáticamente.
+	Si esto no se configura siempre se guadraran las trazas hasta que el disco se llene.
+	Unidades:
+	- h	horas
+	- m	minutos
+	- s	segundos
+
+Después crear el contenedor.
+
+docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 --network red -v /c/Users/alejandro/Desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo/tempo.yaml ubuntu/tempo -> 	Levanta un contendor con una imagen de tempo.
+	Se debe de poner la ruta completa del archivo si se usa git bash.
+	- -p 3200:3200 -> Puerto donde corre tempo.
+	- -p 4317:4317 -> Puerto donde recibe trazas via grpc.
+	- -p 4318:4318 -> Puerto donde recibe trazas via http.
+	- -v $(pwd)/tempo.yaml:/etc/tempo.yaml -> Para meterle al contendor nuestra 
+		configuración de tempo.yaml
+	- -v $(pwd)/tempo-data:/var/tempo -> Para persistir los datos.
+
+Implementación de opentelemetry al proyecto -------------------------------
+
+Dirigirse al repositorio oficial y descargar la versión mas reciente de este agente (deberá 
+ser un archivo .jar): 
+https://github.com/open-telemetry/opentelemetry-java-instrumentation?tab=readme-ov-file
+
+El archivo se mueve a la raíz del proyecto y se ejcuta el siguiente comando.
+
+java -javaagent:opentelemetry-javaagent.jar \
+-Dotel.service.name=mi-app \
+-Dotel.traces.exporter=otlp \
+-Dotel.metrics.exporter=none \
+-Dotel.logs.exporter=none \
+-Dotel.exporter.otlp.endpoint=http://localhost:4317 \
+-Dotel.exporter.otlp.protocol=grpc \
+-jar ./target/app-1.0.0.jar -> Levanta la aplicacion pero antes carga un agente que la 
+	instrumenta automáticamente.
+	- -javaagent:nombreAgente.jar -> Antes de arrancar mi aplicación, carga este agente.
+		Este agente intercepta llamadas HTTP, HDBC, redis, clientes HTTP.
+	- -Dotel.service.name=mi-app -> Define el nombre lógico del servicio.
+		En grafana aparecerá este nombre.
+	- -Dotel.traces.exporter=otlp -> Para que la app exporte trazas con el mecanismo de 
+		exportación llamado OTPL.
+	- -Dotel.metrics.exporter=none -> Desactiva exportación de métricas.
+		Porque Tempo solo recibe traces.
+		Si no lo desactivas, el agente intentará enviarlas y puede generar errores.
+	- -Dotel.logs.exporter=none -> Desactiva exportación de logs.
+		Mismo motivo.
+		Si quisieras logs necesitarías algo como: Loki o algo similar.
+	- -Dotel.exporter.otlp.endpoint=http://localhost:4317 -> Para que envie todo lo que se
+		haya configurado (trazas, métricas y/o logs) a determinada ruta.
+		Aquí escucha tempo.
+	- -Dotel.exporter.otlp.protocol=grpc -> Indica como se envían los datos que se hayan
+		configurado (trazas, métricas y/o logs) con el exporter otlp.
+	- -jar ./target/app-1.0.0.jar -> Indicar donde vive el jar de la aplicación.
+		Evidentemtne se debió haber generado el .jar antes de usar este comando.
+
+Para confirmar que todo este bien, los logs de la aplicación se deben de ver limpios.
+
+Agregar a tempo como data source en grafana: *En grafana* -> apartado izq. connections -> data 
+	sources -> add new data source -> prometheus -> Ingresar en la url el valor 
+	http://tempo:3200, se usa el nombre del contenedor que alamcena a tempo y su puerto ->
+	save and test.
+ 
 
 
 
@@ -262,5 +378,9 @@ docker run -d --name promtail \
   -v /var/log:/var/log \
   --network red \
   grafana/promtail
+
+
+
+
 
 

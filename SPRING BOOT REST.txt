@@ -329,7 +329,8 @@ docker run -d \
 		otro aplicación de correo este valor podría variar.
 	- GF_SMTP_FROM_NAME="Grafana Alerts" -> Define el nombre visible del remitente del 
 		correo.
-	- -e GF_SMTP_FROM_ADDRESS=alerts@empresa.com -> Define el nombre visible del correo 			remitente del correo.
+	- -e GF_SMTP_FROM_ADDRESS=alerts@empresa.com -> Define el nombre visible del correo 
+		remitente del correo.
 		De tal modo que esta configuración en combinación con la anterior, al usuario
 		le llegara el correo asi: Grafana Alerts <alerts@empresa.com>.
 
