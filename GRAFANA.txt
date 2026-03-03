@@ -1,3 +1,6 @@
+/////////////////////////////////////PROMETHEUS//////////////////////////////////////////
+
+
 METRICAS 
 
 http_server_requests_seconds_count -> Es un counter. Contiene el numero total acumulado de 
@@ -56,6 +59,15 @@ increase(metrica[tiempo]) -> Calcula cuánto aumentó el contador dentro del ran
 
 
 /////////////////////////////////////INTERFAZ GRAFICA//////////////////////////////////////////
+
+Conectar grafana con algún data source: Apartado izq. connections -> data sources -> add new 
+	data source -> seleccionar determinado data source -> Ingresar en la url el valor 
+	http://nombreContenedor:puertoContenedor, se usa el nombre del contenedor
+	que almacena a la herramienta de interés y su puerto -> save and test.
+
+Eliminar determinado data source: Apartado izq. connections -> data sources -> Seleccionar 
+	determinado data source -> irse hasta la parte inferior -> delete.
+
 
 DASHBOARDS 
 
@@ -151,7 +163,7 @@ Crear un usuario: Apartado izq. administration -> users and Access -> users -> n
 	viewer al usuario.
 
 
-///////////////////////////////MEDICION DE ERRORES EN APLICACIONES//////////////////////////////
+MEDICION DE ERRORES EN APLICACIONES
 
 Existen 3 formas principales de medir errores: 
 - Contar logs de tipo ERROR (para ello se Loki + promtail). Evidentmente esto depende 100% de 
@@ -160,7 +172,7 @@ Existen 3 formas principales de medir errores:
 - Desconocido aun.
 
 
-MEDIR CODIGOS HTTPS
+Medir código http --------------------------------------------
 
 En si, en este punto ya todo estará configurado pero se pueden seguir unos pasos para comprobar
 que se esta consumiendo la metrica de interés.
@@ -190,7 +202,7 @@ ambos: Apartado izq. dashboards -> new -> new dashboard -> add visualization -> 
 
 
 
-INSTRUMENTAR SPRING BOOT CON OPENTELEMETRY
+///////////////////////////////INSTRUMENTAR SPRING BOOT CON OPENTELEMETRY////////////////////////////
 
 Instrumentar una aplicación significa: Agregarle la capacidad de medir y reportar lo que está haciendo 
 internamente.
@@ -208,7 +220,8 @@ Grafana tempo: Es la base de datos donde se guardan los requests de tu aplicaci�
 Una traza es El recorrido completo de una petición dentro del sistema.
 Span: Una operación individual dentro del trace
 
-Configuración e implmentacion de tempo -----------------------------------
+
+CONFIGURACION E IMPLEMENTACION DE TEMPO
 
 En la raíz del proyecto se debe crear un archivo llamado tempo.yaml y tener ciertas configuraciones.
 
@@ -254,7 +267,8 @@ docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 --network red 
 		configuración de tempo.yaml
 	- -v $(pwd)/tempo-data:/var/tempo -> Para persistir los datos.
 
-Implementación de opentelemetry al proyecto -------------------------------
+
+IMPLEMENTACION DE OPENTELEMETRY AL PROYECTO
 
 Dirigirse al repositorio oficial y descargar la versión mas reciente de este agente (deberá 
 ser un archivo .jar): 
@@ -294,10 +308,23 @@ java -javaagent:opentelemetry-javaagent.jar \
 Para confirmar que todo este bien, los logs de la aplicación se deben de ver limpios.
 
 Agregar a tempo como data source en grafana: *En grafana* -> apartado izq. connections -> data 
-	sources -> add new data source -> prometheus -> Ingresar en la url el valor 
+	sources -> add new data source -> tempo -> Ingresar en la url el valor 
 	http://tempo:3200, se usa el nombre del contenedor que alamcena a tempo y su puerto ->
 	save and test.
  
+OpenTelemetry Collector es un proxy inteligente de telemetría.
+Collector puede enviar cada señal (trazas, logs y/o metricas) a un diferente destino: Traces → 
+Tempo, Métricas → Prometheus y Logs → Loki.
+Tiene un sampling inteligente pe: Enviar solo 20% de traces, Enviar 100% si son errores ó Enviar
+100% si tardan más de 1s.
+
+
+
+
+
+
+
+
 
 
 
