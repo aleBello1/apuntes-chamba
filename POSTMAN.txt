@@ -1,0 +1,4 @@
+Cuando se tiene configurado el header como:
+	Content-Type: application/x-www-form-urlencoded
+y en el cuerpo de la respuesta se meten varios valores, cada valor se debe separar por un ampersand
+Ejemplo: parametro1=valor1&parametro2=valor2&parametroN=valorN

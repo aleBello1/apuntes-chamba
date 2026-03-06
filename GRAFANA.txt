@@ -202,7 +202,7 @@ ambos: Apartado izq. dashboards -> new -> new dashboard -> add visualization -> 
 
 
 
-///////////////////////////////INSTRUMENTAR SPRING BOOT CON OPENTELEMETRY////////////////////////////
+////////////////////////INSTRUMENTAR SPRING BOOT CON OPENTELEMETRY (LOCAL)//////////////////////
 
 Instrumentar una aplicación significa: Agregarle la capacidad de medir y reportar lo que está haciendo 
 internamente.
@@ -220,10 +220,26 @@ Grafana tempo: Es la base de datos donde se guardan los requests de tu aplicaci�
 Una traza es El recorrido completo de una petición dentro del sistema.
 Span: Una operación individual dentro del trace
 
+El flujo ideal de herramientas debe ser el siguiente:
+
+App (Combinado con el agente OpenTelemetry)
+        ↓
+Collector (receiver → processor → exporter)
+        ↓
+Tempo (almacena trazas)
+        ↓
+Grafana (visualiza)
+
 
 CONFIGURACION E IMPLEMENTACION DE TEMPO
 
+Si solo se ocupa openTelemetry + tempo (sin el collector en medio de los dos), primero se debe crear
+el contenedor de tempo porque openTelemetry se conectara a él.
+
 En la raíz del proyecto se debe crear un archivo llamado tempo.yaml y tener ciertas configuraciones.
+
+Las siguientes configuración solo sirven para tempo versión 2.7.1 (Para determinarlo nos metimos
+al contenedor y ejecutamos tempo --version).
 
 server:
   http_listen_port: 3200 -> Abre un servidor HTTP en el puerto 3200.
@@ -232,8 +248,7 @@ server:
 
 distributor:
   receivers:
-    otlp: -> Para decir que se recibirá trazas usando el protocolo OTLP (OpenTelemetry Protocol,
-	Es el protocolo estándar que usa OpenTelemetry para enviar trazas).
+    otlp: -> Para decir que se recibirá trazas usando el protocolo OTLP.
 	Configuraciones para esta opción:
       - protocols:
          grpc:
@@ -242,7 +257,7 @@ distributor:
 
 storage:
   trace:
-    backend: local -> INdica donde se guardaran los logs.
+    backend: local -> Indica donde se guardaran los logs.
 	Configuraciones para esta opción:
 	- path: /tmp/tempo/traces -> Indica la ruta donde físicamente se guardan los archivos.
 	
@@ -258,23 +273,30 @@ compactor:
 
 Después crear el contenedor.
 
-docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 --network red -v /c/Users/alejandro/Desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo/tempo.yaml ubuntu/tempo -> 	Levanta un contendor con una imagen de tempo.
+MSYS_NO_PATHCONV=1 docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 --network red -v /c/Users/alejandro/Desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo/tempo.yaml ubuntu/tempo:2.7.1-24.04_stable -> Levanta un contendor con una imagen de tempo.
 	Se debe de poner la ruta completa del archivo si se usa git bash.
 	- -p 3200:3200 -> Puerto donde corre tempo.
 	- -p 4317:4317 -> Puerto donde recibe trazas via grpc.
 	- -p 4318:4318 -> Puerto donde recibe trazas via http.
-	- -v $(pwd)/tempo.yaml:/etc/tempo.yaml -> Para meterle al contendor nuestra 
+	- /etc/tempo/tempo.yaml -> Archivo de configuración que carga el contendor
+		al iniciar.
+	- -v rutaCompleta/tempo.yaml:/etc/tempo/tempo.yaml -> Para meterle al contendor nuestra 
 		configuración de tempo.yaml
-	- -v $(pwd)/tempo-data:/var/tempo -> Para persistir los datos.
+
+Se debe usar específicamente esta imagen y esta versión, estas si mostraron buenos 
+resultados.***********
 
 
-IMPLEMENTACION DE OPENTELEMETRY AL PROYECTO
+IMPLEMENTACION DE OPENTELEMETRY (NORMAL) AL PROYECTO
 
 Dirigirse al repositorio oficial y descargar la versión mas reciente de este agente (deberá 
 ser un archivo .jar): 
 https://github.com/open-telemetry/opentelemetry-java-instrumentation?tab=readme-ov-file
 
-El archivo se mueve a la raíz del proyecto y se ejcuta el siguiente comando.
+El archivo se mueve a la raíz del proyecto y se ejecuta el siguiente comando.
+
+OTLP = OpenTelemetry Protocol
+Es el protocolo estándar de OpenTelemetry para enviar: traces, métricas y logs.
 
 java -javaagent:opentelemetry-javaagent.jar \
 -Dotel.service.name=mi-app \
@@ -283,7 +305,7 @@ java -javaagent:opentelemetry-javaagent.jar \
 -Dotel.logs.exporter=none \
 -Dotel.exporter.otlp.endpoint=http://localhost:4317 \
 -Dotel.exporter.otlp.protocol=grpc \
--jar ./target/app-1.0.0.jar -> Levanta la aplicacion pero antes carga un agente que la 
+-jar ./target/app-1.0.0.jar -> Levanta la aplicación pero antes carga un agente que la 
 	instrumenta automáticamente.
 	- -javaagent:nombreAgente.jar -> Antes de arrancar mi aplicación, carga este agente.
 		Este agente intercepta llamadas HTTP, HDBC, redis, clientes HTTP.
@@ -297,7 +319,7 @@ java -javaagent:opentelemetry-javaagent.jar \
 	- -Dotel.logs.exporter=none -> Desactiva exportación de logs.
 		Mismo motivo.
 		Si quisieras logs necesitarías algo como: Loki o algo similar.
-	- -Dotel.exporter.otlp.endpoint=http://localhost:4317 -> Para que envie todo lo que se
+	- -Dotel.exporter.otlp.endpoint=http://localhost:4317 -> Para que envié todo lo que se
 		haya configurado (trazas, métricas y/o logs) a determinada ruta.
 		Aquí escucha tempo.
 	- -Dotel.exporter.otlp.protocol=grpc -> Indica como se envían los datos que se hayan
@@ -309,16 +331,153 @@ Para confirmar que todo este bien, los logs de la aplicación se deben de ver li
 
 Agregar a tempo como data source en grafana: *En grafana* -> apartado izq. connections -> data 
 	sources -> add new data source -> tempo -> Ingresar en la url el valor 
-	http://tempo:3200, se usa el nombre del contenedor que alamcena a tempo y su puerto ->
+	http://tempo:3200, se usa el nombre del contenedor que almacena a tempo y su puerto ->
 	save and test.
+
+
+IMPLEMENTACION DE OPENTELEMETRY (COLLECTOR) AL PROYECTO
  
-OpenTelemetry Collector es un proxy inteligente de telemetría.
-Collector puede enviar cada señal (trazas, logs y/o metricas) a un diferente destino: Traces → 
+Es un proxy inteligente de telemetría.
+Collector puede enviar cada señal (trazas, logs y/o métricas) a un diferente destino: Traces → 
 Tempo, Métricas → Prometheus y Logs → Loki.
 Tiene un sampling inteligente pe: Enviar solo 20% de traces, Enviar 100% si son errores ó Enviar
 100% si tardan más de 1s.
 
+El Collector es opcional y actúa como intermediario entre las aplicaciones instrumentadas con 
+OpenTelemetry y los backends de observabilidad (grafana). No reemplaza al agente OpenTelemetry; 
+lo complementa agregando capacidades como procesamiento, enrutamiento, buffering y sampling 
+avanzado.
 
+Se vuelve a crear el contenedor de tempo pero ahora solo exponiendo el puerto principal (el puerto
+3200), los demás puertos se quitan. Primero se hace esto porque el collector se conectara a 
+tempo.
+
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name tempoCollector \
+  -p 3200:3200 \
+  --network red \
+  -v /c/users/alejandro/desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo.yaml \
+  grafana/tempo:main-756a295 \
+  -config.file=/etc/tempo.yaml -> Para crear un contedor con la imgen de tempo y metiendo
+	nuestro archivo de configuración.
+	En los logs se debe de ver un mensaje que diga: 'msg="Tempo started"' significando que 
+	todo esta ok.
+
+Se debe crear un archivo llamado otel-collector-config.yaml
+
+Si el Collector fuera una fábrica:
+- Receivers = puerta de entrada
+- Processors = área de transformación
+- Exporters = camiones que llevan mercancía
+
+receivers: -> Configuraciones para recibir datos de otro sistema.
+  otlp_grpc:
+    protocols:
+      grpc: 
+        endpoint: 0.0.0.0:4317 -> Crea una puerta de entrada para recibir datos otlp 
+		con el protocolo grpc.
+		Por defecto este protocolo usa el puerto es 4317 y se debe especificar
+		que escuche en todas las interfaces de red.
+		Mas adelante cuando se levante la app con el agente, se indicara que se 
+		envíen los datos aquí. ***
+
+processors: -> Los processors modifican o procesan datos antes de enviarlos.
+	Configuraciones para esta opción:
+	- batch: -> No envía cada span inmediatamente.
+		Los agrupa en pequeños lotes.
+		Los envía juntos.
+	- probabilistic_sampler:
+    	     sampling_percentage: n -> Guarda solo el n% de las trazas aleatoriamente.
+
+exporters: -> Configuraciones para enviar los datos a otro sistema.
+	Configuraciones para esta opción: 
+	- otlp_grpc: -> En teoría este nombre es indiferente porque es como si fuera el 
+		nombre de un objeto donde lo importante es su conteneido sin embargo
+		la documentación recomienda este nombre.
+		- endpoint: nombreContenedorTempo:4317 -> Para que se envíen datos al 
+			servicio llamado tempo el cual esta en el puerto 4317.
+    	    	- tls:
+		     insecure: true -> No verifiques certificados TLS.
+			Permite conexión sin validación segura.
+
+service:
+  pipelines: -> Define los pipelines, el cual se encargan de recibir, procesar y exportar
+	datos.
+	Configuraciones para esta opción:
+	- traces: -> Indica el pipeline de las trazas.
+		Configuraciones para esta opción:
+		- receivers: [nombreReceiver1, nombreReceiver2, nombreReceiverN] -> Para
+			indicar que receiver's de los que se configuraron en la etiqueta
+			receiver llegaran las trazas al collector.
+			No importa que dentro de la etiqueta exporters se tenga uno con 
+			el mismo nombre porque no se definen los nombres de manera
+			global, cada sección es indepentiente, entonces solo buscara 
+			los receivers definidos dentro de la etiqueta recervers.
+			Lo común seria colocarle solo otlp para indicar que recibirá 
+			traces de tipo OTLP. 
+      		- processors: [nombreProccesor1, nombreProccesor2, nombreProccesorN] -> Se le pasa 
+			todos los processors que queremos que tenga esta señal.
+			Estos proccesor se debieron definir anteriormente dentro de la etiqueta
+			proccessors. ***
+      		- exporters: [nombreExporter1, nombreExporter2, nombreExporterN] -> Para
+			indicar que exporter's de los que se configuraron en la etiqueta
+			exporters se enviaran las trazas del collector hacia afuera.
+			Se envían al exporter OTLP (Tempo)
+
+docker run -d --name collector -p 4317:4317 --network red otel/opentelemetry-collector-contrib:latest 
+	-> Crear un contenedor para el collector.
+	- -p 4317:4317 -> Este es el puerto principal del collector y es para recibir con el
+		tipo de exportación OTLP datos por el protocolo gRPC.
+	- -p 8888:8888 -> Puerto opcional de abrir. Se usa si se quiere que prometheus
+		monitoree el collector y habilitarlo en la configuración.
+
+Logs del collector -------------------------------------
+
+Datos que podemos encontrar en los logs del contenedor que almacena a collector:
+
+"otelcol.component.id": "nombreExporter" -> Contiene el nombre de un exporter.
+	Los exporters se definen en el arhicvo otel-collector-config.yml, adicionalmente vienen
+	otros exporters que existen por defecto.
+	Exporters que existen por defecto:
+	- debug -> NO envía datos a ningún lado externo.
+		Solo imprime en consola.
+
+"otelcol.component.kind": "tipoComponente" -> Contiene el tipo de componente.
+	- receiver -> Recibe datos
+	- processor -> Modifica / filtra
+	- exporter -> Envía a otro sistema
+	- extensión -> Son funciones operativas (debug, healthcheck, pprof, etc.)
+		- healthcheck -> Sirve para que Kubernetes o Docker puedan verificar si el Collector 
+			está vivo.
+		- zpages -> Sirve para ver internamente qué está pasando en el Collector:
+			Qué receivers están activos
+			Cuántos spans están fluyendo
+			Qué exporters están enviando datos
+
+"otelcol.component.id": "otlp",
+"otelcol.component.kind": "receiver",
+"endpoint": "[::]:4317" -> Ver algo asi indica que esta perfectamente preparado el collector para
+	recibir datos otlp por el puerto 4317.
+
+"otelcol.signal": "traces" -> Para confirmar que realmente esta recibiendo trazas.
+
+Si al ver al final de los logs se ven mensajes como (usando Docker logs collector --tail 100):
+Starting GRPC server
+Everything is ready. Begin running and processing data.
+
+java -javaagent:opentelemetry-javaagent.jar \
+-Dotel.service.name=mi-app \
+-Dotel.traces.exporter=otlp \
+-Dotel.metrics.exporter=none \
+-Dotel.logs.exporter=none \
+-Dotel.exporter.otlp.endpoint=http://localhost:4317 \
+-Dotel.exporter.otlp.protocol=grpc \
+-jar ./target/app-1.0.0.jar -> Se ejecuta el mismo comando para levantar la app con openTelemetry 
+	solo que se debe considerar que ahora la app se conectara al contenedor que almacena al 
+	collector y no a tempo.
+
+En grafana ajustar el nombre del contenedor de tempo (en caso de que se haya usado otro nombre de
+contenedor).
 
 
 
@@ -405,6 +564,68 @@ docker run -d --name promtail \
   -v /var/log:/var/log \
   --network red \
   grafana/promtail
+
+
+
+
+//////////////////////INSTRUMENTAR SPRING BOOT CON OPENTELEMETRY (PRODUCCION)///////////////////
+
+
+ARQUITECTURAS PRODUCTIVAS
+
+Esta teoría es de acuerdo a chatgpt.
+
+Modelo: collector distribuido + grafana central ------------------
+
+Cada EC2 Proyecto
+ └─ OpenTelemetry Collector (local)
+        │
+        ▼
+EC2 Observabilidad
+ ├─ Tempo
+ ├─ Prometheus
+ ├─ Loki
+ └─ Grafana
+
+Aquí:
+Cada proyecto tiene su Collector local
+Ese Collector envía datos al backend central
+
+Este modelo se usa mucho en empresas medianas.
+
+Modelo: Todo separado ---------------------------------------
+
+EC2 1 → Grafana
+EC2 2 → Tempo
+EC2 3 → Prometheus / Mimir
+EC2 4 → Loki
+EC2 5 → Collector cluster
+Ec2 6 - N -> Cada app en una instancia diferente.
+
+Este modelo es el ideal pero es el mas caro.
+
+
+
+
+
+
+
+
+
+
+investigar que hace el archivo orignal del yaml
+
+corregir en los apuntes que se debe usar la opción esa 
+de git bash para que use nuestro archivo y no el otro.
+
+
+
+
+
+
+
+
+
 
 
 

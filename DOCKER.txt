@@ -1,0 +1,48 @@
+Persistencia de los datos en el contenedor --------------------
+
+
+°°°°°°°°° Bind mount °°°°°°°°°°
+
+docker run … -> 
+	- -v rutaMaquinaLocal:rutaContenedor -> Sirve para crear un bind mount, es decir, montar 
+		un archivo o directorio de la máquina host dentro del contenedor. Consiste en 
+		usar una carpeta o archivo compartido entre la maquina local y el contenedor. 
+		Esto permite que el contenedor lea o escriba directamente en el sistema de 
+		archivos del host. 
+		Si la ruta del local host no existe, Docker la crea automáticamente como 
+		directorio y si Si la ruta del contenedor no existe Docker también la crea 
+		dentro del contenedor.
+		Si se asgina una carpeta del local host en el contenedor reemplazara todos los
+		archivos que había ahí o si se asigna un archivo en especifico del local host y
+		este existe en cierta ruta especificada del contenedor también lo reemplazara.
+		Ejemplo, si: docker run -v /home/user/data:/app/data nginx, esto hace que 
+		Todo lo que el contenedor escriba en /app/data aparecerá en /home/user/data.
+		Si se esta usando un archivo compartido cuando se edite el archivo en la maquina
+		local se vera reflejado el cambio inmediatamente en el contenedor sin necesidad de
+		reiniciarlo. Hay contenedores que necesitan cargar al inicio archivos de configuración
+		entonces si dicho archivo es compartido y se edita, no se verán los cambios porque el
+		contenedor ya cargo ese archivo y en ese caso se necesitaría reiniciar el contenedor.
+		- MSYS_NO_PATHCONV=1 -> Esto es específico de Windows cuando usas Git Bash. Git Bash usa 
+			MSYS2, que intenta convertir rutas de estilo Unix a rutas de Windows automáticamente.
+			Ejemplo: si docker run -v /tmp:/data Ubuntu, MSYS lo convierte en algo como:
+			C:\Program Files\Git\tmp y muchas veces esa ruta es incorrecta.
+			Esta opción Desactiva la conversión automática de rutas ermitiendo que Docker reciba 
+			la ruta exactamente como fue escrita., se antepone antes del comando run.
+
+docker run … ->
+	- --mount type=bind,source=rutaMaquinaLocal,target=rutaContenedor -> Comando mas moderno
+		para realizar exactamente lo mismo que la anterior explicación.
+		Supuestamente de las únicas diferencias con el comando original es que la ruta en la
+		maquina local debe de existir o si no el comando fallara.
+	- --mount type=volume,source=nombreVolumen,target=rutaContenedor -> Para realizar persistencia
+		de datos.
+	
+ docker inspect nombreContenedor --format '{{json .Mounts}}' -> sirve para ver los volúmenes o bind mounts
+	que tiene montados un contenedor en Docker, pero mostrados en formato JSON.
+	Es muy buena practica usar este comando para verificar el source, es decir, verificar que
+	ruta de nuestra maquina local esta siendo usada para hacer el bind mount, porque en ocasione se 
+	tomara mal la ruta del source y con este comando podemos verificarlo y si es necesario usar
+	el MSYS_NO_PATHCONV=1.
+
+		
+	
