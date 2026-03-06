@@ -241,19 +241,44 @@ En la raíz del proyecto se debe crear un archivo llamado tempo.yaml y tener cie
 Las siguientes configuración solo sirven para tempo versión 2.7.1 (Para determinarlo nos metimos
 al contenedor y ejecutamos tempo --version).
 
-server:
-  http_listen_port: 3200 -> Abre un servidor HTTP en el puerto 3200.
-	Ese puerto sirve para: Que Grafana se conecte a Tempo, Consultar trazas y Hacer búsquedas
-	Este puerto NO es para que tu aplicación envíe trazas.
+stream_over_http_enabled: true -> habilita que Tempo pueda enviar trazas por streaming sobre HTTP.
+	Al hacerlo con stream Tempo empieza a mandar datos mientras grafana todavía los está 
+	leyendo. Esto provoca consultas más rápidas.
 
-distributor:
-  receivers:
-    otlp: -> Para decir que se recibirá trazas usando el protocolo OTLP.
+server:
 	Configuraciones para esta opción:
-      - protocols:
-         grpc:
-         http: -> Habilitar dos formas de recibir trazas: via grpc (puerto 4317) y http (puerto 
-		4318).
+	- http_listen_port: 3200 -> Abre un servidor HTTP en el puerto 3200.
+		Ese puerto sirve para: Que Grafana se conecte a Tempo, Consultar trazas y Hacer 
+		búsquedas.
+		Este puerto NO es para que tu aplicación envíe trazas.
+	- log_level: nivelLog
+		- debug -> muy detallado
+		- info	normal
+		- warn	advertencias
+		- error	errores
+
+distributor: -> se encarga de recibir spans, validarlos y distribuirlos a los ingesters.
+	- receivers: -> Define qué protocolos acepta Tempo para recibir trazas.
+		- otlp: -> Para decir que se recibirá trazas usando el protocolo OTLP.
+			Configuraciones para esta opción:
+      			- protocols:
+         			- grpc:
+				    endpoint: 0.0.0.0:4317
+         		 	  http: 
+				    endpoint: 0.0.0.0:4318 -> Habilitar dos formas de recibir 						trazas: via grpc (puerto 4317) y http (puerto 4318) en 
+					todas las interfaces. Es en todas las interfaces porque 
+					se asume que esta herramienta corre dentro de un 
+					contenedor y no la misma maquina que collector.
+
+ingester: -> Para configurar al intester.
+	Los ingesters reciben las trazas desde el distributor y las preparan para almacenamiento.
+	Configuraciones para esta opción:
+	- trace_idle_period: ns -> Tempo espera n segundos sin recibir spans nuevos para 
+		considerar que la traza está completa.
+		Ejemplo: traceID 123 -> span1 -> span2 -> span3. Si en n segundos no llegan más 
+		spans entonces Tempo cierra la traza.
+	- max_block_bytes: 100 -> Tamaño máximo de bloque en memoria antes de escribirlo.
+	- max_block_duration: 30m -> 
 
 storage:
   trace:
@@ -263,13 +288,15 @@ storage:
 	
 compactor:
   compaction:
-    block_retention: n[unidad_tiempo] -> Guarda trazas solo por n cantidad de tiempo después 
-	trazas que superen esta antigüedad será eliminado automáticamente.
-	Si esto no se configura siempre se guadraran las trazas hasta que el disco se llene.
-	Unidades:
-	- h	horas
-	- m	minutos
-	- s	segundos
+	- block_retention: n[unidad_tiempo] -> Guarda trazas solo por n cantidad de tiempo después
+		trazas que superen esta antigüedad será eliminado automáticamente.
+		Si esto no se configura siempre se guardarán las trazas hasta que el disco se 
+		llene.
+		Unidades:
+		- h	horas
+		- m	minutos
+		- s	segundos
+	- compacted_block_retention: 1h -> 
 
 Después crear el contenedor.
 
@@ -378,6 +405,9 @@ receivers: -> Configuraciones para recibir datos de otro sistema.
 		con el protocolo grpc.
 		Por defecto este protocolo usa el puerto es 4317 y se debe especificar
 		que escuche en todas las interfaces de red.
+		Debe escuchar en todas las interfaces de red y no en localhost porque esta
+		herramienta se asume que esta en un contenedor y no corriendo en el mismo host
+		que la app.
 		Mas adelante cuando se levante la app con el agente, se indicara que se 
 		envíen los datos aquí. ***
 
@@ -391,14 +421,20 @@ processors: -> Los processors modifican o procesan datos antes de enviarlos.
 
 exporters: -> Configuraciones para enviar los datos a otro sistema.
 	Configuraciones para esta opción: 
-	- otlp_grpc: -> En teoría este nombre es indiferente porque es como si fuera el 
-		nombre de un objeto donde lo importante es su conteneido sin embargo
-		la documentación recomienda este nombre.
+	- otlp_grpc: -> Crea un objeto exporter.. En teoría este nombre es indiferente 
+		porque es como si fuera el nombre de un objeto donde lo importante es 
+		su contenido, sin embargo, la documentación recomienda este nombre.
 		- endpoint: nombreContenedorTempo:4317 -> Para que se envíen datos al 
-			servicio llamado tempo el cual esta en el puerto 4317.
+			servicio llamado tempo el cual escucha el protocolo grpc en el 
+			puerto 4317.
     	    	- tls:
 		     insecure: true -> No verifiques certificados TLS.
 			Permite conexión sin validación segura.
+	- debug:
+		- verbosity: detailed -> sirve para imprimir en los logs del collector 
+			los datos de los pipelines.
+			Básicamente para debuggear o verificar que sí están llegando 	
+			traces/metrics/logs.
 
 service:
   pipelines: -> Define los pipelines, el cual se encargan de recibir, procesar y exportar
@@ -430,6 +466,13 @@ docker run -d --name collector -p 4317:4317 --network red otel/opentelemetry-col
 		tipo de exportación OTLP datos por el protocolo gRPC.
 	- -p 8888:8888 -> Puerto opcional de abrir. Se usa si se quiere que prometheus
 		monitoree el collector y habilitarlo en la configuración.
+	- /etc/otelcol-contrib/config.yaml -> Archivo de configuración que carga el contendor
+		al iniciar.
+
+Lo que se recuerda que se hizo para este caso, fue crear el contenedor y una vez que el contenedor
+estuviese corriendo usar el comando de cp para pasar nuestro propio archivo de configuración. Valdría
+le pena intentar en un futuro como crearlo usando bind mounts y la opción de git bash desde Windows
+llamada: MSYS_NO_PATHCONV=1.
 
 Logs del collector -------------------------------------
 
@@ -487,24 +530,16 @@ contenedor).
 
 
 
-IMPLMENTACION DE LOKI + PROMTAIL
+IMPLMENTACION DE LOKI
 
 Loki: Es un sistema de agregación de logs creado por Grafana Labs.
 Su objetivo es: Guardar, organizar y consultar logs Pero de una forma más ligera y barata que otros sistemas.
 
-Promtail: es el agente recolector de logs oficial de Loki.
-Su función es: Leer logs, Agregar etiquetas (labels) y Enviarlos a Loki.
-No guarda los logs, solo los transporta.
-
-Flujo de los dos: App escribe en los logs → el Archivo cambia → Promtail detecta cambios → 
-Promtail agrega labels → se los Envía a Loki → Grafana consulta a Loki
-
 
 °°°°°°°°°° Activar el guardado de logs °°°°°°°°°
 
-Para que grafana pueda graficar los logs, estos deben ser enviados por loki y asu vez este se 
-los debe de enviar promtail pero para que promtail los recoga la app debe guardar los logs
-en un archivo.
+Para que grafana pueda graficar los logs, estos deben ser enviados por loki y a su 
+vez para que eso suceda la app debe guardar los logs en un archivo.
 
 *Revisar los apuntes sobre como se hace esto*
 
@@ -555,15 +590,8 @@ El archivo que se uso tiene este contenido:
 
 </configuration>
 
-Ya no se siguió investigando porque se encontró que era mejor medir los http. *****
-
 docker run -d --name loki -p 3100:3100 --network red grafana/loki -> Crea y corre un contendor
 	con loki.
-
-docker run -d --name promtail \
-  -v /var/log:/var/log \
-  --network red \
-  grafana/promtail
 
 
 
