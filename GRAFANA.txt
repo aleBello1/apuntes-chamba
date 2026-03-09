@@ -241,7 +241,8 @@ En la raíz del proyecto se debe crear un archivo llamado tempo.yaml y tener cie
 Las siguientes configuración solo sirven para tempo versión 2.7.1 (Para determinarlo nos metimos
 al contenedor y ejecutamos tempo --version).
 
-stream_over_http_enabled: true -> habilita que Tempo pueda enviar trazas por streaming sobre HTTP.
+stream_over_http_enabled: true -> Permite que Tempo envíe resultados de consultas a Grafana usando 
+	streaming HTTP.
 	Al hacerlo con stream Tempo empieza a mandar datos mientras grafana todavía los está 
 	leyendo. Esto provoca consultas más rápidas.
 
@@ -265,10 +266,10 @@ distributor: -> se encarga de recibir spans, validarlos y distribuirlos a los in
          			- grpc:
 				    endpoint: 0.0.0.0:4317
          		 	  http: 
-				    endpoint: 0.0.0.0:4318 -> Habilitar dos formas de recibir 						trazas: via grpc (puerto 4317) y http (puerto 4318) en 
-					todas las interfaces. Es en todas las interfaces porque 
-					se asume que esta herramienta corre dentro de un 
-					contenedor y no la misma maquina que collector.
+				    endpoint: 0.0.0.0:4318 -> Habilitar dos formas de recibir 
+					trazas: via grpc (puerto 4317) y http (puerto 4318) en 
+					todas las interfaces. Escuchar en todas las interfaces de red
+					permite conexiones desde otros contenedores y otras máquinas.
 
 ingester: -> Para configurar al intester.
 	Los ingesters reciben las trazas desde el distributor y las preparan para almacenamiento.
@@ -278,15 +279,40 @@ ingester: -> Para configurar al intester.
 		Ejemplo: traceID 123 -> span1 -> span2 -> span3. Si en n segundos no llegan más 
 		spans entonces Tempo cierra la traza.
 	- max_block_bytes: 100 -> Tamaño máximo de bloque en memoria antes de escribirlo.
-	- max_block_duration: 30m -> 
+		Tempo no guarda cada span inmediatamente en disco.
+		Primero los acumula en memoria y Cuando el bloque alcanza cierto tamaño o tiempo
+		se guarda en el storage.
+		En prod, el valor recomendado es 500MB (524288000 bytes) hasta 1GB y para pruebas
+		se puede dejar entre 1MB a 10MB.
+	- max_block_duration: 30m -> controla el tiempo máximo que un bloque puede permanecer 
+		abierto.
+		Este parámetro evita que un bloque permanezca abierto demasiado tiempo si el tráfico 
+		es bajo.
+		Entonces si el bloque no alcanza el max_block_bytes pero ya paso 
+		max_block_duration el bloque se cierra.
+		En prod el valor recomendado entre 30m y 1h.
 
-storage:
+storage: -> Define dónde se guardan las trazas.
   trace:
-    backend: local -> Indica donde se guardaran los logs.
+    backend: tipoUbicacion -> Indica el tipo de almacenado de las trazas.
+	Ubicaciones:
+	- local
+	- s3
+	- gcs
+	- azure
 	Configuraciones para esta opción:
-	- path: /tmp/tempo/traces -> Indica la ruta donde físicamente se guardan los archivos.
+	- wal:
+	    path: rutaX -> Configura el wal (Write Ahead Log) y su ruta. Es un log de seguridad. Antes 
+		de guardar datos en almacenamiento final tempo escribe en wal.
+		Si tempo crashea se recupera desde wal.
+	Si se uso local: -----------------------------
+	- local: # se repite esta linea
+	    path: /tmp/tempo/traces -> Indica la ruta en la maquina local donde se guardaran las
+		archivos.
+		Si tempo esta dentro de un contenedor y se quiere implementar un volumen de persistencia
+		esta ruta debe coincidir con la ruta del volumen.
 	
-compactor:
+compactor: -> Optimiza los bloques almacenados.
   compaction:
 	- block_retention: n[unidad_tiempo] -> Guarda trazas solo por n cantidad de tiempo después
 		trazas que superen esta antigüedad será eliminado automáticamente.
@@ -296,11 +322,22 @@ compactor:
 		- h	horas
 		- m	minutos
 		- s	segundos
-	- compacted_block_retention: 1h -> 
+	- compacted_block_retention: 1h -> Mantiene los bloques viejos un tiempo antes de 
+		borrarlos.
+		El valor en prod recomendado es entre 1h y 2h.
 
 Después crear el contenedor.
 
-MSYS_NO_PATHCONV=1 docker run -d --name tempo -p 3200:3200 -p 4317:4317 -p 4318:4318 --network red -v /c/Users/alejandro/Desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo/tempo.yaml ubuntu/tempo:2.7.1-24.04_stable -> Levanta un contendor con una imagen de tempo.
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name tempo \
+  -p 3200:3200 \
+  -p 4317:4317 \
+  -p 4318:4318 \
+  --network red \
+  -v volTempo:/traces \
+  -v volTempoWal:/etc/tempo/tempo_wal \
+  -v /c/users/alejandro/desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo/tempo.yaml \
+  ubuntu/tempo:2.7.1-24.04_stable -> Levanta un contendor con una imagen de tempo.
 	Se debe de poner la ruta completa del archivo si se usa git bash.
 	- -p 3200:3200 -> Puerto donde corre tempo.
 	- -p 4317:4317 -> Puerto donde recibe trazas via grpc.
@@ -375,17 +412,25 @@ OpenTelemetry y los backends de observabilidad (grafana). No reemplaza al agente
 lo complementa agregando capacidades como procesamiento, enrutamiento, buffering y sampling 
 avanzado.
 
+Es importante usar collector en prod porque combate varios problemas:
+1. si hay varias apps enviando sus datos directamente a tempo no se podrá limitar el trafico, ni 
+filtrar spans y ni se podrá reducir el volumen, con collector si se puede lograr todos eso.
+2. Si tempo se cae, las trazas se pierden pero si esta collector algunas trazas se puede guardar
+un rato en collector.
+3. mejora eficiencia porque collector envia bloques de spans.
+
 Se vuelve a crear el contenedor de tempo pero ahora solo exponiendo el puerto principal (el puerto
 3200), los demás puertos se quitan. Primero se hace esto porque el collector se conectara a 
 tempo.
 
 MSYS_NO_PATHCONV=1 docker run -d \
-  --name tempoCollector \
+  --name tempo \
   -p 3200:3200 \
   --network red \
-  -v /c/users/alejandro/desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo.yaml \
-  grafana/tempo:main-756a295 \
-  -config.file=/etc/tempo.yaml -> Para crear un contedor con la imgen de tempo y metiendo
+  -v volTempo:/traces \
+  -v volTempoWal:/etc/tempo/tempo_wal \
+  -v /c/users/alejandro/desktop/MAPFRE/ws-mapfre/tempo.yaml:/etc/tempo/tempo.yaml \
+  ubuntu/tempo:2.7.1-24.04_stable -> Para crear un contenedor con la imagen de tempo y metiendo
 	nuestro archivo de configuración.
 	En los logs se debe de ver un mensaje que diga: 'msg="Tempo started"' significando que 
 	todo esta ok.
