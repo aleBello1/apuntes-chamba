@@ -348,7 +348,7 @@ MSYS_NO_PATHCONV=1 docker run -d \
 		configuración de tempo.yaml
 
 Se debe usar específicamente esta imagen y esta versión, estas si mostraron buenos 
-resultados.***********
+resultados.********
 
 
 IMPLEMENTACION DE OPENTELEMETRY (NORMAL) AL PROYECTO
@@ -442,27 +442,48 @@ Si el Collector fuera una fábrica:
 - Processors = área de transformación
 - Exporters = camiones que llevan mercancía
 
-receivers: -> Configuraciones para recibir datos de otro sistema.
+receivers: -> Configuraciones para recibir datos (traces, metrics o logs) de otro sistema.
   otlp_grpc:
     protocols:
       grpc: 
         endpoint: 0.0.0.0:4317 -> Crea una puerta de entrada para recibir datos otlp 
 		con el protocolo grpc.
-		Por defecto este protocolo usa el puerto es 4317 y se debe especificar
+		Por convencion este protocolo usa el puerto es 4317 y se debe especificar
 		que escuche en todas las interfaces de red.
-		Debe escuchar en todas las interfaces de red y no en localhost porque esta
-		herramienta se asume que esta en un contenedor y no corriendo en el mismo host
-		que la app.
+		Debe escuchar en todas las interfaces de red para permitir conexión de 
+		otros contenedores u otros hosts.
 		Mas adelante cuando se levante la app con el agente, se indicara que se 
 		envíen los datos aquí. ***
 
 processors: -> Los processors modifican o procesan datos antes de enviarlos.
+	Los processors se ejecutan en orden (de izq a der, según se hayan metido en el 
+	arreglo que se le pasa a los processors).
 	Configuraciones para esta opción:
-	- batch: -> No envía cada span inmediatamente.
-		Los agrupa en pequeños lotes.
-		Los envía juntos.
+	- batch: -> Agrupa muchas trazas/logs/métricas y después las envia juntos.
+		Configuraciones para esta opción:
+		En pruebas los valores recomendados son: 1, 64 y 128 respectivamente y para 
+		producción son: 5, 512 y 1024 respectivamente.
+		- timeout: ns -> Si no se llena el batch, el collector espera máximo n
+			segundos antes de enviarlo.
+		- send_batch_size: m -> Cuando se acumulan m spans, se envían 
+			inmediatamente.
+		- send_batch_max_size: z -> Proteje contra batches gigantes.
+			Si llegan mas de m spans al mismo tiempo, lo máximo que se enviara
+			serán z spans.
 	- probabilistic_sampler:
     	     sampling_percentage: n -> Guarda solo el n% de las trazas aleatoriamente.
+	- resource: -> Para agregar enriquecimiento a los datos. Significa agregar información 
+		extra a las trazas, métricas o logs antes de enviarlos.
+		Muchas veces la aplicación no incluye toda la información útil, entonces el 
+		collector la agrega automáticamente.
+    	     attributes:
+      		- - key: nombreClave
+       		  value: valor
+        	  action: tipoAction -> Crea una clave y valor que será agregado a los datos.
+			Tipos de accion:
+			- insert -> Agrega el atributo solo si no existe.
+			- upsert -> Inserta o reemplaza.
+			- delete -> Elimina un atributo.
 
 exporters: -> Configuraciones para enviar los datos a otro sistema.
 	Configuraciones para esta opción: 
@@ -475,6 +496,23 @@ exporters: -> Configuraciones para enviar los datos a otro sistema.
     	    	- tls:
 		     insecure: true -> No verifiques certificados TLS.
 			Permite conexión sin validación segura.
+		- retry_on_failure: -> Define como el collector reintentara enviar datos cuando 
+			la herramienta que recibiría los datos no los recibe.
+			Configuraciones para esta opción: 
+			En pruebas los valores recomendados son: 1, 5 y 30 respectivamente y para 
+			producción son: 5, 30 y 300 respectivamente.
+			- enabled: true -> Activia los reintentos.
+			- initial_interval: ns -> El primer retry se hace después de n segundos.
+			- max_interval: ys -> Es el tiempo máximo entre retries.
+			- max_elapsed_time: zs -> Tiempo máximo total intentando enviar los datos.
+		- sending_queue: -> Guarda temporalmente los datos antes de enviarlos
+			En pruebas los valores recomendados son: 2 y 1000 respectivamente y 
+			para producción son: 4 y 1000 respectivamente.
+			La cola guarda batches, no spans individuales.
+			- enabled: true -> Activa la cola.
+			- num_consumers: 4 -> Número de workers enviando datos en paralelo.
+			- queue_size: 10000 -> Máximo número de batches en la cola.
+				Si se llena los datos nuevos se descartan.
 	- debug:
 		- verbosity: detailed -> sirve para imprimir en los logs del collector 
 			los datos de los pipelines.
@@ -484,6 +522,8 @@ exporters: -> Configuraciones para enviar los datos a otro sistema.
 service:
   pipelines: -> Define los pipelines, el cual se encargan de recibir, procesar y exportar
 	datos.
+	Cada telemetria tiene su propio pipeline.
+	El collector no procesa datos si no están en un pipeline.
 	Configuraciones para esta opción:
 	- traces: -> Indica el pipeline de las trazas.
 		Configuraciones para esta opción:
@@ -492,7 +532,7 @@ service:
 			receiver llegaran las trazas al collector.
 			No importa que dentro de la etiqueta exporters se tenga uno con 
 			el mismo nombre porque no se definen los nombres de manera
-			global, cada sección es indepentiente, entonces solo buscara 
+			global, cada sección es independiente, entonces solo buscara 
 			los receivers definidos dentro de la etiqueta recervers.
 			Lo común seria colocarle solo otlp para indicar que recibirá 
 			traces de tipo OTLP. 
@@ -500,10 +540,12 @@ service:
 			todos los processors que queremos que tenga esta señal.
 			Estos proccesor se debieron definir anteriormente dentro de la etiqueta
 			proccessors. ***
+			Si se tiene muchos processors el orden correcto debería de ser:
+			resource, attributes, sampling y batch.
       		- exporters: [nombreExporter1, nombreExporter2, nombreExporterN] -> Para
 			indicar que exporter's de los que se configuraron en la etiqueta
 			exporters se enviaran las trazas del collector hacia afuera.
-			Se envían al exporter OTLP (Tempo)
+			Se envían al exporter OTLP (Tempo).
 
 docker run -d --name collector -p 4317:4317 --network red otel/opentelemetry-collector-contrib:latest 
 	-> Crear un contenedor para el collector.
