@@ -484,6 +484,18 @@ processors: -> Los processors modifican o procesan datos antes de enviarlos.
 			- insert -> Agrega el atributo solo si no existe.
 			- upsert -> Inserta o reemplaza.
 			- delete -> Elimina un atributo.
+	- memory_limiter: -> Este processor protege al collector para que no se quede sin 
+		memoria RAM y no se caiga, porque cuando tempo se cae el collector mantiene
+		los datos en memoria, si no se configura esto el collector usara toda la
+		memoria ram.
+		Configuraciones para esta opción:
+		- limit_mib: 512 -> Este es el límite máximo de memoria que el collector puede usar.
+			Lo ideal es que este valor sea igual al 70% u 80% de la ram de la maquina
+			donde corra el collector.
+  		- spike_limit_mib: 128 -> Cuando se acerca a este limite se empieza a rechazar 
+			telemetría temporalmente.
+  		- check_interval: 5s -> Cada n segundos el collector revisa cuanta memoria 
+			esta usando
 
 exporters: -> Configuraciones para enviar los datos a otro sistema.
 	Configuraciones para esta opción: 
@@ -513,14 +525,27 @@ exporters: -> Configuraciones para enviar los datos a otro sistema.
 			- num_consumers: 4 -> Número de workers enviando datos en paralelo.
 			- queue_size: 10000 -> Máximo número de batches en la cola.
 				Si se llena los datos nuevos se descartan.
+			- storage: file_storage -> Para que persista los datos en caso de que no
+				se puedan enviar.
 	- debug:
 		- verbosity: detailed -> sirve para imprimir en los logs del collector 
 			los datos de los pipelines.
 			Básicamente para debuggear o verificar que sí están llegando 	
 			traces/metrics/logs.
 
+extensions: -> Para agregar funcionalidades auxiliares al collector
+	Configuraciones para esta opción:
+	- health_check: -> Crea el endpoint de salud para el collector.
+	- file_storage:
+    	    directory: /var/lib/otelcol -> habilita almacenamiento persistente dentro del 	
+		collector.
+		Esta ruta deberá de coincidir con la ruta del volumen persistente para el
+		contenedor. *
+
 service:
-  pipelines: -> Define los pipelines, el cual se encargan de recibir, procesar y exportar
+ - extensions: [health_check, file_storage] -> habilita un endpoint de salud del collector.
+	Esto es usado por otros contenedores para ver el estado de saludo del colletor.
+ - pipelines: -> Define los pipelines, el cual se encargan de recibir, procesar y exportar
 	datos.
 	Cada telemetria tiene su propio pipeline.
 	El collector no procesa datos si no están en un pipeline.
@@ -547,8 +572,26 @@ service:
 			exporters se enviaran las trazas del collector hacia afuera.
 			Se envían al exporter OTLP (Tempo).
 
-docker run -d --name collector -p 4317:4317 --network red otel/opentelemetry-collector-contrib:latest 
-	-> Crear un contenedor para el collector.
+La imagen del OpenTelemetry Collector ejecuta el proceso con un usuario no root por razones de seguridad.
+Cuando Docker crea un volumen de persistencia, este se crea con propietario root:root y permisos 755.
+Debido a esto, el usuario interno del collector no puede escribir en el volumen, lo que provoca errores 
+de permission denied. Para solucionarlo, primero se crea el volumen y después se modifican sus permisos 
+desde un contenedor temporal.
+
+docker volume create volCollector
+
+Este comando monta el volumen en un contenedor temporal basado en Alpine Linux y cambia los permisos 
+para permitir lectura, escritura y ejecución a todos los usuarios.
+
+MSYS_NO_PATHCONV=1 docker run --rm -it -v volCollector:/data alpine chmod -R 777 /data
+
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name collectorDefinitivo \
+  -p 4317:4317 \
+  -v volCollector:/var/lib/otelcol \
+  --network red \
+  -v /c/users/alejandro/desktop/MAPFRE/ws-mapfre/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml \
+  otel/opentelemetry-collector-contrib:0.102.1 -> Crear un contenedor para el collector.
 	- -p 4317:4317 -> Este es el puerto principal del collector y es para recibir con el
 		tipo de exportación OTLP datos por el protocolo gRPC.
 	- -p 8888:8888 -> Puerto opcional de abrir. Se usa si se quiere que prometheus
@@ -727,16 +770,8 @@ Este modelo es el ideal pero es el mas caro.
 
 
 
-
-investigar que hace el archivo orignal del yaml
-
-corregir en los apuntes que se debe usar la opción esa 
-de git bash para que use nuestro archivo y no el otro.
-
-
-
-
-
+preguntarle a chagpt si el archivos de configuración de 
+tempo si es el adecuado para prod.
 
 
 

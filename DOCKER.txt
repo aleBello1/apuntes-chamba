@@ -44,5 +44,27 @@ docker run … ->
 	tomara mal la ruta del source y con este comando podemos verificarlo y si es necesario usar
 	el MSYS_NO_PATHCONV=1.
 
+
+
+
+docker container inspect nombreContendor_o_idContenedor -> Inspecciona determinado 
+	contenedor.
+	Muestra Identificador único, nombre asignado, si está en ejecución, detenido,
+	Qué CMD o ENTRYPOINT se usó al iniciarlo, Dirección IP del contenedor, nombre 
+	de red, las variables de ambiente y valores que estas tienen, etc.
+	Muchos contenedores cargan archivos de configuración cuando se levantan y este
+	comando se puede usar para determinar la ruta de dicho archivo, este se encontrara en 
+	varios lugares tras la ejecución del comando: dentro del atributo "Args", "Cmd", 
+	Entrypoint o Env. Se podría dar el caso de que no aparezca en la salida de este comando
+	y de ser ese el caso hay varias opciones: 1. nos tendríamos que meter al contenedor y 
+	ejecutar ps aux, esto imprimira la ruta del archivo de configuración inicial. 2. nos 
+	tendríamos que meter al contenedor y navegar dentro de las carpetas de etc/ y buscar 
+	manualmente el archivo yaml.
+
+
+
+
+
+
 		
 	
