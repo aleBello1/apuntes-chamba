@@ -326,6 +326,28 @@ compactor: -> Optimiza los bloques almacenados.
 		borrarlos.
 		El valor en prod recomendado es entre 1h y 2h.
 
+overrides:
+  defaults: -> sirve para limitar cuántos datos podemos recibir de cada 
+	cliente
+	Configuraciones para esta opcon:
+	- max_traces_per_user: x -> Define el número máximo de trazas activas que un usuario 
+		puede tener en memoria.
+		Si llega a x trazas activas, Tempo empieza a rechazar nuevas trazas.
+    	- ingestion_rate_limit_bytes: y -> limita cuántos bytes por segundo puede enviar un 
+		cliente.
+		si lo supera Tempo empieza a responder: 429 Too Many Requests.
+
+query_frontend:
+  search:
+    duration_slo: ns -> componente que optimiza consultas desde Grafana.
+	divide consultas grandes, paraleliza búsquedas y cachea resultados.
+	Para indicar que Las búsquedas deberían resolverse en máximo n segundos.
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo -> Permite generar métricas a partir de trazas.
+
 Después crear el contenedor.
 
 MSYS_NO_PATHCONV=1 docker run -d \
@@ -349,6 +371,10 @@ MSYS_NO_PATHCONV=1 docker run -d \
 
 Se debe usar específicamente esta imagen y esta versión, estas si mostraron buenos 
 resultados.********
+
+Para comprobar que se usa nuestro archivo
+docker exec -it tempoDefinitivo sh
+cat etc/tempo/tempo.yaml
 
 
 IMPLEMENTACION DE OPENTELEMETRY (NORMAL) AL PROYECTO
@@ -599,10 +625,10 @@ MSYS_NO_PATHCONV=1 docker run -d \
 	- /etc/otelcol-contrib/config.yaml -> Archivo de configuración que carga el contendor
 		al iniciar.
 
-Lo que se recuerda que se hizo para este caso, fue crear el contenedor y una vez que el contenedor
-estuviese corriendo usar el comando de cp para pasar nuestro propio archivo de configuración. Valdría
-le pena intentar en un futuro como crearlo usando bind mounts y la opción de git bash desde Windows
-llamada: MSYS_NO_PATHCONV=1.
+La única manera que se encontró para visualizalizar el contenido de archivo de configuración fue
+mover desde el contendor el archivo a nuestra maquina local. Esto se hizo para comprobar que se
+toma nuestro archivo y no el que viene por default.
+docker cp collectorDefinitivo:/etc/otelcol-contrib/config.yaml ./config.yaml
 
 Logs del collector -------------------------------------
 
