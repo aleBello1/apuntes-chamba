@@ -321,16 +321,26 @@ MSYS_NO_PATHCONV=1 docker run -d \
   -v ${PWD}\prometheus.yml:/etc/prometheus/prometheus.yml \
   -v prometheusData:/prometheus \
   --network red \
+  --memory=2g \
+  --restart unless-stopped \
+  prom/prometheus \
   --storage.tsdb.retention.time=15d \
   --storage.tsdb.wal-compression \
   --storage.tsdb.path=/prometheus \
   --query.max-concurrency=20 \
+  --storage.tsdb.retention.size=2GB \
   --web.enable-lifecycle \
-  --query.timeout=2m \
-  prom/prometheus -> Crear un contenedor con base a la imagen prom/prometheus.
+  --query.timeout=2m -> Crear un contenedor con base a la imagen prom/prometheus.
+	Banderas de docker --------------------------
 	- -p 9090:9090 -> Puerto donde queda expuesto prometheus.
 	- -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml -> Es un volumen al cual se le
 		dice Usa MI prometheus.yml personalizado En lugar del default del contenedor.
+	- --memory=2g -> el contenedor no podrá usar más de 2 GB de RAM.
+	- --restart unless-stopped -> Si Docker mata el contedor entonces se reinicia 
+		automáticamente.
+	Banderas de prometheus --------------------------
+	Las banderas de prometheus deben ir después de la imagen porque son banderas de la imagen y 
+	no de Docker.
 	- --storage.tsdb.path=/prometheus -> Define dónde se guardan las métricas en disco.
 	- --storage.tsdb.retention.time=nd -> Para que promethues guarde métricas de máximo n días.
 	- --storage.tsdb.retention.size=xGB -> Manera alternativa de retención. Prometheus mantiene 
