@@ -262,50 +262,100 @@ En la raíz del proyecto se crea el archivo de configuración de prometheus llam
  
 global: -> Para hacer configuraciones globales de prometheus.
 	Configuraciones para esta opción:
-  	- scrape_interval: ns -> Cada n segundos Prometheus hará una petición HTTP a tu 
-		aplicación para leer métricas.
+  	- scrape_interval: ns -> Cada n segundos Prometheus hará una petición HTTP a las apps, db's
+		o herramientas para leer métricas.
+		El valor 15 es el recomendado para producción.
+	- scrape_timeout: xs -> define cuánto tiempo espera Prometheus a que un target responda antes 
+		de cancelar el scrape.
+		Cada n segundos Prometheus intenta leer métricas, Pero solo espera máximo x segundos 
+		a que respondan.
+		Si no existiera timeout Prometheus podría quedarse esperando Por eso la regla 
+		recomendada es: scrape_timeout < scrape_interval
+		El valor 10 es el recomendado para producción.
+	- evaluation_interval: zs -> Cada z segundos Prometheus evalúa reglas.
+		El valor 15 es el recomendado para producción.
+		Solo se configura si no se usan las alertas de grafana.
 
 scrape_configs: -> Lista de cosas que Prometheus debe monitorear.
 	Se coloca una lista de Jobs, cada elemento nuevo empieza por el carácter '-'.
+	- job_name: "prometheus"
+            static_configs:
+              - targets: [ "localhost:9090" ]
+                labels:
+                  service: "prometheus" -> Para exponer métricas internas de prometheus.
   	- - job_name: "nombreJob" -> Asigna que monitoreo determinado job.
-		Un job puede ser uan app o una db.
-	- metrics_path: "/actuator/prometheus" -> Le dice a Prometheus la URL donde debe leer 
+		Un job puede ser una app, una herramienta o una db.
+	- metrics_path: "ruta" -> Le dice a Prometheus la URL donde debe leer 
 		la métrica para este job.
+		- /actuator/prometheus -> Para leer métricas de la app.
 	- static_configs:
 		- - targets: ["host.docker.internal:puertoApp"] -> Indicarle a que servidor 
-			conectarse, es decir, indicarla donde esta la app que debe consumir para
-			recolectar las métricas.
+			conectarse, es decir, indicarla donde esta la app, db o herramienta que 
+			debe consumir para recolectar las métricas.
 			Se hace la suposición que la app esta corriendo en local y proteus 
 			dentro de un contenedor, por eso se usa el 'host.docker.internal'.
+		- labels:
+  		    service: "nombreLabel" -> Agrega un label a todas las métricas provenientes
+			de este target (herramienta, db o app).
+			Esto ayuda en consultas por eso es importante agregarlo y que sea el 
+			nombre del target.
+	- metric_relabel_configs: -> Define reglas que permiten modificar o eliminar métricas antes 
+		de que Prometheus las almacene.
+	    - - source_labels: [__name__]
+              regex: "promhttp_.*"
+    	      action: drop -> Muchos sistemas de observabilidad están escritos en Go. Por ejemplo: 
+		Prometheus, Grafana Loki, Grafana Tempo y OpenTelemetry Collector. Todos generan métricas 
+		internas del runtime de Go.
+		Como prometheus recibe muchas métricas del runtime de go y estas métricas no sirven para 
+		dashboards lo mejor es eliminarlas, asi se reduce la ram, disco y cardinalidad.
+		Esta configuración sirve para eliminar todas las métricas de go. Esta configuración se usa 
+		sobre collector, tempo y loki.
 
 Hacer que promethus consuma las métricas: 
 
 docker network create red -> Se crea una red para que compartan prometheus y grafana.
 
-*En la terminal de power shell*
-docker run -d `
-  --name prometheus `
-  -p 9090:9090 `
-  -v ${PWD}\prometheus.yml:/etc/prometheus/prometheus.yml `
-  --network red `
-  prom/prometheus -> Crear y ejecutar un contenedor con base a la imagen prom/prometheus.
-	Prometheus corre en el puerto 9090 dentro del contenedor.
-	Si se ejeucta en la terminal de git bash el ${PWD} se convierte en algo como:
-	C:/Program Files/Git/… y Docker no lo interpreta como se espera por eso se ocupa 
-	forzosamente la terminal de power shel.
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name prometheus \
+  -p 9090:9090 \
+  -v ${PWD}\prometheus.yml:/etc/prometheus/prometheus.yml \
+  -v prometheusData:/prometheus \
+  --network red \
+  --storage.tsdb.retention.time=15d \
+  --storage.tsdb.wal-compression \
+  --storage.tsdb.path=/prometheus \
+  --query.max-concurrency=20 \
+  --web.enable-lifecycle \
+  --query.timeout=2m \
+  prom/prometheus -> Crear un contenedor con base a la imagen prom/prometheus.
+	- -p 9090:9090 -> Puerto donde queda expuesto prometheus.
 	- -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml -> Es un volumen al cual se le
 		dice Usa MI prometheus.yml personalizado En lugar del default del contenedor.
+	- --storage.tsdb.path=/prometheus -> Define dónde se guardan las métricas en disco.
+	- --storage.tsdb.retention.time=nd -> Para que promethues guarde métricas de máximo n días.
+	- --storage.tsdb.retention.size=xGB -> Manera alternativa de retención. Prometheus mantiene 
+		máximo xGB de métricas, cuando supera el limite empieza a borrar métricas antiguas.
+	- --storage.tsdb.wal-compression -> Para comprimir el WAL y reducir el disco.
+	- --web.enable-lifecycle -> Permite recargar la configuración ionicial sin reiniciar 
+		Prometheus. De este modo Prometheus vuelve a leer: prometheus.yml
+	- --query.max-concurrency=20 -> controla cuántas consultas simultáneas puede ejecutar Prometheus.
+	- --query.timeout=2m -> si una query tarda más de 2 minutos la cancela
 
-http://localhost:9090/targets -> En esta ruta prometheus enlista todas las rutas que esta 
-	scrapenado/consumiendo, si está up ó down y cada cuanto las consulta.
+GET /targets -> En esta ruta prometheus enlista todas los targets que esta scrapenado/consumiendo, 
+	ademas muestra de cada uno si están up ó down y cada cuanto las consume.
 
-http://localhost:9090/query -> Muestra que métricas tenemos disponibles con base a los endpoints
-	que esta consumiendo prometheus.
+GET /query -> Muestra que métricas tenemos disponibles con base a los endpoints que esta 
+	consumiendo prometheus.
 
 
 ||||||||||| Levantar y configurar grafana ||||||||||||
 
-docker run -d --name grafana -p 3000:3000 --network red -v grafana_data:/var/lib/grafana 	grafana/grafana -> Crear y ejecutar un contenedor con base a la imagen grafana/grafana.
+docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  --network red \
+  -v grafana_data:/var/lib/grafana \
+  grafana/grafana -> Crear y ejecutar un contenedor con base a la imagen grafana/grafana.
 	- /var/lib/grafana -> Los dashboards, usuarios y configuraciones se guardan en esta 
 		ruta.
 

@@ -3,6 +3,8 @@
 
 METRICAS 
 
+Spring boot app -------------------------------
+
 http_server_requests_seconds_count -> Es un counter. Contiene el numero total acumulado de 
 	requests HTTP que tu aplicación ha recibido.
 	Empieza en 0 cuando arranca la app y nunca disminuye.
@@ -376,6 +378,12 @@ Para comprobar que se usa nuestro archivo
 docker exec -it tempoDefinitivo sh
 cat etc/tempo/tempo.yaml
 
+Endpoints de tempo:
+
+GET /metrics -> Exponen métricas de tempo.
+
+GET /ready -> Para verificar si tempo esta vivo.
+
 
 IMPLEMENTACION DE OPENTELEMETRY (NORMAL) AL PROYECTO
 
@@ -485,7 +493,7 @@ processors: -> Los processors modifican o procesan datos antes de enviarlos.
 	Los processors se ejecutan en orden (de izq a der, según se hayan metido en el 
 	arreglo que se le pasa a los processors).
 	Configuraciones para esta opción:
-	- batch: -> Agrupa muchas trazas/logs/métricas y después las envia juntos.
+	- batch: -> Agrupa muchas trazas/logs/métricas y después las envía juntos.
 		Configuraciones para esta opción:
 		En pruebas los valores recomendados son: 1, 64 y 128 respectivamente y para 
 		producción son: 5, 512 y 1024 respectivamente.
@@ -515,16 +523,16 @@ processors: -> Los processors modifican o procesan datos antes de enviarlos.
 		los datos en memoria, si no se configura esto el collector usara toda la
 		memoria ram.
 		Configuraciones para esta opción:
-		- limit_mib: 512 -> Este es el límite máximo de memoria que el collector puede usar.
-			Lo ideal es que este valor sea igual al 70% u 80% de la ram de la maquina
-			donde corra el collector.
-  		- spike_limit_mib: 128 -> Cuando se acerca a este limite se empieza a rechazar 
-			telemetría temporalmente.
+		- limit_percentage: 70 -> Si el proceso usa más del 70% de la memoria disponible
+			empieza a rechazar datos
+		- spike_limit_percentage: 25 -> si la memoria aumenta demasiado rápido
+			limita cuánto puede crecer en ese pico.
   		- check_interval: 5s -> Cada n segundos el collector revisa cuanta memoria 
 			esta usando
 
 exporters: -> Configuraciones para enviar los datos a otro sistema.
 	Configuraciones para esta opción: 
+	Para mandar datos a tempo ---------------------------------------
 	- otlp_grpc: -> Crea un objeto exporter.. En teoría este nombre es indiferente 
 		porque es como si fuera el nombre de un objeto donde lo importante es 
 		su contenido, sin embargo, la documentación recomienda este nombre.
@@ -558,6 +566,10 @@ exporters: -> Configuraciones para enviar los datos a otro sistema.
 			los datos de los pipelines.
 			Básicamente para debuggear o verificar que sí están llegando 	
 			traces/metrics/logs.
+	Para mandar datos a loki ---------------------------------------
+	- loki:
+    	    endpoint: http://nombreContenedorLoki:3100/loki/api/v1/push -> Para mandar los logs 
+		a loki.
 
 extensions: -> Para agregar funcionalidades auxiliares al collector
 	Configuraciones para esta opción:
@@ -569,6 +581,11 @@ extensions: -> Para agregar funcionalidades auxiliares al collector
 		contenedor. *
 
 service:
+ - telemetry:
+    metrics:
+      address: 0.0.0.0:8888 -> Permite monitorear el collector con Prometheus o Grafana.
+	Evidentemtne si se configura esto, se debe configurar prometheus para que consuma
+	este servicio.
  - extensions: [health_check, file_storage] -> habilita un endpoint de salud del collector.
 	Esto es usado por otros contenedores para ver el estado de saludo del colletor.
  - pipelines: -> Define los pipelines, el cual se encargan de recibir, procesar y exportar
@@ -576,6 +593,7 @@ service:
 	Cada telemetria tiene su propio pipeline.
 	El collector no procesa datos si no están en un pipeline.
 	Configuraciones para esta opción:
+	Configuración para tempo ---------------------------------------
 	- traces: -> Indica el pipeline de las trazas.
 		Configuraciones para esta opción:
 		- receivers: [nombreReceiver1, nombreReceiver2, nombreReceiverN] -> Para
@@ -597,6 +615,12 @@ service:
 			indicar que exporter's de los que se configuraron en la etiqueta
 			exporters se enviaran las trazas del collector hacia afuera.
 			Se envían al exporter OTLP (Tempo).
+	Configuración para loki ---------------------------------------
+	- pipelines:
+	    logs:
+	      receivers: [otlp]
+    	      processors: [batch]
+              exporters: [loki]
 
 La imagen del OpenTelemetry Collector ejecuta el proceso con un usuario no root por razones de seguridad.
 Cuando Docker crea un volumen de persistencia, este se crea con propietario root:root y permisos 755.
@@ -679,14 +703,7 @@ En grafana ajustar el nombre del contenedor de tempo (en caso de que se haya usa
 contenedor).
 
 
-
-
-
-
-
-
-
-IMPLMENTACION DE LOKI
+IMPLEMENTACION DE LOKI
 
 Loki: Es un sistema de agregación de logs creado por Grafana Labs.
 Su objetivo es: Guardar, organizar y consultar logs Pero de una forma más ligera y barata que otros sistemas.
@@ -846,6 +863,7 @@ MSYS_NO_PATHCONV=1 docker run -d \
   -p 3100:3100 \
   --network red \
   -v lokiData:/loki \
+  -v $PWD/local-config.yaml:/etc/loki/local-config.yaml  \
   grafana/loki:2.9.8 -> Crea y corre un contendor con loki.
 	- -p 3100:3100 -> Puerto donde corre loki.
 	- /etc/loki/local-config.yaml -> Ubicación del archivo de configuración 
@@ -860,6 +878,10 @@ GET /loki/api/v1/query -> Para consultar logs.
 POST /loki/api/v1/push -> Para enviar logs.
 
 /metrics -> Aquí Loki expone métricas que puede recolectar: Prometheus.
+
+Ahora realizar la conexión de grafana con loki.
+Después agregar las configuraciones necesarias en el collector para que pueda
+mandar logs a loki.
 
 
 Configurar el guardado de logs en la app ----------------------------
@@ -963,21 +985,9 @@ Este modelo es el ideal pero es el mas caro.
 
 
 
-
-
-
-
-
-
-
-
-MSYS_NO_PATHCONV=1
-
-hacer la conexión de grafana con loki.
-Decirle a chatgpt como configurar la conexión del collector con loki
 Preguntar si la configuración de los logs en la app ya esta para prod
 Preguntar como se deben implmentar los logs en la app.
-Preguntar por curiosidad que métricas de loki podría mandarse a prometheus
+
 
 
 
