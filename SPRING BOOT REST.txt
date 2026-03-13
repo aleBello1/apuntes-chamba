@@ -485,6 +485,12 @@ Cuando se define logback-spring.xml, normalmente se deja de usar la configuraci�
 	de rotación y niveles de logs.
 	Es el nodo raíz obligatorio del archivo de configuración de Logback.
 
+<include resource="rutaArchivo"/> -> Permite importar configuraciones de Logback definidas 
+	en otro archivo XML.
+	Spring Boot normalmente incluye: org/springframework/boot/logging/logback/base.xml
+	Este archivo ya define las configuraciones de la consola. En resumen agragar esta 
+	nos permite tener la impresión de logs en la consola como nomalmente se tendría.
+
 <springProfile name="nombrePerfil">
     *Etiqueta de configuracion*
 </springProfile> -> Para que cierta etiqueta de configuración funcione solo cuando se tenga

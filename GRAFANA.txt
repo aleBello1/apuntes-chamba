@@ -493,6 +493,7 @@ processors: -> Los processors modifican o procesan datos antes de enviarlos.
 	Los processors se ejecutan en orden (de izq a der, según se hayan metido en el 
 	arreglo que se le pasa a los processors).
 	Configuraciones para esta opción:
+	Configuraciones para loki y tempo ------------------------------------
 	- batch: -> Agrupa muchas trazas/logs/métricas y después las envía juntos.
 		Configuraciones para esta opción:
 		En pruebas los valores recomendados son: 1, 64 y 128 respectivamente y para 
@@ -529,6 +530,13 @@ processors: -> Los processors modifican o procesan datos antes de enviarlos.
 			limita cuánto puede crecer en ese pico.
   		- check_interval: 5s -> Cada n segundos el collector revisa cuanta memoria 
 			esta usando
+	Configuraciones para loki ------------------------------------
+	- attributes:
+    	    actions:
+            - key: loki.attribute.labels
+              action: upsert
+              value: nombreCampo1, nombreCampo2, nombreCampoN -> Tomando campos existentes, los
+		convierte en campos labels.
 
 exporters: -> Configuraciones para enviar los datos a otro sistema.
 	Configuraciones para esta opción: 
@@ -568,8 +576,15 @@ exporters: -> Configuraciones para enviar los datos a otro sistema.
 			traces/metrics/logs.
 	Para mandar datos a loki ---------------------------------------
 	- loki:
-    	    endpoint: http://nombreContenedorLoki:3100/loki/api/v1/push -> Para mandar los logs 
-		a loki.
+		Configuraciones para esta opción:
+    	    	- endpoint: http://nombreContenedorLoki:3100/loki/api/v1/push -> Para mandar los 
+			logs a loki.
+		- default_labels_enabled: -> Controla qué labels automáticas añade Loki a TODOS 
+			los logs.
+			- exporter: false -> NO añade la label "exporter" a los logs.
+				Si estuviera en true, los logs dirían de donde viene los logs 
+				(de loki)
+			- job: true -> Añade el label que representa el nombre de proyecto.
 
 extensions: -> Para agregar funcionalidades auxiliares al collector
 	Configuraciones para esta opción:
@@ -884,59 +899,52 @@ Después agregar las configuraciones necesarias en el collector para que pueda
 mandar logs a loki.
 
 
-Configurar el guardado de logs en la app ----------------------------
+Configurar la app ----------------------------
 
-Para que grafana pueda graficar los logs, estos deben ser enviados por loki y a su 
-vez para que eso suceda la app debe guardar los logs en un archivo.
+Hay dos tipos con loki:
+- labels: Se usan para indexar.
+	No debe tener cardinalidad alta porque esto genera millones de combinaciones. ****
+	Los valores comunes seria: el nombre del ambiente, el nombre de la app, el nivel de 
+	información (error, info, debug, etc)
+- campos: Son datos que van dentro del json.
+	Evidentemente no se agrega datos como contraseñas, tokens, tarjetas, etc.
+	En el collector decides qué campos del logJson se vuelven labels. ****
 
-*Revisar los apuntes sobre como se hace esto*
 
-El archivo que se uso tiene este contenido:
 
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration>
 
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+Se crea el package llamado config y dentro de este la clase ''.
 
-    <!-- Ruta del archivo -->
+*Explicar el codigo*
 
-    <springProfile name="local">
-        <property name="LOG_PATH" value="./logs"/>
-    </springProfile>
+MDC.put("nombreCampo", valor); -> Para crear y asignar un valor al logJson.
+	MDC significa Mapped Diagnostic Context.
+	Permite agregar información contextual al hilo actual.
+	El logger agrega automáticamente como campo el nivel de log (cuando se hace log.nivel()). 
+	Mientras que OpenTelemetry agrega automáticamente el trace_id para que se puede correlacionar 
+	un trace_id de tempo con un log de loki y viceversa.
 
-    <springProfile name="dev">
-        <property name="LOG_PATH" value="/var/log/miapp"/>
-    </springProfile>
 
-    <springProfile name="prod">
-        <property name="LOG_PATH" value="/var/log/miapp"/>
-    </springProfile>
+Después nos regresaríamos a la configuración del collector para definir que campos del logJson
+serán labels.
 
-    <!-- Nombre y ruta del archivo -->
-    <property name="LOG_FILE" value="${LOG_PATH}/app.log"/>
-
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-
-        <file>${LOG_FILE}</file>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxFileSize>200MB</maxFileSize>
-            <maxHistory>7</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
-        </rollingPolicy>
-
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </root>
-
-</configuration>
+java -javaagent:opentelemetry-javaagent.jar \
+-Dotel.service.name=mi-app \
+-Dotel.traces.exporter=otlp \
+-Dotel.metrics.exporter=none \
+-Dotel.logs.exporter=otlp \
+-Dotel.exporter.otlp.endpoint=http://localhost:4317 \
+-Dotel.exporter.otlp.protocol=grpc \
+-Dotel.instrumentation.logback-appender.enabled=true \
+-Dotel.instrumentation.logback-mdc.enabled=true \
+-Dotel.instrumentation.logback-appender.experimental.capture-mdc-attributes=* \
+-jar ./target/app-1.0.0.jar -> Se ejecuta el mismo comando para levantar la app con openTelemetry 
+	solo que se debe considerar que ahora la app manda logs. Ademas se agrega una nueva
+	opción mas.
+	- -Dotel.instrumentation.logback-appender.enabled=true -> Para hacer que los logs tengan 
+		traceId y span_id automáticamente. 
+	- -Dotel.instrumentation.logback-appender.experimental.capture-mdc-attributes=* -> Para
+		que los campos personalizados (los que se agregan con MDC.put) se envíen correctamente.
 
 
 
@@ -985,9 +993,25 @@ Este modelo es el ideal pero es el mas caro.
 
 
 
-Preguntar si la configuración de los logs en la app ya esta para prod
-Preguntar como se deben implmentar los logs en la app.
 
 
+conocer que hace el código de la app
 
+Hacer que aparezca el botón "View Trace" en los logs: *En grafana* -> apartado izq. connections
+	-> data sources -> loki -> buscar en esa pagina donde diga algo como: 'Derived fields'
+	-> add -> name: TraceID; type: regex in log line; regex: "traceid":"([a-f0-9]+)"; 
+	query: ${__value.raw} -> internal link: tempo.
 
+Visualizar la traza de determinado log: En el apartado explore -> data source: loki -> click 
+	dentro del cuerpo de determinado log -> scrollear hasta llegar al apartado links ->
+	click sobre tempo.
+
+Hacer que aparezca el botón "View log" en las trazas: *En grafana* -> apartado izq. connections
+	-> data sources -> tempo -> En apartado trace to logs -> data source: loki -> start time
+	shift: -1m; end time shift: 1m; use custom query: on -> query: {job=~".+"} | json | 
+	traceid="${__trace.traceId}" significa busca en todos los Jobs y dentro del json el 
+	traceId correspondiente al traceId seleccionado.
+
+Visualizar el log de determinada traza: En el apartado explore -> data source: tempo -> click 
+	sobre el traceId determinad traza -> a lado de determinado span id esta el button de 
+	log.
