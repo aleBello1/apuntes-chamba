@@ -1,12 +1,5 @@
 
 
-*EN SI ES EN GIT HUB*
-TAGS
-
-git push --tags --dry-run -> En lista los tags que esta pendientes por subirse al repositorio
-	remoto, es decir, muestra cuales tags están en local pero en remoto no.
-
-
 GIT FLOW
 
 Gestionar ramas de manera más eficiente y Automatiza merge's.

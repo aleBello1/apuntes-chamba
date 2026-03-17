@@ -1,9 +1,0 @@
-IMPORTAR EL SWAGGER A POSTMAN
-
-Si tenemos un swagger pero no la collection de postman, podemos exportar el 
-swagger para que postman construya la collection.
-
-*Estar en la pagina que tiene el swagger* -> presionar f12 -> apartado network -> refrescar la
-pagina -> seleccionar swagger-config y tomando la url del ambiente y el valor parcial de configUrl
-se arma una cadena así: 'urlAmbiente/v2/apic-docs' (podría ser v3 seguido por un valor diferente
-esto dependerá de la versión de swagger).

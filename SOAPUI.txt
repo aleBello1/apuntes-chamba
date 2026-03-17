@@ -1,5 +1,0 @@
-Sorprendentemente, una vez no jalo una request en soapUI pero en postman si jalo, lo que se hizo 
-fue enviar el mismo request que se envió en soapUi pero en postman. En postman se agrego la 
-siguiente configuración: *En la request* -> Apartado de arriba headers -> se agregaron dos heards
-	Content-Type: text/xml;charset=UTF-8
-	SOAPAction: "" (tal cual las dos comillas dobles vacías)
