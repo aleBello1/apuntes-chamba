@@ -131,7 +131,7 @@ ALERTAS
 
 Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule ->
 
-Crear un punto de contacto: Es definir por cual medio grafna nos enviara alertas: email, sms,
+Crear un punto de contacto: Es definir por cual medio grafana nos enviara alertas: email, sms,
 	slack, etc.
 	Apartado izq. alerting -> contact points:
 	- Crear el contacto point para email: Primero se debe crear un servidor SMTP (Simple Mail
@@ -152,7 +152,7 @@ generar contraseña de aplicación en Gmail: Esto es para que desde nuestro corr
 	Importante: necesitas tener activada la verificación en 2 pasos.
 	- Activar verificación en 2 pasos: Ir a Gmail -> click sobre nuestra foto -> click sobre
 		nuestrea cuenta -> seguridad y acceso -> verificación de 2 pasos.
-	Ir a este enlace:  https://myaccount.google.com/apppasswords -> asginar nobmre a la 
+	Ir a este enlace:  https://myaccount.google.com/apppasswords -> asginar nombre a la 
 	app -> crear -> nos arrjara la contraseña para esa app (se debe usar sin espacios en
 	blanco aunque Gmail nos la de con espacios en blanco***). xsyb zvvm kaem mlkp
 
@@ -910,20 +910,97 @@ Hay dos tipos con loki:
 	Evidentemente no se agrega datos como contraseñas, tokens, tarjetas, etc.
 	En el collector decides qué campos del logJson se vuelven labels. ****
 
+Se crea el package llamado config y dentro de este se crea la clase 'RequestLoggingFilter'.
+Esta clase es un filtro de Spring que intercepta todas las peticiones HTTP y con base a esas peticiones
+se crean campos personalizados que se agregaran a los logs de loki, algunos de los campos incluyen:
+nombre del ambiente, endpoint, método http, status, cuerpo de la request, entre otros.
 
+Esa clase se divide en tres partes dentro del método doFilterInternal:
+1. Antes de filterChain.doFilter(...): Son las acciones que se ejecutan antes de que la request
+	llegue al siguiente filtro o al controller.
+2. Llamada a filterChain.doFilter(...): Es lo que permite que la request continúe su flujo.
+	Puede ir a: otro filtro (si hay más en la cadena) o al controller (si ya es el último 
+	filtro).
+3. Después de filterChain.doFilter(...): lógica posterior cuando ya terminó toda la cadena (otros
+	filtros y el controllador).
+Nota: Hay algunos valores que están disponibles hasta determiado punto del flujo.
 
+@Component
+class RequestLoggingFilter : OncePerRequestFilter() {} -> Se crea la clase y se convierte en un componente 
+	de spring boot.
+	El hacer que se herede de la clase OncePerRequestFilter implica que el filtro se ejecuta una sola 
+	vez por cada request HTTP.
 
-Se crea el package llamado config y dentro de este la clase ''.
+@Throws(ServletException::class, IOException::class)
+override fun doFilterInternal(
+    request: HttpServletRequest,
+    response: HttpServletResponse,
+    filterChain: FilterChain
+) {...} -> Método principal del filtro.
+	Aquí se define qué hacer antes, durante y después de una request HTTP.
+	Spring lo ejecuta automáticamente por cada request.
+	- request: HttpServletRequest -> Representa la petición HTTP que llega.
+		Aquí puedes obtener: método http, headers, body, parámetros, URL, etc.
+	- response: HttpServletResponse -> Representa la respuesta que vas a enviar.
+	- filterChain: FilterChain -> Controla por donde pasara la request.
+	- @Throws(...) -> Para indicar que este método puede lanzar estas exceptiones.
+		Es necesario agregar esto Porque el método original que estás sobrescribiendo (de 
+		OncePerRequestFilter) ya declara esas excepciones.
 
-*Explicar el codigo*
+val wrappedRequest = ContentCachingRequestWrapper(request) -> Envuelve la request original en un wrapper que:
+	permite leer el body (cuerpo) de la request múltiples veces.
+	Si no se usa esto, entonces el controller ya no podrá leer el body y por tanto el flujo fallara.
+
+wrappedRequest.method -> Devuelve el nombre del método http de la request.
+
+wrappedRequest.requestURI -> Devuelve el valor de la url sin los query params, los path variables si los incluye.***
+
+wrappedRequest.queryString -> Devuelve el valor de todos los query params junto con sus respectivos valores.
+
+wrappedRequest.getHeader("nombreHeader") -> Extrae el valor asociado a determinado header.
+
+wrappedRequest.headerNames -> Devuelve le nombre de todos los headers.
+
+wrappedRequest.getParameter("nombreQueryParam") -> Devuelve el valor asociado a determinado query param.
+
+wrappedRequest.contentLength -> Devuelve el tamaño del body.
+
+try {
+    filterChain.doFilter(wrappedRequest, response)
+} catch (ex: Exception) {
+    throw ex
+} finally {...} -> Para que la request y la response vayan al siguiente filtro o 
+	en su defecto a controller que le corresponde ir.
+	Si no se llama a esta función la request se quedara ahí y nunca llevara al controller. ***
+	Esta instrucción va en un try catch porque ahí ocurren otros filtros, el controller, etc y
+	eso puede provocar excepciontes. En el catch es necesario que se lance la exception que 
+	se capture porque si no spring no se enterara de la exception. 
+
+wrappedRequest.contentAsByteArray -> Devuelve el body de la request.
+	El body solo estará disponible después de doFilter. ****
+
+response.status -> Devuelve el status de la respuesta.
+
+val endpoint = wrappedRequest.getAttribute(
+    HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE
+) as? String ?: wrappedRequest.requestURI -> Intenta obtener el endpoint mapeado por Spring (con 
+	patrones) Si no puede, usa la URL real (requestURI).
+	Es super importante usar este valor en loki porque al ser un patron tiene baja 
+	cardinalidad perfecto para los labels. *****
+	Este valor solo existe después de que Spring resuelve el controller. ***
+	- HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE -> Representa El patrón del endpoint que 
+		mejor coincidió con la request.
 
 MDC.put("nombreCampo", valor); -> Para crear y asignar un valor al logJson.
 	MDC significa Mapped Diagnostic Context.
 	Permite agregar información contextual al hilo actual.
 	El logger agrega automáticamente como campo el nivel de log (cuando se hace log.nivel()). 
-	Mientras que OpenTelemetry agrega automáticamente el trace_id para que se puede correlacionar 
-	un trace_id de tempo con un log de loki y viceversa.
+	Mientras que OpenTelemetry agrega automáticamente el trace_id para que se puede 
+	correlacionar un trace_id de tempo con un log de loki y viceversa.
 
+MDC.clear() -> Elimina TODOS los valores del MDC del hilo actual.
+	Es indispensable usar esta instrucción dentro de un finally para que se ejecute siempre
+	y evite contaminar datos.
 
 Después nos regresaríamos a la configuración del collector para definir que campos del logJson
 serán labels.
@@ -944,7 +1021,30 @@ java -javaagent:opentelemetry-javaagent.jar \
 	- -Dotel.instrumentation.logback-appender.enabled=true -> Para hacer que los logs tengan 
 		traceId y span_id automáticamente. 
 	- -Dotel.instrumentation.logback-appender.experimental.capture-mdc-attributes=* -> Para
-		que los campos personalizados (los que se agregan con MDC.put) se envíen correctamente.
+		que los campos personalizados (los que se agregan con MDC.put) se envíen 
+		correctamente.
+
+Volver a grafana para hacer unas configuraciones.
+
+Hacer que aparezca el botón "View Trace" en los logs: *En grafana* -> apartado izq. connections
+	-> data sources -> loki -> buscar en esa pagina donde diga algo como: 'Derived fields'
+	-> add -> name: TraceID; type: regex in log line; regex: "traceid":"([a-f0-9]+)"; 
+	query: ${__value.raw} -> internal link: tempo.
+
+Visualizar la traza de determinado log: En el apartado explore -> data source: loki -> click 
+	dentro del cuerpo de determinado log -> scrollear hasta llegar al apartado links ->
+	click sobre tempo.
+
+Hacer que aparezca el botón "View log" en las trazas: *En grafana* -> apartado izq. connections
+	-> data sources -> tempo -> En apartado trace to logs -> data source: loki -> start time
+	shift: -1m; end time shift: 1m; use custom query: on -> query: {job=~".+"} | json | 
+	traceid="${__trace.traceId}" significa busca en todos los Jobs y dentro del json el 
+	traceId correspondiente al traceId seleccionado.
+
+Visualizar el log de determinada traza: En el apartado explore -> data source: tempo -> click 
+	sobre el traceId determinad traza -> a lado de determinado span id esta el button de 
+	log.
+
 
 
 
@@ -992,26 +1092,41 @@ Ec2 6 - N -> Cada app en una instancia diferente.
 Este modelo es el ideal pero es el mas caro.
 
 
+Modelo: Personalizado ---------------------------------------
+
+Con base en los modelos que ha propuesto la ia se pensó un modelo mejor.
+
+EC2 1 → Grafana
+EC2 2 → Tempo
+EC2 3 → Prometheus / Mimir
+EC2 4 → Loki
+EC2 5 → Collector cluster
+Ec2 6 - N -> Cada app con su propio collector en una instancia diferente.
+
+Este modelo es igual de caro que el ideal pero con la diferencia es que cada app tiene su 
+propio collector con la finalidad de filtrar información y que al collector maestro no le 
+lleguen tantos datos.
+
+
+CONSTRUCCION DEL DOCKER COMPOSE
+
+No es necesario usar depends_on hacia Grafana porque Grafana solo es la capa de visualización. Es 
+decir, servicios como Prometheus, Loki o Tempo deben funcionar de manera totalmente independiente 
+recolectando y almacenando métricas, logs y trazas, aunque Grafana no esté disponible.
+
+Asi mismo, lo ideal es que todas las herramientas puedan estar levantadas de manera independiente
+para que puedan seguir recolentando datos. En resumen no se debe usar depends on en ninguna 
+herramienta.
 
 
 
-conocer que hace el código de la app
 
-Hacer que aparezca el botón "View Trace" en los logs: *En grafana* -> apartado izq. connections
-	-> data sources -> loki -> buscar en esa pagina donde diga algo como: 'Derived fields'
-	-> add -> name: TraceID; type: regex in log line; regex: "traceid":"([a-f0-9]+)"; 
-	query: ${__value.raw} -> internal link: tempo.
 
-Visualizar la traza de determinado log: En el apartado explore -> data source: loki -> click 
-	dentro del cuerpo de determinado log -> scrollear hasta llegar al apartado links ->
-	click sobre tempo.
+Agregar el contenedor auxiliar al collector el cual le permite tener un volumen (eso cambiara de
+local a prod??)
+Hacer el Docker compose. Si será necesario hacerlo para que los compañeros lo puedan
+usar en su local con sus proyectos.
+Preguntarle a chatGpt sobre que reglas de entrada y salida serán necesarios abrir y documentarlo.
+Falta agregar al código el atributo reason e implementarlo a la lógica de la app.
 
-Hacer que aparezca el botón "View log" en las trazas: *En grafana* -> apartado izq. connections
-	-> data sources -> tempo -> En apartado trace to logs -> data source: loki -> start time
-	shift: -1m; end time shift: 1m; use custom query: on -> query: {job=~".+"} | json | 
-	traceid="${__trace.traceId}" significa busca en todos los Jobs y dentro del json el 
-	traceId correspondiente al traceId seleccionado.
 
-Visualizar el log de determinada traza: En el apartado explore -> data source: tempo -> click 
-	sobre el traceId determinad traza -> a lado de determinado span id esta el button de 
-	log.

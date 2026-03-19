@@ -1,0 +1,105 @@
+Opcional: Preparación e instalación de Docker -----------------------
+
+Al conectarnos a la MV deberemos actualizar todos los paquetes 
+	sudo yum update -y ó
+	sudo apt update && sudo apt upgrade -y
+
+sudo amazon-linux-extras install Docker ó
+sudo yum install Docker ó
+sudo apt install docker.io -y -> Instala Docker en la MV.
+
+sudo service docker start -> Levanta el servicio de Docker.
+
+sudo service docker status -> Comprobar el status del servicio de Docker.
+
+Después instalamos Docker compose, para ello buscar en la pagina oficial de Docker compose
+los comandos para instalar Docker compose en una maquina virutal 'Linux standalone binary'.
+
+*Desde la terminal local*
+scp -i /ruta/nombreArhivoPem.pem rutaMHost/nombreArchivo.entenxion 
+	instance-user-name@instance-public-dns-name rutaMV/ -> Para copiar un archivo desde 
+		la maquina local y pegarlo en la maquina remota.
+		La idea es copiar y pegar el archivo Docker compose. *
+	- instance-user-name: Es el nombre algun usuario dentro de una instancia EC2.
+		Por defecto siempre se creara un usuario llamado 'ec2-user'.
+	- instance-public-dns-name: Entrar al detalle de una EC2 y en donde diga 'DNS de ipv4
+		publica'.
+
+Con esto ya podriamos correr el Docker compose sin problemas. Todos los comandos de Docker se 
+deben usar con sudo. *
+Pudiese darse el caso de que al usar los comandos se nos arrje el mensaje: 'out of memory' el 
+cual implica que estamos al borde de ocupar toda la memoria ram que tiene disponible nuestra
+instancia y por tanto ya no obtendremos resultados en nuestros comandos. En ese caso la solución
+seria usar un escalamiento horizontal.
+
+*En la maquina vi4rtual*
+free -> Nos muestra una tabla donde se ve la memoria ram* total ocupada y disponible.
+	Conforme se van levantando los contenedores van ocupando mas y mas meoria, para 
+	monitorear la memoria se ocupa este comando.
+
+Para probar con postman que los microservicios, servicios o apps están corriendo usarimos 
+como hostname la dns publica y el puerto pertinente: 'dns-publica:puertoApp'.***
+
+Si un Docker compose originalmente estaba conformado por 4 contenedores y por espacio en memoria
+se necesita poner 2 contenedores en una mv y los otros 2 contenedores en la otra mv se puede hacer
+pero en la instrucción depends_on se quitara los contenedores de los cuales depende.
+
+Se recuerda que, los contenedores que almacenan db puede estar en la instancia pero una mejor
+opción seria utilizar un servicio de db en la nube como dinamoDd, rds, mongoDb atlas, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////HERRAMIENTAS PARA CONECTARSE REMOTAMENTE AL SERVIDOR////////////////////
+
+
+MOBAXTERMN 
+
+Es una herramienta muy popular en Windows para trabajar con servidores remotos, 
+especialmente en entornos Linux/Unix.
+programa que reúne en una sola interfaz varias herramientas de acceso remoto y utilidades de 
+red. Básicamente te permite conectarte a otros equipos (servidores, contenedores, máquinas 
+virtuales, etc.) y operarlos como si estuvieras dentro de ellos.
+
+Una de las características principales del programa es que con cualquier otro siempre será
+necesario ingresar la ip de servidor externo junto con su respectiva contraseña (pe un pem)
+con este programa ya no será necesario cargar esos datos cada que deseemos conectarnos al
+servidor.****
+
+Ir a la pagina oficial de mobaxterm y descargar la versión portable.
+
+
+Crear un espacio de trabajo: En el apartado izq dar click der -> new folder -> Asignar el nombre
+	al proyecto.
+
+Crear una nuevo conexión con una instancia: click derecho sobre el folder de un proyecto -> new 
+	sesión -> ssh -> remote host: ip_publica; specify username: ubuntu (casi siempre será
+	es nombre) -> click apartado advanced ssh settings -> palomear use private key y buscar
+	el archivo pem.
+
+Subir archivos de la maquina local al servidor: Solo se arrastran y se sueltan en la parte izq
+	del mobaxternm. Es parte representa con interfaz grafica un sistema de archivo del 
+	servidor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

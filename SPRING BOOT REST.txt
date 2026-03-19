@@ -16,7 +16,8 @@ spring.data.redis.timeout=time_ms -> Configuraciones necesarias para conectarse 
 		desea conectar.
 		Por defecto se conectara a la db numero 0.
 		Redis no maneja bases de datos por su nombre como MySQL, solo le asigna números
-		a sus db's, cuando no se especifica el numero de la db a la que se desea 			conectar, se conecta a la db No. 0. Por defecto solo vienen 16 db's.
+		a sus db's, cuando no se especifica el numero de la db a la que se desea 
+			conectar, se conecta a la db No. 0. Por defecto solo vienen 16 db's.
 	- spring.data.redis.timeout=time_ms -> Es el tiempo máximo que Spring esperará una 
 		respuesta de Redis.
 		Si Redis no responde en ese tiempo → se lanza excepción.
@@ -40,7 +41,8 @@ Deja de intentar llamadas inútiles.
 Se recupera cuando Redis vuelve.
 
 Se usa cuando se depende de un sistema externo que puede fallar o volverse lento. *****
-Para el caso de redis, el punto es poder manejar el caso en el que redis no este funcionado y podamos usar la db (MySQL, postresql, etc) en su lugar.
+Para el caso de redis, el punto es poder manejar el caso en el que redis no este funcionado y 
+podamos usar la db (MySQL, postresql, etc) en su lugar.
 
 Si no se implementa, las request serán lentas porque siempre se intentara llamar a Redis y como
 este podría tardar en responder entonces habrá timeouts largos (si se configura el timeout aun
@@ -55,7 +57,8 @@ Resilience4j: Es una librería de resiliencia para Java/Kotlin. Se le llama resi
 resiste fallos externos sin caerse. Implementa patrones de diseño para manejar fallos externos 
 de forma inteligente.
 Proporciona: Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time limiter.
-Resuelve problemas reales de producción: servicios lentos, dependencias caídas, cascadas de fallos, saturación de threads.
+Resuelve problemas reales de producción: servicios lentos, dependencias caídas, cascadas de fallos,
+saturación de threads.
 
 Para aplicaciones con redis remoto se recomienda:
 
@@ -128,12 +131,15 @@ fun <T> get(key: String, typeRef: TypeReference<T>): T? {
 	Si el método falla (por ejemplo porque no hay conexión con redis porque esta caído
 	o si simplmenete se supera el timeout), se lanzara una excepción y ejecutara el método
 	que se asigne al parámetro: 'fallbackMethod'.
-	- fallbackMethod = "fallback" -> El método fallback debe cumplir reglas estrictas: Debe 		estar en la misma clase, Debe tener los mismos parámetros que el método que se 
+	- fallbackMethod = "fallback" -> El método fallback debe cumplir reglas estrictas: Debe
+ 		estar en la misma clase, Debe tener los mismos parámetros que el método que se 
 		le pone la anotación CircuitBreaker y Debe agregar un parámetro extra al final
 		de tipo Throwable.
-		Cuando el circuito este abierto, el método con la anotación CircuitBreaker ni 			siquiera se ejecuta e inmediatamente se ejecuta su fallback.
+		Cuando el circuito este abierto, el método con la anotación CircuitBreaker ni 	
+		siquiera se ejecuta e inmediatamente se ejecuta su fallback.
 	- name = "redisRemoteCB" -> Identifica una instancia específica del Circuit Breaker (de 
-		los que se configuraron en el application en la opción instances: 				nombreInstancia).
+		los que se configuraron en el application en la opción instances: 		
+		nombreInstancia).
 		La conecta con una configuración concreta.
 		Mantiene su propio estado independiente.
 
@@ -191,9 +197,11 @@ fun getNombreRecurso(): List<tipoDatoX> {
 
 °°°°°°°° Implementación de monitoreo + alerta (en local) °°°°°°
 
-Los que se implementa funciona para Ver cuánto tiempo el Circuit Breaker estuvo OPEN, Ver histórico de estados y Crear alertas si dura demasiado tiempo abierto.
+Los que se implementa funciona para Ver cuánto tiempo el Circuit Breaker estuvo OPEN, Ver histórico 
+de estados y Crear alertas si dura demasiado tiempo abierto.
 
-Micrometer es una librería de métricas para JVM. Es la capa intermedia entre tu aplicación y el sistema de monitoreo.
+Micrometer es una librería de métricas para JVM. Es la capa intermedia entre tu aplicación y el 
+sistema de monitoreo.
 Se encarga de Micrometer de Crear métricas (counter, gauge, timer), Las registra y Las exporta 
 al sistema que tú elijas.
 Desde Spring Boot 2, Micrometer viene integrado automáticamente.
@@ -202,7 +210,8 @@ Prometheus es un sistema de monitoreo basado en scraping.
 Encargado de:
 - Hace requests HTTP a tu app
 - Lee métricas en formato especial
-- Las guarda en una base de datos de series temporales (Prometheus tiene su propia base de datos de series temporales (TSDB), No vuelve lenta tu app, sin embargo tener una cardinalidad alta
+- Las guarda en una base de datos de series temporales (Prometheus tiene su propia base de datos de 
+series temporales (TSDB), No vuelve lenta tu app, sin embargo tener una cardinalidad alta
 puede ser peligroso porque puede matar al servidor de prometheus).
 - Permite hacer queries y alertas
 Prometheus NO recibe métricas.
@@ -304,12 +313,12 @@ scrape_configs: -> Lista de cosas que Prometheus debe monitorear.
 	    - - source_labels: [__name__]
               regex: "promhttp_.*"
     	      action: drop -> Muchos sistemas de observabilidad están escritos en Go. Por ejemplo: 
-		Prometheus, Grafana Loki, Grafana Tempo y OpenTelemetry Collector. Todos generan métricas 
-		internas del runtime de Go.
+		Prometheus, Grafana Loki, Grafana Tempo y OpenTelemetry Collector. Todos generan
+		métricas internas del runtime de Go.
 		Como prometheus recibe muchas métricas del runtime de go y estas métricas no sirven para 
 		dashboards lo mejor es eliminarlas, asi se reduce la ram, disco y cardinalidad.
-		Esta configuración sirve para eliminar todas las métricas de go. Esta configuración se usa 
-		sobre collector, tempo y loki.
+		Esta configuración sirve para eliminar todas las métricas de go. Esta configuración se 
+		usa sobre collector, tempo y loki.
 
 Hacer que promethus consuma las métricas: 
 
@@ -383,6 +392,9 @@ docker run -d \
   -v grafana_data:/var/lib/grafana \
   grafana/grafana -> Manera en el que se debe crear el contendor si es que se usara para pruebas
 	locales el correo personal de Gmail.
+	- GF_SMTP_ENABLED=true -> Habilita SMTP (puede enviar emails).
+	- GF_SMTP_USER=correo_personal_empresa -> Es el correo electrónico que Grafana usará 
+		para enviar emails. 
 	- GF_SMTP_PASSWORD=mi_contraseña -> Es la contraseña que nos da Gmail especial para 
 		aplicaciones.
 	- GF_SMTP_HOST=smtp.gmail.com:587 -> Este es el especifico valor para Gmail, al usar
@@ -393,6 +405,7 @@ docker run -d \
 		remitente del correo.
 		De tal modo que esta configuración en combinación con la anterior, al usuario
 		le llegara el correo asi: Grafana Alerts <alerts@empresa.com>.
+	- GF_SMTP_SKIP_VERIFY=false -> Verifica el certificado SSL del servidor (modo seguro).
 
 Al ingresar el usuario y contraseña será admin, posteriormente nos pedirá cambiar la contraseña.
 
@@ -472,11 +485,13 @@ logging.level.com.alejandro.proyecto.nombrePaqueteNoInteresN=ERROR -> Para mostr
 
 Configuración de logs usando un archivo xml ---------------------
 
-En src/main/resources se crea un archivo llamado logback-spring.xml. Spring Boot ya trae una configuración interna por defecto.
+En src/main/resources se crea un archivo llamado logback-spring.xml. Spring Boot ya trae una 
+configuración interna por defecto.
 Si tú creas logback-spring.xml, la reemplazas completamente.
 
 Se puede usar configuración en application.yml o logback-spring.xml.
-Cuando se define logback-spring.xml, normalmente se deja de usar la configuración básica de logging en application.
+Cuando se define logback-spring.xml, normalmente se deja de usar la configuración básica de 
+logging en application.
 
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
