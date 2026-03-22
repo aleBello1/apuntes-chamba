@@ -8,6 +8,8 @@ sudo amazon-linux-extras install Docker ó
 sudo yum install Docker ó
 sudo apt install docker.io -y -> Instala Docker en la MV.
 
+sudo apt install docker-compose -y -> Instala Docker compose.
+
 sudo service docker start -> Levanta el servicio de Docker.
 
 sudo service docker status -> Comprobar el status del servicio de Docker.
@@ -84,7 +86,8 @@ Crear un espacio de trabajo: En el apartado izq dar click der -> new folder -> A
 Crear una nuevo conexión con una instancia: click derecho sobre el folder de un proyecto -> new 
 	sesión -> ssh -> remote host: ip_publica; specify username: ubuntu (casi siempre será
 	es nombre) -> click apartado advanced ssh settings -> palomear use private key y buscar
-	el archivo pem.
+	el archivo pem -> click sobre el apartado bookmark settings -> sesión name: ingresar
+	el nombre de la instancia -> ok.
 
 Subir archivos de la maquina local al servidor: Solo se arrastran y se sueltan en la parte izq
 	del mobaxternm. Es parte representa con interfaz grafica un sistema de archivo del 

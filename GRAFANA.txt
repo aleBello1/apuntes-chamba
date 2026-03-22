@@ -585,10 +585,25 @@ exporters: -> Configuraciones para enviar los datos a otro sistema.
 				Si estuviera en true, los logs dirían de donde viene los logs 
 				(de loki)
 			- job: true -> Añade el label que representa el nombre de proyecto.
+	Para mandar datos a promethues ---------------------------------------
+	- prometheus:
+		Configuraciones para esta opción:
+		- endpoint: "0.0.0.0:9464" -> Indica el puerto donde quedaran expuestas las métricas
+			para que promethues pueda scrapear.
+			Nuevamente es en todas las interfaces para exporner esto afuera del contenedor.
+		- send_timestamps: true -> Incluye el timestamp original de la métrica.
+			Sin esto Prometheus pone su propio timestamp
+		- metric_expiration: 180m -> Tiempo que una métrica vive sin actualizarse.
+		- enable_open_metrics: true -> Usa formato moderno (OpenMetrics)
+
 
 extensions: -> Para agregar funcionalidades auxiliares al collector
 	Configuraciones para esta opción:
 	- health_check: -> Crea el endpoint de salud para el collector.
+		Por defecto el endpoint se encuentra en localhost:13133.
+		- endpoint: 0.0.0.0:13133 -> Para modificar donde se encuentra el endpoint de 
+			healthcheck. Al escuchar en todas las interfaces se puede usar este
+			servicio afuera del contendor.
 	- file_storage:
     	    directory: /var/lib/otelcol -> habilita almacenamiento persistente dentro del 	
 		collector.
@@ -631,11 +646,15 @@ service:
 			exporters se enviaran las trazas del collector hacia afuera.
 			Se envían al exporter OTLP (Tempo).
 	Configuración para loki ---------------------------------------
-	- pipelines:
-	    logs:
-	      receivers: [otlp]
-    	      processors: [batch]
-              exporters: [loki]
+	- logs:
+	    receivers: [otlp]
+    	    processors: [memory_limiter, batch]
+            exporters: [loki]
+	Configuración para prometheus ---------------------------------------
+	- logs:
+	    receivers: [otlp]
+    	    processors: [memory_limiter, batch]
+            exporters: [prometheus]
 
 La imagen del OpenTelemetry Collector ejecuta el proceso con un usuario no root por razones de seguridad.
 Cuando Docker crea un volumen de persistencia, este se crea con propietario root:root y permisos 755.
@@ -1046,6 +1065,30 @@ Visualizar el log de determinada traza: En el apartado explore -> data source: t
 	log.
 
 
+IMPLMENTACION DEL COLLECTOR MAS PROMETHEUS
+
+Si se tienen varios proyectos mandando métricas al collector, el collector sabe de que proyecto
+vienen porque al levantar el proyecto con la bandera: -Dotel.service.name=mi-app este nombre 
+viene con los datos que mande al collector.
+
+java -javaagent:opentelemetry-javaagent.jar \
+-Dotel.service.name=mi-app \
+-Dotel.traces.exporter=otlp \
+-Dotel.metrics.exporter=otlp \
+-Dotel.metric.export.interval=10000 \
+-Dotel.logs.exporter=otlp \
+-Dotel.exporter.otlp.endpoint=http://localhost:4317 \
+-Dotel.exporter.otlp.protocol=grpc \
+-Dotel.instrumentation.logback-appender.enabled=true \
+-Dotel.instrumentation.logback-mdc.enabled=true \
+-Dotel.instrumentation.logback-appender.experimental.capture-mdc-attributes=* \
+-jar ./target/app-1.0.0.jar -> Se ejecuta el mismo comando para levantar la app con openTelemetry 
+	solo que se debe considerar que ahora la app manda metricas.
+	- -Dotel.metric.export.interval=10000 -> Para que Cada 10 segundos mande métricas al Collector.
+
+En el archivo de configuración del collector se agrega el exporter y el pipeline.
+
+En el archivo de configuracion de prometheus se scrapea al collector en vez de a cada proyecto.
 
 
 
@@ -1119,14 +1162,49 @@ para que puedan seguir recolentando datos. En resumen no se debe usar depends on
 herramienta.
 
 
+CONFIGURACION DE LAS INSTANCIAS
+
+Hay dos instancias: la instancia con la app y la instancia de observabilidad (con las herramientas: 
+grafana, loki, promethues, collector y tempo).
+
+En la instancia de observabilidad se abren las siguiente reglas de entrada:
+	- puerto 4317 para que el collector reciba datos.
+	- puerto 3000 para poder acceder a grafana.
+
+Idealmente la configuración en la gui de aws debe ser la siguiente: 
+Campo	Collector	Grafana
+Puerto	4317		3000
+Tipo	TCP		TCP
+Source	instancia APP	tu IP
+
+En la instancia de la app, Probablemente NO necesitas abrir ninguna regla de salida (outbound)
+porque Por defecto, los Security Groups tienen esto: Outbound: 0.0.0.0/0 → ALLOW y Eso significa:
+la instancia puede salir a cualquier IP en cualquier puerto. 
+
+Si fuese el caso de tener que abrir una regla de salida, la configuración en aws debe ser la 
+siguiente:
+Campo		Valor
+Type		Custom TCP
+Port		4317
+Destination	IP de la instancia de observabilidad
+
+*En la instancia de la app*
+nc -zv IP_INSTANCIA_OBSERVABILIDAD 4317 -> Verifica que la regla de salida en la instancia con la 
+	app funcione y que la regla de entrada en la instancia de observabilidad funcione.
+	Si este comando falla no se puede determinar que fallo exactamente.
+
+Para debuggear *Dentro de la instancia de observabilidad*: docker ps y docker logs colllector
+
+ss -tulnp | grep 4317 -> Verifica si hay un proceso escuchando en el puerto 4317 dentro de la instancia.
 
 
 
-Agregar el contenedor auxiliar al collector el cual le permite tener un volumen (eso cambiara de
-local a prod??)
-Hacer el Docker compose. Si será necesario hacerlo para que los compañeros lo puedan
-usar en su local con sus proyectos.
-Preguntarle a chatGpt sobre que reglas de entrada y salida serán necesarios abrir y documentarlo.
-Falta agregar al código el atributo reason e implementarlo a la lógica de la app.
+probar en la instancia si al comentar el init-volume sigue jalando bien.
+decirle a maquitos que suba esa rama para yo trabjar ahí
+preguntarle a chatpgt si puedo quitar spring actuator y todo 
+lo demás configuración para el la app con prometheus
+
+
+
 
 

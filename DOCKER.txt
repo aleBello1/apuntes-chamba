@@ -1,0 +1,82 @@
+
+docker run ... -> Con este comando, por defecto Docker crea un volumen anonimo (un volumen 
+	sin nombre) y se lo asigna al contenedor.
+	- -v nombreVolumen:rutaGuardado -> Para que el contenedor use cierto volumen y 
+		respalde los datos de determinada ruta.
+		La 'rutaGuardado' es una ruta dentro del contenedor el cual contiene
+		lo que queremos almacenar en el volumen.
+		- /var/lib/mysql -> Ruta donde se encuentran las db's que almacena mysql.
+		- /var/lib/postgresql/data -> Ruta donde se encuentran las db's que 
+			almacena postgresql.
+		- /data/db -> Ruta donde se encuentran las db's que almacena mongoDb.
+		- /data -> Ruta donde se encuentran las db's que almacena redis.
+	El siguiente comando es opcional pero puede ir acompañado con volumenes.
+	- --restart=valorOpcion 
+		- always -> El contenedor Siempre se reinicia, incluso si tú lo detienes 
+			manualmente
+		- no (por defecto) -> No se reinicia nunca automáticamente.
+		- on-failure -> Se reinicia solo si el contenedor falla (con código distinto 
+			de 0).
+		- unless-stopped -> Igual que always, pero NO si tú lo detuviste manualmente.
+			Es como decir: “mantén este contenedor siempre vivo, excepto si yo
+			explícitamente lo detengo”.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*En el servicio que debe estar levantado antes*
+		- healthcheck: -> Definir un healthcheck le permite a Docker evaluar si la 
+			aplicación dentro del contenedor realmente está funcionando correctamente, 
+			no solo si el proceso está en ejecución.
+			Si no se define, Docker únicamente sabe que el contenedor está “corriendo”, 
+			pero no puede detectar si la aplicación está colgada, falló internamente o 
+			si aún no ha terminado de iniciar.
+			Esto puede ser útil para tomar decisiones como reiniciar el contenedor 
+			automáticamente o para que otros servicios sepan cuándo la aplicación está 
+			lista para recibir tráfico.
+			Además, proporciona mayor visibilidad, ya que al ejecutar docker ps se muestra 
+			el estado de salud, por ejemplo: Up 30s (healthy) en lugar de solo indicar el 
+			tiempo que el contenedor ha estado en ejecución.
+			Configuraciones para esta opción:
+			- disable: false -> ACTIVA el healthcheck.
+			- test: [comando] -> Comando que verifica si el proceso de interés dentro
+				del contenedor está saludable (esta listo)
+			- interval: ns -> Cada cuánto tiempo se ejecuta el test.
+			- timeout: xs -> Tiempo máximo que espera en recibir la respuesta al 
+				test.
+			- retries: y -> Cuántas veces reintentar el test antes de marcar como 
+				"unhealthy".
+			- start_period: zs -> Es el tiempo que Docker espera antes de hacer la 
+				primera verificación de salud.
+
+
+
+
+
+
+
+volumes: -> Para crear objetos con configuraciones de volumen.
+	Configuraciones para esta opcion:
+	- nombreObjetoVolumenX: -> Crea un objeto con configuraciones de volumen.
+		Configuraciones para esta opcion:
+		- name: nombreVolumen -> Para indicar el nombre del volumen.
+			Si no se le coloca un nombre, Docker no creara un nombre para un volumen
+			anonimo, si no usara esta nomeclatura para crear el nombre a los volumentes:	
+				<nombre_del_proyecto>nombreObjetoVolumenX
+		- external: true -> Para decirle a Docker Compose que use un volumen que ya 
+			existe previamente en Docker, en lugar de crear uno nuevo.
+
+
