@@ -253,7 +253,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,prometheus > Configurar spring actuator para exponer los enpoints
+        include: health,metrics,prometheus -> Configurar spring actuator para exponer los enpoints
 		relacionados con health, métricas y prometheus.
 
 management:

@@ -16,6 +16,11 @@ http_server_requests_seconds_count -> Es un counter. Contiene el numero total ac
 	- uri -> Url del servicio
 	- outcome -> Nombre del codigo http (SUCCESS, CLIENT_ERROR, SERVER_ERROR)
 	- exception -> Nombre de la excepción si ocurrió error (puede estar vacío)
+
+Prometheus -------------------------------------
+
+prometheus_target_scrapes_exceeded_sample_limit_total -> cuántas veces un scrape fue 
+		rechazado por exceso de métricas
 	
 
 CONSULTAS PROMQL
@@ -129,8 +134,6 @@ Crear dashboard dinámico: En vez de crear 10 dashboards iguales (uno por endpoi
 
 ALERTAS
 
-Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule ->
-
 Crear un punto de contacto: Es definir por cual medio grafana nos enviara alertas: email, sms,
 	slack, etc.
 	Apartado izq. alerting -> contact points:
@@ -141,7 +144,11 @@ Crear un punto de contacto: Es definir por cual medio grafana nos enviara alerta
 		correo a tal persona. 
 		El SMTP es de paga y en teoría la empresa debe proporcionar las credenciales pero
 		para pruebas locales se puede usar nuestro propio correo.
-	- Crear el contacto point para slakc: Ingresar a este link: https://api.slack.com/apps -> 
+		créate contact point -> asginar name -> integration: email -> asginar el correo o 
+		los correos -> si se ingresaron muchos correos palomear la opción single email
+		para enviar un solo correo y no multiples -> test (solo si necesita hacer una
+		prueba) -> sabe contact point.
+	- Crear el contacto point para slack: Ingresar a este link: https://api.slack.com/apps -> 
 		créate new app -> Ingresar el nombre que tendrá la app -> sig -> En el menú
 		izquierdo: Incoming Webhooks -> activar Activate Incoming Webhooks -> Add New 
 		Webhook to Workspace -> Hasta aquí se dejo este paso porque se necesitaba que 
@@ -154,7 +161,15 @@ generar contraseña de aplicación en Gmail: Esto es para que desde nuestro corr
 		nuestrea cuenta -> seguridad y acceso -> verificación de 2 pasos.
 	Ir a este enlace:  https://myaccount.google.com/apppasswords -> asginar nombre a la 
 	app -> crear -> nos arrjara la contraseña para esa app (se debe usar sin espacios en
-	blanco aunque Gmail nos la de con espacios en blanco***). xsyb zvvm kaem mlkp
+	blanco aunque Gmail nos la de con espacios en blanco***). 
+
+Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule -> elegir el data source
+	-> la metrica y la condición que disparara la alerta -> run query para asegurar que sea
+	una query valida -> elegir el pending period el cual significa que si la condición es 
+	true dudante n teimpo entonces se lanza la alerta -> definir el keep firing for el cual
+	sginifica Período en el que la alerta seguirá mostrándose como activa incluso después 
+	de que la condición del umbral deje de incumplirse -> seleccionar el contact point
+	-> agregar el subject y cuerpo del correro -> sabe.
 
 
 ADMINISTRACION DE USUARIOS
@@ -1090,8 +1105,14 @@ En el archivo de configuración del collector se agrega el exporter y el pipelin
 
 En el archivo de configuracion de prometheus se scrapea al collector en vez de a cada proyecto.
 
-
-
+Ahora del pom Se puede quitar la dependencia 'micrometer-registry-prometheus'.
+Del application se puede quitar toda la configuración dentro de 'endpoint' y dentro del 'endpoints' 
+se puede quitar lo de prometheus. Dejar asi:
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
 
 
 
@@ -1161,6 +1182,23 @@ Asi mismo, lo ideal es que todas las herramientas puedan estar levantadas de man
 para que puedan seguir recolentando datos. En resumen no se debe usar depends on en ninguna 
 herramienta.
 
+ram -----------------------------------------
+
+Considerando que la instancia donde se despliegan las herramientas tiene 8gb de ram y que todas
+las herramientas viven en la misma instancia pero cada una en su propio contenedor, se le pido
+a la IA hacer una comparación para ayudar a elegir la cantidad de ram limite que debe consumir 
+cada contenedor. 
+
+Herramienta 	Uso de RAM 	Cantidad limite
+Prometheus 	Alto		 2.5 GB  (~31%)
+Loki       	Medio Alto	 2.0 GB  (~25%)
+Tempo      	Medio		 1.2 GB  (~15%)
+Collector  	Bajo		 0.6 GB  (~7%)
+Grafana    	Bajo		 0.5 GB  (~6%)
+Libre      	--		~1.2 GB (~16%)
+
+En general, el host siempre debe tener el 15% al 20% de memoria libre de ram. *****
+
 
 CONFIGURACION DE LAS INSTANCIAS
 
@@ -1198,13 +1236,53 @@ Para debuggear *Dentro de la instancia de observabilidad*: docker ps y docker lo
 ss -tulnp | grep 4317 -> Verifica si hay un proceso escuchando en el puerto 4317 dentro de la instancia.
 
 
+MONITOREO DE HERRAMIENTAS
 
-probar en la instancia si al comentar el init-volume sigue jalando bien.
-decirle a maquitos que suba esa rama para yo trabjar ahí
-preguntarle a chatpgt si puedo quitar spring actuator y todo 
-lo demás configuración para el la app con prometheus
+Se crearan varios dashboards para cada una de las herramientas. En todas se utiliza prometheus
+porque este nos permite visualizar estas métricas.
+
+Todos -----------------------------------------------------------
+
+Visualizar el estado (ver si esta arriba o abajo): dashboard -> prometheus -> metrica: up -> job:
+	nombre de la herramienta.
+
+Visualizar la ram consumida por cada herramienta (Manera si no se usa contenedores para cada
+herramienta): dashboard -> prometheus -> metrica: process_resident_memory_bytes -> tipo de grafico:
+	bar gauge -> agregar esta consulta: max by (job) 
+	(process_resident_memory_bytes{job=~"prometheus|loki|tempo"}) or max by (job) 
+	(otelcol_process_memory_rss{job="collector"})
+	- process_resident_memory_bytes -> Metrica usada para medir la ram que ocupan 
+		tempo, loki y prometheus.
+	- otelcol_process_memory_rss -> Metrica usada para medir la ram que ocupa 
+		collector.
+	- Cambiar la unidad de los números (pe a mb): En el panel derecho buscar el apartado 
+		standard options -> unit: data -> bytes(IEC).
+
+Visualizar la ram consumida por cada herramienta (Manera si se usa contenedores para cada
+herramienta): Lamentablemente no se puede a menos que se agregue la herramienta llamada cadvisor.
+
+Visualizar la CPU consumida por cada herramienta (Manera si se usa contenedores para cada
+herramienta): Lamentablemente no se puede a menos que se agregue la herramienta llamada cadvisor.
 
 
+Para prometheus -------------------------------
+
+Visualizar Frecuencia de scrapes fallidos por exceso de métricas por cada servicio: 
+	sum by (job) (
+  	rate(prometheus_target_scrapes_exceeded_sample_limit_total[5m])
+	)
+
+
+ALERTAS DE HERRAMIENTAS
+
+Todos -----------------------------------------------------------
+
+
+
+
+decirle a maquitos que cree una rama y ahí haga el despliegue automatico
+matar el jar de dev y subir uno nuevo y levantarlo como ya se sabe
+Investigar las alertas para monitorear la ram y cpu de cada herramienta
 
 
 

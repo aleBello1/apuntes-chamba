@@ -74,9 +74,49 @@ volumes: -> Para crear objetos con configuraciones de volumen.
 		Configuraciones para esta opcion:
 		- name: nombreVolumen -> Para indicar el nombre del volumen.
 			Si no se le coloca un nombre, Docker no creara un nombre para un volumen
-			anonimo, si no usara esta nomeclatura para crear el nombre a los volumentes:	
+			anonimo, si no usara esta nomeclatura para crear el nombre a los volumenes:	
 				<nombre_del_proyecto>nombreObjetoVolumenX
 		- external: true -> Para decirle a Docker Compose que use un volumen que ya 
 			existe previamente en Docker, en lugar de crear uno nuevo.
 
+
+
+
+Ram de contenedores --------------------------------------
+
+Un contenedor NO tiene RAM fija por defecto.
+Si no defines nada, puede usar toda la RAM del host. ********
+
+docker stats -> Muestra una tabla en la que se enlistan todos los contenedores que actualmente están 
+	corriendo y se ve: el nombre del contenedor, la memoria en ram que esta usando, el limite 
+	que tiene permitido usar y el porcentaje que esta ocupando actualmente.
+
+docker stats nombreContenedor -> Para ver la información de ram de un solo contenedor.
+
+docker run *opciones* nombreImagen -> 
+	- -m valor[unidad] -> Para definir la cantidad de ram limite que puede usar un contenedor.
+		Si proceso dentro del contenedor supera este limite entonces El kernel activa el OOM 
+		Killer (Out Of Memory Killer) y El proceso dentro del contenedor es terminado además
+		El contenedor normalmente se detiene.
+		Por eso es de buena practica combinar esta opción con: --restart para que se reinicie
+		el contenedor.
+		Unidades:
+		- b	bytes	1024b
+		- k	kilobytes	1024k
+		- m	megabytes	512m
+		- g	gigabytes	2g
+
+
+
+
+
+
+
+		- networks: 
+			Configuraciones para esta opcion:
+			- - nombreObjetoRedX -> Para que este contenedor use las 
+				configuraciones de red que contiene este objeto.
+				Evidentemente tiene que existir este objeto.
+		- mem_limit: valorUnidad -> Para definir la cantidad de ram limite que puede usar el 
+			contenedor.
 
