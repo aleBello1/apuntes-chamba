@@ -1272,17 +1272,29 @@ Visualizar Frecuencia de scrapes fallidos por exceso de métricas por cada servi
   	rate(prometheus_target_scrapes_exceeded_sample_limit_total[5m])
 	)
 
+Apps -----------------------------------------------------------
+
+Para el corto circuito (solo si aplica).
+
 
 ALERTAS DE HERRAMIENTAS
 
 Todos -----------------------------------------------------------
 
+Caida de cada herramienta.
+
+
+Apps -----------------------------------------------------------
+
+Para el corto circuito (solo si aplica).
 
 
 
 decirle a maquitos que cree una rama y ahí haga el despliegue automatico
 matar el jar de dev y subir uno nuevo y levantarlo como ya se sabe
-Investigar las alertas para monitorear la ram y cpu de cada herramienta
+hacer alerta de caída de dev para Mapfre
+hacer grafico de circuit breaker
+alerta de circuit breaker
 
 
 
