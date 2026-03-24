@@ -216,6 +216,7 @@ puede ser peligroso porque puede matar al servidor de prometheus).
 - Permite hacer queries y alertas
 Prometheus NO recibe métricas.
 Él las consulta periódicamente.
+De lo mas importante es que indica si la app esta viva, cuanta cpu usa y cuanta memoria.
 
 Grafana es una herramienta de visualización de métricas. NO guarda métricas y no recoleta 
 métricas.
