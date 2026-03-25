@@ -3,6 +3,11 @@
 
 METRICAS 
 
+outliers: Son valores anormalmente altos o bajos comparados con el resto.
+	Ejemplo en la app si hay 99 requests → 100 ms y 1 request → 5 segundos, entonces ese 
+	de 5s es un outlier. ****
+
+
 Spring boot app -------------------------------
 
 http_server_requests_seconds_count -> Es un counter. Contiene el numero total acumulado de 
@@ -16,6 +21,10 @@ http_server_requests_seconds_count -> Es un counter. Contiene el numero total ac
 	- uri -> Url del servicio
 	- outcome -> Nombre del codigo http (SUCCESS, CLIENT_ERROR, SERVER_ERROR)
 	- exception -> Nombre de la excepción si ocurrió error (puede estar vacío).
+
+http_server_requests_seconds_sum -> tiempo TOTAL acumulado de todas las requests.
+	Ejemplo: Request 1 → 1s; Request 2 → 2s; Request 3 → 3s entonces sum = 6 segundos.
+	
 
 jvm_memory_used_bytes{area="heap"} -> Muestra la memoria HEAP usada por la JVM, separada por
 	regiones (id).
@@ -93,6 +102,7 @@ Funciones -----------------------------
 rate(...) -> Calcula la velocidad promedio por segundo a la que está creciendo un contador.
 	Devuelve un valor por segundo.
 	Se usa principalmente para métricas tipo Counter.
+	Se usa mucho para dashboards mientras que para alertas se ocupa increse. ************
 
 by() -> Permite hacer un group by.
 
@@ -170,8 +180,9 @@ Graficar la cpu de un proceso: Apartado izq dashboards -> new -> new dashboard -
 	-> prometheus -> ingresar la metrica de cpu -> tipo de grafica: time series.
 	- consulta: avg by (job) (process_cpu_usage{job=~"job1|job2|jobN"}) * 100
 
-Para visualizar en el tiempo el estado del circuito: Apartado izq. explore -> seleccionar
-	prometheus -> en metric buscar: 'resilience4j_circuitbreaker_state' -> run query.
+Para visualizar en el tiempo el estado del circuito: Apartado izq. dashboards -> new -> new 
+	dashboard -> seleccionar como data source: prometheus -> en metric buscar: 
+	'resilience4j_circuitbreaker_state' -> run query.
 	Esto nos mostrara en el tiempo todos los estados del circuito: disable, half-open,
 	open and close.
 	Podremos dar click sobre determinada leyenda para observar solamente a ese vector.
@@ -221,11 +232,12 @@ generar contraseña de aplicación en Gmail: Esto es para que desde nuestro corr
 
 Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule -> elegir el data source
 	-> la metrica y la condición que disparara la alerta -> run query para asegurar que sea
-	una query valida -> elegir el pending period el cual significa que si la condición es 
-	true dudante n teimpo entonces se lanza la alerta -> definir el keep firing for el cual
-	sginifica Período en el que la alerta seguirá mostrándose como activa incluso después 
-	de que la condición del umbral deje de incumplirse -> seleccionar el contact point
-	-> agregar el subject y cuerpo del correro -> sabe.
+	una query valida -> elegir en que carpeta estara almacenada la alerta -> seleccionar el 
+	grupo de alertas al que pertenecera la alerta -> elegir el pending period (el cual 
+	significa que si la condición es true dudante cuanto tiempo se esperara para lanzar la 
+	alerta) -> definir el keep firing for (el cual sginifica tiempo extra en que la alerta 
+	se queda encendida aunque el problema ya se resolvió) -> seleccionar el contact point -> 
+	agregar el subject y cuerpo del correo -> sabe.
 
 
 ADMINISTRACION DE USUARIOS
@@ -258,14 +270,18 @@ Ahora ir a prometheus (http://localhost:9090) y buscar lo mismo.
 Lo común es mostrar los códigos de status http 4xx y 5xx en un mismo dashboard y se crear un 
 dashboard por cada servicio que tenga la app.
 
+Crear un dashboard que muestre el porcentaje de errores 5xx enpoint: Apartado izq. dashboards
+	-> new -> new dashboard -> add visualization -> En datasource prometheus 
+	- Consulta: (sum by (uri) (rate(http_server_requests_seconds_count{status=~"5..", 
+		job="ws-mapfre-dev"}[3m])) / sum by (uri) 
+		(rate(http_server_requests_seconds_count{job="ws-mapfre-dev"}[3m]))) * 100
 
-Crear un dashboard que muestre Total errores 4xx, total errores 5xx y Gráfica histórica de 
-ambos: Apartado izq. dashboards -> new -> new dashboard -> add visualization -> En datasource
-	prometheus -> apartado code: meter una consulta asi: 	
-	increase(http_server_requests_seconds_count{status=~"5.."}[3m]) (esto para mostrar los
-	errores 5xx) y agregar una segunda query con la consulta: 
-	increase(http_server_requests_seconds_count{status=~"4.."}[3m]) (para mostrar los 
-	errores 4xx).
+Crear un dashboard que muestre el porcentaje de errores 4xx enpoint: Apartado izq. dashboards
+	-> new -> new dashboard -> add visualization -> En datasource prometheus 
+	- Consulta: (sum by (uri) (rate(http_server_requests_seconds_count{status=~"4..", 
+		job="ws-mapfre-dev"}[3m])) / sum by (uri) 
+		(rate(http_server_requests_seconds_count{job="ws-mapfre-dev"}[3m]))) * 100
+
 
 
 
@@ -1335,17 +1351,19 @@ ALERTAS DE HERRAMIENTAS
 
 Todos -----------------------------------------------------------
 
-Caida de cada herramienta.
+Avisar la caída de cada herramienta cuando este así por mas de 1 min.
 
 
 Apps -----------------------------------------------------------
 
-Avisar cuando el corto circuito este abierto por mas de 2 min.
+Avisar cuando el corto circuito este abierto por mas de 1 min.
+
+
+
 
 
 hacer alerta de caída de dev para Mapfre
 Probar alerta agregando código para tirar app.
-hacer grafico de circuit breaker
 alerta de circuit breaker
 
 
