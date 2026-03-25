@@ -239,6 +239,12 @@ Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule -> elegir 
 	se queda encendida aunque el problema ya se resolvió) -> seleccionar el contact point -> 
 	agregar el subject y cuerpo del correo -> sabe.
 
+silece: Es Ignorar temporalmente alertas que cumplan ciertas etiquetas.
+	No apaga la alerta, No cambia la evaluación y Solo evita notificaciones.
+	Cada alerta tiene labels, por ejemplo: alertname="AppDown"; job="mi-app";
+	instance="10.0.0.1:8080" y el silence dice si una alerta tiene estos labels entonces 
+	no notificar.
+
 
 ADMINISTRACION DE USUARIOS
 
