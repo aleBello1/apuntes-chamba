@@ -1358,13 +1358,19 @@ Apps -----------------------------------------------------------
 
 Avisar cuando el corto circuito este abierto por mas de 1 min.
 
+Avisar cuando la ram supera el 80% por mas de 5 min.
+
+Avisar cuando la ram supera el 90% por mas de 1 min.
+
+Avisar cuando el cpu supera el 80% por mas de 5 min.
+
+Avisar cuando la cpu supera el 90% por mas de 1 min.
 
 
 
 
-hacer alerta de caída de dev para Mapfre
-Probar alerta agregando código para tirar app.
-alerta de circuit breaker
+
+
 
 
 

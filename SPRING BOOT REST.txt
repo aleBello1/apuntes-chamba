@@ -375,14 +375,22 @@ docker run -d \
   -p 3000:3000 \
   --network red \
   -v grafana_data:/var/lib/grafana \
+  -e GF_SERVER_ROOT_URL=http://TU_IP_O_DOMINIO:3000 \
   grafana/grafana -> Crear y ejecutar un contenedor con base a la imagen grafana/grafana.
 	- /var/lib/grafana -> Los dashboards, usuarios y configuraciones se guardan en esta 
 		ruta.
+	- -e GF_SERVER_ROOT_URL="http://TU_IP_O_DOMINIO:3000" -> Para explícitamente a Grafana 
+		cuál es su URL pública.
+		Esto funciona para que cuando grafana mande alertas y en las alertas mande 
+		links, la url sea la de prod y no la de localhost.
+		Esta configuración solo se ocupa cuando grafana esta en producción, porque si
+		no se configura esto el valor por defecto será localhost. ***
 
 docker run -d \
   --name grafana \
   -p 3000:3000 \
   --network red \
+  -e GF_SERVER_ROOT_URL="http://TU_IP_O_DOMINIO:3000" \
   -e GF_SMTP_ENABLED=true \
   -e GF_SMTP_HOST=smtp.gmail.com:587 \
   -e GF_SMTP_USER=correo_personal_empresa \
@@ -574,4 +582,9 @@ logging en application.
 		los logs con ese nivel y niveles mas con mayor gravedad.
 		Si el root está en INFO, entonces se registran INFO, WARN y ERROR.
 	- name="rutaPaquete" -> Permite configurar niveles diferentes para paquetes específicos.
+
+
+
+
+
 
