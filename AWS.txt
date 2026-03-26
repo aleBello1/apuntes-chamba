@@ -119,6 +119,17 @@ Subir archivos de la maquina local al servidor: Solo se arrastran y se sueltan e
 
 
 
+df -h -> Muestra de manera desglosada la memoria en disco usada. Muestra: Espacio total, Espacio 
+	usado, Espacio disponible y Porcentaje de uso.
+
+
+
+
+
+
+
+
+
 
 
 

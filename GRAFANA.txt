@@ -25,7 +25,6 @@ http_server_requests_seconds_count -> Es un counter. Contiene el numero total ac
 http_server_requests_seconds_sum -> tiempo TOTAL acumulado de todas las requests.
 	Ejemplo: Request 1 → 1s; Request 2 → 2s; Request 3 → 3s entonces sum = 6 segundos.
 	
-
 jvm_memory_used_bytes{area="heap"} -> Muestra la memoria HEAP usada por la JVM, separada por
 	regiones (id).
 	GC: Garbage Collector (Recolector de basura). Es el sistema automático de Java que:
@@ -55,13 +54,24 @@ resilience4j_circuitbreaker_calls_total -> Es un contador que dice cuántas llam
 	- kind="not_permitted" -> Llamadas que fueron BLOQUEADAS.
 		significa el circuit breaker está OPEN.
 
-Servidor -----------------------------------------
+Node exporter -----------------------------------------
 
-Se tendría que levantar con Docker compose un node exporter.
+Se tendría que levantar con Docker compose un node exporter en la instancia que se desea
+monitorear.
+
+node_memory_MemTotal_bytes -> Contiene toda la RAM física de tu servidor.
+	Incluye todo: lo usado + libre + cache.
+
+node_memory_MemAvailable_bytes -> Contiene la RAM realmente disponible para usar sin problemas.
 
 node_cpu_seconds_total -> Porcentaje de CPU que está usando el servidor.
 	Es una métrica acumulativa por eso SIEMPRE se usa algo como: 
 	rate(node_cpu_seconds_total[1m])
+
+node_filesystem_size_bytes → tamaño en disco total
+
+node_filesystem_avail_bytes → espacio en disco disponible
+
 
 Prometheus -------------------------------------
 
@@ -238,12 +248,34 @@ Crear alerta: Apartado izq. alerting -> alert rules -> new alert rule -> elegir 
 	alerta) -> definir el keep firing for (el cual sginifica tiempo extra en que la alerta 
 	se queda encendida aunque el problema ya se resolvió) -> seleccionar el contact point -> 
 	agregar el subject y cuerpo del correo -> sabe.
+	Se debe considerar que en un correo el subjet dira algo como: {nombre alerta} - {nombre 
+	folder} ******
 
 silece: Es Ignorar temporalmente alertas que cumplan ciertas etiquetas.
 	No apaga la alerta, No cambia la evaluación y Solo evita notificaciones.
 	Cada alerta tiene labels, por ejemplo: alertname="AppDown"; job="mi-app";
 	instance="10.0.0.1:8080" y el silence dice si una alerta tiene estos labels entonces 
 	no notificar.
+
+
+VALORES PARA PENDING PERIOD
+
+for: 1m (rápido). Usado cuando el problema no puede esperar.
+	Se usa para detectar servicios caídos (up == 0).
+for: 2m (balanceado). Usado para evitar falsos positivos.
+	Por ejemplo para cpu, ram y latencia.
+	Se usa para alertas criticas pe cuando se supera un 90% de ram o cpu. ****
+for: 5m (balanceado). Usado para evitar falsos positivos.
+	Por ejemplo para cpu, ram y latencia.
+	Se usa para alertas warning pe cuando se supera un 80% de ram o cpu. ****
+for: 10m+ (lento): Se usa para monitorear el espacio en disco.
+
+
+	
+
+
+
+
 
 
 ADMINISTRACION DE USUARIOS
@@ -1314,7 +1346,7 @@ Todos -----------------------------------------------------------
 
 Estado de salud de la app.
 
-Para todas las herramientas del observability stack ------------------
+Para las herramientas -------------------------------------------
 
 Visualizar la ram consumida por cada herramienta (Manera si no se usa contenedores para cada
 herramienta): dashboard -> prometheus -> metrica: process_resident_memory_bytes -> tipo de grafico:
@@ -1334,6 +1366,19 @@ herramienta): Lamentablemente no se puede a menos que se agregue la herramienta 
 Visualizar la CPU consumida por cada herramienta (Manera si se usa contenedores para cada
 herramienta): Lamentablemente no se puede a menos que se agregue la herramienta llamada cadvisor.
 
+
+Para las instancias remotas ---------------------------------------
+
+Visualizar la ram consumida por determinada instancia: dashboard -> prometheus -> meter la consutla
+	-> Tipo de grafico: gauge (para ver un especie de velocimetro) -> elegir unidad de percent
+	-> agregar los threshold.
+	- Consulta: 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
+
+Visualizar la cpu consumida por determinada instancia: 100 * 
+	(1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])))
+
+Visualizar el espacio en disco usado: 100 * (1 - (node_filesystem_avail_bytes / 
+	node_filesystem_size_bytes))
 
 Para prometheus -------------------------------
 
@@ -1355,9 +1400,24 @@ Para el corto circuito (solo si aplica).
 
 ALERTAS DE HERRAMIENTAS
 
-Todos -----------------------------------------------------------
+Para las herramientas y apps --------------------------------------------------
 
 Avisar la caída de cada herramienta cuando este así por mas de 1 min.
+
+
+Para las instancias --------------------------------------------------
+
+Avisar cuando la ram supera el 80% por mas de 5 min.
+
+Avisar cuando la ram supera el 90% por mas de 2 min.
+
+Avisar cuando la cpu supera el 80% por mas de 5 min.
+
+Avisar cuando la cpu supera el 90% por mas de 2 min.
+
+Avsar cuando el espacio en disco supera el 75% por mas de 10 min.
+
+Avsar cuando el espacio en disco supera el 90% por mas de 5 min.
 
 
 Apps -----------------------------------------------------------
@@ -1366,11 +1426,11 @@ Avisar cuando el corto circuito este abierto por mas de 1 min.
 
 Avisar cuando la ram supera el 80% por mas de 5 min.
 
-Avisar cuando la ram supera el 90% por mas de 1 min.
+Avisar cuando la ram supera el 90% por mas de 2 min.
 
 Avisar cuando el cpu supera el 80% por mas de 5 min.
 
-Avisar cuando la cpu supera el 90% por mas de 1 min.
+Avisar cuando la cpu supera el 90% por mas de 2 min.
 
 
 

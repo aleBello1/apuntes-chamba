@@ -53,7 +53,10 @@ docker run ... -> Con este comando, por defecto Docker crea un volumen anonimo (
 			Configuraciones para esta opción:
 			- disable: false -> ACTIVA el healthcheck.
 			- test: [comando] -> Comando que verifica si el proceso de interés dentro
-				del contenedor está saludable (esta listo)
+				del contenedor está saludable (esta listo).
+				El comando que se use lo debe de tener instalado el contenedor si no
+				marcara error. Hay imágenes minimalistas que no tienen instalado
+				ningún comando para hacer peticiones. *****
 			- interval: ns -> Cada cuánto tiempo se ejecuta el test.
 			- timeout: xs -> Tiempo máximo que espera en recibir la respuesta al 
 				test.
