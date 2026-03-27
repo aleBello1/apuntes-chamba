@@ -1,0 +1,71 @@
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+NODE EXPORTER
+
+Es una herramienta que expone métricas del sistema (host) donde se ejecuta. No almacena 
+datos. Quien puede scrapear y almacenar estas métricas seria prometheus. Monitorea:
+- espacio usado en disco
+- memoria ram usada
+- a cantidad de cpu usada
+- red (tráfico entrante/saliente)
+- número de procesos
+
+Node Exporter no necesita un archivo de configuración inicial para levantarse.
+
+Esta herramienta se utiliza exclusivamente para monitorear host de Linux, si se quisiera 
+monitorear host de Windows, se usaría otra herramienta llamada: windows_exporter.
+
+Implementación con docker: 
+
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name node-exporter \
+  --network red \
+  --restart unless-stopped \
+  --pid="host" \
+  -p 9100:9100 \
+  -v "/:/host:ro,rslave" \
+  prom/node-exporter:v1.7.0 \
+  --path.rootfs=/host \
+  --collector.netdev.device-exclude="lo|docker.*|veth.*" \
+  --collector.filesystem.mount-points-exclude="^/(sys|proc|dev|host|etc)($|/)" \
+  --collector.filesystem.fs-types-exclude="^(tmpfs|overlay)$" -> Crea un contenedor para node 
+	exporter.
+	- --pid="host" -> Permite que el contenedor use el namespace de procesos del host,
+		para que Node Exporter pueda ver todos los procesos reales del sistema y no solo
+		los del contenedor.
+	- -p 9100:9100 -> Puerto donde corre node exporter.
+	- -v "/:/host:ro,rslave" -> Para que el sistema de nuestro host este disponible dentro
+		de Docker.
+		Este valor en esta bandera se usa cuando el host es Linux. **** Si se intenta 
+		usar este valor o similares en Windows, va a fallar porque muchas métricas de Linux
+		no existen en windos.
+	- --path.rootfs=/host -> Cuando corre Node Exporter en Docker, el contenedor NO ve el
+		sistema real, ve su propio “mini sistema aislado”.
+		Esta bandera le indica a node exportaer que sistema monitorear (el host, no
+		el del contenedor).
+	- --collector.netdev.device-exclude="lo|docker.*|veth.*" -> Excluye interfaces de red 
+		irrelevantes:
+		- lo → loopback.
+		- docker.* → redes internas de Docker.
+		- veth.* → interfaces virtuales.
+	- --collector.filesystem.mount-points-exclude="^/(sys|proc|dev|host|etc)($|/)" -> 
+		Evita monitorear pseudo-filesystems:
+		- /proc → info del kernel
+		- /sys → hardware virtual
+		- /dev → dispositivos
+		- /host → el mount que hiciste
+	- --collector.filesystem.fs-types-exclude="^(tmpfs|overlay)$" -> Excluye tipos de 
+		filesystem inútiles:
+		- tmpfs → memoria temporal
+		- overlay → Docker
+
+Ahora dirigirse a prometheus y configurar ese scraping.
+Después ya se podrán crear los dashboards y las alertas.
+
+
+
+
+	

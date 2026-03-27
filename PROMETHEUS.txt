@@ -1,0 +1,124 @@
+/////////////////////////////////////PROMETHEUS//////////////////////////////////////////
+
+
+METRICAS 
+
+outliers: Son valores anormalmente altos o bajos comparados con el resto.
+	Ejemplo en la app si hay 99 requests → 100 ms y 1 request → 5 segundos, entonces ese 
+	de 5s es un outlier. ****
+
+
+Spring boot app -------------------------------
+
+http_server_requests_seconds_count -> Es un counter. Contiene el numero total acumulado de 
+	requests HTTP que tu aplicación ha recibido.
+	Empieza en 0 cuando arranca la app y nunca disminuye.
+	Cuando la app se reinicia, el counter vuelve a 0, Prometheus detecta ese reset 
+	automáticamente
+	Parámetros/labels que trae:
+	- method -> Método HTTP (GET, POST, etc.)
+	- status -> Codigo de status http de la request (200, 404, 500, etc)
+	- uri -> Url del servicio
+	- outcome -> Nombre del codigo http (SUCCESS, CLIENT_ERROR, SERVER_ERROR)
+	- exception -> Nombre de la excepción si ocurrió error (puede estar vacío).
+
+http_server_requests_seconds_sum -> tiempo TOTAL acumulado de todas las requests.
+	Ejemplo: Request 1 → 1s; Request 2 → 2s; Request 3 → 3s entonces sum = 6 segundos.
+	
+jvm_memory_used_bytes{area="heap"} -> Muestra la memoria HEAP usada por la JVM, separada por
+	regiones (id).
+	GC: Garbage Collector (Recolector de basura). Es el sistema automático de Java que:
+	libera memoria eliminando objetos que ya no se usan. 
+	Regiones: 
+	- Eden -> Memoria usada por objetos recién creados.
+		Se llena y se limpia constantemente (GC joven)
+	- Survivor -> Memoria usada por Objetos que sobrevivieron a un GC.
+		Zona de transición hacia Old Gen
+	- Old gen -> Memoria usada por objetos viejos.
+	- sum(jvm_memory_used_bytes{area="heap"}) -> Representa la memoria total de ram que la 
+		aplicación está usando en este momento. ******
+		Si la app llega al limite se muere.
+
+sum(jvm_memory_max_bytes{area="heap"}) -> Representa el límite máximo que la JVM puede usar 
+	para heap.
+
+process_cpu_usage -> Porcentaje de CPU que está usando la app Java.
+	
+resilience4j_circuitbreaker_state -> Contiene el estado del circuit breaker.
+
+resilience4j_circuitbreaker_calls_total -> Es un contador que dice cuántas llamadas han 
+	pasado por el circuit breaker, clasificadas por resultado.
+	Parámetros/labels que trae:
+	- kind="successful" -> Llamadas que pasaron y salieron bien.
+	- kind="failed" -> Llamadas que pasaron pero fallaron
+	- kind="not_permitted" -> Llamadas que fueron BLOQUEADAS.
+		significa el circuit breaker está OPEN.
+
+Node exporter -----------------------------------------
+
+Se tendría que levantar con Docker compose un node exporter en la instancia que se desea
+monitorear.
+
+node_memory_MemTotal_bytes -> Contiene toda la RAM física de tu servidor.
+	Incluye todo: lo usado + libre + cache.
+
+node_memory_MemAvailable_bytes -> Contiene la RAM realmente disponible para usar sin problemas.
+
+node_cpu_seconds_total -> Porcentaje de CPU que está usando el servidor.
+	Es una métrica acumulativa por eso SIEMPRE se usa algo como: 
+	rate(node_cpu_seconds_total[1m])
+
+node_filesystem_size_bytes → tamaño en disco total
+
+node_filesystem_avail_bytes → espacio en disco disponible
+
+
+Prometheus -------------------------------------
+
+prometheus_target_scrapes_exceeded_sample_limit_total -> cuántas veces un scrape fue 
+		rechazado por exceso de métricas
+	
+
+CONSULTAS PROMQL
+
+Promql significa lenguaje de consultas de prometheus.
+
+nombreMetricaZ{nombreParametroX operador valorX} -> Para condicionar que la metrica deba tener 
+	cierto valor en determinado parámetro.
+	-  nombreParametro1 operador valor1, nombreParametro2 operador valor2, nombreParametroN 
+		operador valorN -> Se colocan comas para condicionar por varios labels, la coma
+			seria equivalente a un and.
+	Ejemplo: {status=~"4.."} seria para seleccionar todos los datos que en el parámetro 
+		status inicie con 4xx.
+	Operadores: 
+	- != → Diferente
+	- =~ -> Para indicar que lo siguiente será una expresión regular.
+		Operadores usados con regex:
+		- | -> Para indicar un valor u otro. Se puede usar multiples veces.
+
+nombreMetricaZ[tiempo] -> Para aplicar un range vector.
+	Significa Toma los valores de esta métrica en los últimos n unidad de tiempo.
+	Ejemplo: 5m seria los últimos 5 minutos.
+	Unidades:
+	- s	segundos
+	- m	minutos
+	- h	horas
+	- d	días
+	- w	semanas
+	- y	años
+
+Funciones -----------------------------
+
+rate(...) -> Calcula la velocidad promedio por segundo a la que está creciendo un contador.
+	Devuelve un valor por segundo.
+	Se usa principalmente para métricas tipo Counter.
+	Se usa mucho para dashboards mientras que para alertas se ocupa increse. ************
+
+by() -> Permite hacer un group by.
+
+increase(metrica[tiempo]) -> Calcula cuánto aumentó el contador dentro del rango de tiempo que 
+	le pasas. **
+	Solo tiene sentido en metricas de tipo Counters.
+	Ejemplo si increase(contador[5m]) y si el primer valor es a las 10.00am y hubo 30 	
+	mientras que a las 10.05am hubo 47 entonces se graficara a las 10.00am un 30 y a las 
+	10.05am se graficara un 17.
