@@ -151,9 +151,12 @@ Activar el autorefrescado en las queries: Apartado izq. explore -> Alado del but
 	presionar la flecha hacia abajo y seleccionar cada cuantos segundos queremos el 
 	autorefrescado.
 
-Crear dashboard: Apartado izq. dashboards -> new -> Apartado izq. explore -> add visualization
+Crear dashboard: Apartado izq. dashboards -> new -> new dashboard -> add visualization
 	-> hacer las queries al gusto -> en la parte sup derecha sabe dashboard -> asginar 
 	nombre y descripción al dashboard.
+
+Agregar una nueva grafica en un dashboard existente: Apartado izq. dashboards -> seleccionar 
+	determinado dashboard -> parte superior buscar el button edit -> add -> visualization
 
 Visualizar los dashboards existentes: Apartado izq. dashboards -> aquí se enlistaran todos los
 	dashboards existentes.
@@ -1337,6 +1340,15 @@ Para debuggear *Dentro de la instancia de observabilidad*: docker ps y docker lo
 ss -tulnp | grep 4317 -> Verifica si hay un proceso escuchando en el puerto 4317 dentro de la instancia.
 
 
+AGREGAR UN NUEVO PROYECTO AL MONITOREO Y ALERTA DE GRAFANA
+
+Dar de alta el proyecto en las configuración de prometheus y en vez de reiniciar el contendor de 
+prometheus, usar el endpoint que obliga a prometheus a volver a cargar su archivo de configuración.
+	curl -X POST http://localhost:9090/-/reload
+
+Crear sus nuevos dashboards y alertas en grafana.
+
+
 DASHBOARDS QUE SE AGREGAN EN PRODUCCION 
 
 Se crearan varios dashboards para cada una de las herramientas. En todas se utiliza prometheus
@@ -1424,15 +1436,18 @@ Apps -----------------------------------------------------------
 
 Avisar cuando el corto circuito este abierto por mas de 1 min.
 
-Avisar cuando la ram supera el 80% por mas de 5 min.
+Avisar cuando la ram supera el 80% por mas de 5 min y agregar avg_over_time(up{job="nombreApp"}[2m]) > 0.9
 
-Avisar cuando la ram supera el 90% por mas de 2 min.
+Avisar cuando la ram supera el 90% por mas de 2 min y agregar avg_over_time(up{job="nombreApp"}[2m]) > 0.9
 
-Avisar cuando el cpu supera el 80% por mas de 5 min.
+Avisar cuando el cpu supera el 80% por mas de 5 min y agregar avg_over_time(up{job="nombreApp"}[2m]) > 0.9
 
-Avisar cuando la cpu supera el 90% por mas de 2 min.
+Avisar cuando la cpu supera el 90% por mas de 2 min y agregar avg_over_time(up{job="nombreApp"}[2m]) > 0.9
 
-
+La condición avg_over_time(up{job="nombreApp"}[2m]) > 0.9 sirve para condicionar a que La app 
+estuvo UP el 90% del tiempo durante los últimos 2 minutos. Esto se hace porque si cuando la app se 
+reinicia la ram y la capu suelve subir de golpe y esto provoca falsos positivos, entonces 
+condiciona a que si la app esta viva y sube la ram o cpu no es un falso negativo.
 
 
 

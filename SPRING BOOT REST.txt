@@ -363,6 +363,7 @@ MSYS_NO_PATHCONV=1 docker run -d \
 
 GET /targets -> En esta ruta prometheus enlista todas los targets que esta scrapenado/consumiendo, 
 	ademas muestra de cada uno si están up ó down y cada cuanto las consume.
+	curl http://localhost:9090/api/v1/targets
 
 GET /query -> Muestra que métricas tenemos disponibles con base a los endpoints que esta 
 	consumiendo prometheus.
