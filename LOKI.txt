@@ -1,0 +1,326 @@
+IMPLEMENTACION Y CONFIGURACION DE LOKI
+
+Loki: Es un sistema de agregación de logs creado por Grafana Labs.
+Su objetivo es: Guardar, organizar y consultar logs Pero de una forma más ligera y barata que otros sistemas.
+
+Loki también puede crear sus propias reglas para mandar alertas, pero hoy se recomienda que las reglas y 
+alertas las maneje grafana. Entonces se puede ommitir el componente ruler y la creación de la carpeta
+rules_directory. **
+
+Un stream es un conjunto de logs con exactamente la misma combinación de labels.
+Ejemplo real:
+{app="api",env="prod",pod="abc"}
+
+El mayor problema de Loki es que un mismo label tenga una cardinalidad enorme porque esto provoca muchos
+streams. ***
+
+
+Configurar loki ----------------------------
+
+Crear el puro contedor, sin tantas opciones y determinar la ruta del archivo de configuración 
+inicial y crear nuestro propio archivo de confgiuracion inicial.
+
+docker cp loki:/etc/loki/local-config.yaml . -> Para sacar del contenedor a nuestra ruta actual
+	el archivo de configuración inicial original.
+	Se hizo de esta manera porque no se puede meter dentro del contenedor.
+
+auth_enabled: false -> deshabilita la autenticación en Loki.
+	Asi Cualquier cliente puede enviar logs, Cualquier cliente puede consultar logs y 
+	No hay validación de tokens, usuarios o credenciales.
+
+server:
+	Configuraciones de esta opción:
+	- http_listen_port: 3100 -> Define el puerto donde loki esta ejecutándose.
+	- log_level: nivelLog  -> controla el nivel de detalle de los logs internos que genera Loki.
+		Valores: debug, info, warn y error.
+	- http_server_read_timeout: 30s -> Define cuánto tiempo espera Loki para recibir completamente 
+		una petición HTTP.
+	- http_server_write_timeout: 30s -> Define cuánto tiempo puede tardar Loki en enviar la 
+		respuesta al cliente.
+
+common:
+	Configuraciones de esta opción:
+	- instance_addr: 127.0.0.1 -> Define la dirección del nodo Loki en el cluster interno.
+		Esto se usa para que otros nodos Loki lo identifiquen.
+		- 127.0.0.1 -> Para este caso significa que Loki corre standalone (un solo nodo).
+	- path_prefix: /loki -> Define el directorio raíz donde Loki guarda su información local.
+		Todo lo que Loki almacene en disco se guardará dentro de esta carpeta.
+		Aquí Loki guarda: chunks, índices, WAL, compactor y reglas.
+		Esta carpeta debe de coincidir con el volumen de persistencia que se le coloque a 
+		Docker.
+	- storage: -> Define cómo Loki guarda los logs.
+		Configuraciones para esta opción:
+		- filesystem: -> Significa que Loki guardará todo en el sistema de archivos local.
+			Alternativas comunes: S3, GCS, Azure Blob.
+			Configuraciones para esta opción: 
+			- chunks_directory: /loki/chunks -> Aquí Loki guarda los chunks de logs.
+				Loki no guarda cada línea de log individualmente. En cambio:
+				Recibe logs, Los agrupa, Los comprime y Los guarda en bloques 
+				llamados chunks. 
+				Notese que al colocarle un volumen en /loki implica que también
+				se persista esta carpeta y la de rules.
+			- rules_directory: /loki/rules -> Aquí Loki guarda reglas de alerta.
+			- replication_factor: 1 -> Esto define cuántas copias de cada chunk se 
+				guardan.
+			- ring: -> Es la estructura que Loki usa para distribuir datos entre nodos.
+				El ring se usa para distribuir streams entre ingesters.
+				kvstore: -> Define dónde se guarda el estado del ring.
+					store: inmemory -> Esto significa que el ring se guarda en 
+						memoria RAM.
+						Esto implica: solo funciona con un nodo y que al 
+						reiniciar Loki se pierde el estado del ring.
+
+schema_config: -> Esta sección define cómo Loki indexa los logs. 
+	Configuraciones para esta opción:
+	- configs: -> Permite definir diferentes esquemas de almacenamiento según fecha.
+		Esto permite migraciones.
+		Configuraciones para esta opción:
+		- - from: yyyy-mm-dd -> desde esta fecha usar este esquema.
+		- store: tsdb -> Define el tipo de almacenamiento del índice.
+			TSDB significa: Time Series DataBase. Esto usa el motor TSDB moderno de 
+			Loki.
+		- object_store: filesystem -> Define dónde se guardan los objetos de datos.
+			En este caso será en disco local. En producción se usa normalmente:
+			S3, GCS, Azure
+		- schema: v13 -> Define la versión del esquema de indexación.
+			El schema define cómo Loki organiza los datos y el índice en el storage.
+			La versión mas moderna y actual es esta, la numero 13.
+		- index: -> Configura cómo se crean los índices de búsqueda.
+			Configuraciones para esta opción:
+			- prefix: index_ -> Todos los archivos de índice empezarán con este valor.
+			- period: 24h -> cada cuando loki creara un nuevo índice.
+
+limits_config:
+	Configuraciones para esta opción:
+	- retention_period: 30d -> Los logs que superen esta antigüedad se eliminaran por el 
+		compactor, pero este debe estar activo.
+	- max_query_length: 720h -> Define el máximo rango de tiempo que una consulta puede pedir.
+		Esto protege contra consultas enormes.
+	- max_query_parallelism: 32 -> Define cuántos workers pueden ejecutar una query
+		Cuando haces una consulta grande Loki la divide.
+		Con este valor se puede ejecutar hasta 32 subqueries simultáneas.
+	- max_streams_per_user: 10000 -> limita cuántos streams de logs puede crear un usuario.
+	- max_line_size: 256kb -> define el tamaño máximo permitido para una sola línea de log.
+	- ingestion_rate_mb: 4 -> limita cuántos datos de logs puede aceptar Loki por segundo.
+  	- ingestion_burst_size_mb: 8 -> Se puede exceder el límite brevemente.
+		Esto permite manejar picos temporales.
+	- max_label_names_per_series: 30 -> define cuántos labels puede tener un stream.
+		En Loki los logs se agrupan por labels. Cada combinación única de labels crea un 
+		stream.
+		Eso es un desastre para Loki porque cada label se indexa, se guarda y se 
+		consulta. Entonces mas labels a su vez implica mas ram, mas cpu, índices mas
+		grandes y consultas mas lentas.
+	- max_label_value_length: 2048 -> Limita el tamaño del valor de un label.
+	- max_global_streams_per_user: 5000 -> máximo 5000 streams simultáneos.
+	- max_entries_limit_per_query: 5000 -> Limita cuántos logs puede devolver una consulta.
+
+querier:
+  max_concurrent: 20 -> Limita queries paralelas.
+
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 100 -> hace que consultas repetidas en Grafana sean mucho más rápidas.
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 2048 -> controla cuántas consultas pueden estar en espera 
+	simultáneamente.
+
+ruler: -> componente de Loki que evalúa reglas.
+	Permite generar alertas desde logs.
+  alertmanager_url: http://localhost:9093 -> Define dónde enviar alertas.
+	
+ingester:
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
+  max_chunk_age: 1h
+  wal:
+    enabled: true
+    dir: /loki/wal -> Loki NO guarda inmediatamente los logs en chunks, Primero los guarda en memoria RAM 
+	y ya cuando el chunk llega a cierto tamaño, pasa cierto tiempo y luego se cierra el stream. Si loki
+	se cae, todos los logs en ram se perderan. Al utilizar wal, provocara que se guarden en ram y en wal, 
+	de este modo al levantar el contedor se pueden recuperar los logs que estaban en ram al leer del wal.	
+
+compactor: -> Cuando Loki escribe datos, genera muchos archivos pequeños y el compactor unifica
+	estos archivos para crear un solo archivo. Ademas este componente borra los datos que superan el
+	periodo de retención.
+	Configuraciones para esta opción:
+	- working_directory: /loki/compactor -> Es donde el compactor guarda: archivos temporales e índices 
+		compactados.
+	- compaction_interval: 10m -> Cada cuánto tiempo el compactor corre. Revisa: ¿hay índices 
+		fragmentados? y ¿hay datos expirados?
+	- retention_enabled: true -> Esto activa el borrado de logs expirados.
+
+MSYS_NO_PATHCONV=1 docker run -d \
+  --name loki \
+  -p 3100:3100 \
+  --network red \
+  -v lokiData:/loki \
+  -v $PWD/local-config.yaml:/etc/loki/local-config.yaml  \
+  grafana/loki:2.9.8 -> Crea y corre un contendor con loki.
+	- -p 3100:3100 -> Puerto donde corre loki.
+	- /etc/loki/local-config.yaml -> Ubicación del archivo de configuración 
+		inicial de loki.
+
+Endpoints:
+
+GET /ready -> Para probar un helth check.
+
+GET /loki/api/v1/query -> Para consultar logs.
+
+POST /loki/api/v1/push -> Para enviar logs.
+
+/metrics -> Aquí Loki expone métricas que puede recolectar: Prometheus.
+
+Ahora realizar la conexión de grafana con loki.
+Después agregar las configuraciones necesarias en el collector para que pueda
+mandar logs a loki.
+
+
+Configurar la app ----------------------------
+
+Hay dos tipos con loki:
+- labels: Se usan para indexar.
+	No debe tener cardinalidad alta porque esto genera millones de combinaciones. ****
+	Los valores comunes seria: el nombre del ambiente, el nombre de la app, el nivel de 
+	información (error, info, debug, etc)
+- campos: Son datos que van dentro del json.
+	Evidentemente no se agrega datos como contraseñas, tokens, tarjetas, etc.
+	En el collector decides qué campos del logJson se vuelven labels. ****
+
+Se crea el package llamado config y dentro de este se crea la clase 'RequestLoggingFilter'.
+Esta clase es un filtro de Spring que intercepta todas las peticiones HTTP y con base a esas peticiones
+se crean campos personalizados que se agregaran a los logs de loki, algunos de los campos incluyen:
+nombre del ambiente, endpoint, método http, status, cuerpo de la request, entre otros.
+
+Esa clase se divide en tres partes dentro del método doFilterInternal:
+1. Antes de filterChain.doFilter(...): Son las acciones que se ejecutan antes de que la request
+	llegue al siguiente filtro o al controller.
+2. Llamada a filterChain.doFilter(...): Es lo que permite que la request continúe su flujo.
+	Puede ir a: otro filtro (si hay más en la cadena) o al controller (si ya es el último 
+	filtro).
+3. Después de filterChain.doFilter(...): lógica posterior cuando ya terminó toda la cadena (otros
+	filtros y el controllador).
+Nota: Hay algunos valores que están disponibles hasta determiado punto del flujo.
+
+@Component
+class RequestLoggingFilter : OncePerRequestFilter() {} -> Se crea la clase y se convierte en un componente 
+	de spring boot.
+	El hacer que se herede de la clase OncePerRequestFilter implica que el filtro se ejecuta una sola 
+	vez por cada request HTTP.
+
+@Throws(ServletException::class, IOException::class)
+override fun doFilterInternal(
+    request: HttpServletRequest,
+    response: HttpServletResponse,
+    filterChain: FilterChain
+) {...} -> Método principal del filtro.
+	Aquí se define qué hacer antes, durante y después de una request HTTP.
+	Spring lo ejecuta automáticamente por cada request.
+	- request: HttpServletRequest -> Representa la petición HTTP que llega.
+		Aquí puedes obtener: método http, headers, body, parámetros, URL, etc.
+	- response: HttpServletResponse -> Representa la respuesta que vas a enviar.
+	- filterChain: FilterChain -> Controla por donde pasara la request.
+	- @Throws(...) -> Para indicar que este método puede lanzar estas exceptiones.
+		Es necesario agregar esto Porque el método original que estás sobrescribiendo (de 
+		OncePerRequestFilter) ya declara esas excepciones.
+
+val wrappedRequest = ContentCachingRequestWrapper(request) -> Envuelve la request original en un wrapper que:
+	permite leer el body (cuerpo) de la request múltiples veces.
+	Si no se usa esto, entonces el controller ya no podrá leer el body y por tanto el flujo fallara.
+
+wrappedRequest.method -> Devuelve el nombre del método http de la request.
+
+wrappedRequest.requestURI -> Devuelve el valor de la url sin los query params, los path variables si los incluye.***
+
+wrappedRequest.queryString -> Devuelve el valor de todos los query params junto con sus respectivos valores.
+
+wrappedRequest.getHeader("nombreHeader") -> Extrae el valor asociado a determinado header.
+
+wrappedRequest.headerNames -> Devuelve le nombre de todos los headers.
+
+wrappedRequest.getParameter("nombreQueryParam") -> Devuelve el valor asociado a determinado query param.
+
+wrappedRequest.contentLength -> Devuelve el tamaño del body.
+
+try {
+    filterChain.doFilter(wrappedRequest, response)
+} catch (ex: Exception) {
+    throw ex
+} finally {...} -> Para que la request y la response vayan al siguiente filtro o 
+	en su defecto a controller que le corresponde ir.
+	Si no se llama a esta función la request se quedara ahí y nunca llevara al controller. ***
+	Esta instrucción va en un try catch porque ahí ocurren otros filtros, el controller, etc y
+	eso puede provocar excepciontes. En el catch es necesario que se lance la exception que 
+	se capture porque si no spring no se enterara de la exception. 
+
+wrappedRequest.contentAsByteArray -> Devuelve el body de la request.
+	El body solo estará disponible después de doFilter. ****
+
+response.status -> Devuelve el status de la respuesta.
+
+val endpoint = wrappedRequest.getAttribute(
+    HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE
+) as? String ?: wrappedRequest.requestURI -> Intenta obtener el endpoint mapeado por Spring (con 
+	patrones) Si no puede, usa la URL real (requestURI).
+	Es super importante usar este valor en loki porque al ser un patron tiene baja 
+	cardinalidad perfecto para los labels. *****
+	Este valor solo existe después de que Spring resuelve el controller. ***
+	- HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE -> Representa El patrón del endpoint que 
+		mejor coincidió con la request.
+
+MDC.put("nombreCampo", valor); -> Para crear y asignar un valor al logJson.
+	MDC significa Mapped Diagnostic Context.
+	Permite agregar información contextual al hilo actual.
+	El logger agrega automáticamente como campo el nivel de log (cuando se hace log.nivel()). 
+	Mientras que OpenTelemetry agrega automáticamente el trace_id para que se puede 
+	correlacionar un trace_id de tempo con un log de loki y viceversa.
+
+MDC.clear() -> Elimina TODOS los valores del MDC del hilo actual.
+	Es indispensable usar esta instrucción dentro de un finally para que se ejecute siempre
+	y evite contaminar datos.
+
+Después nos regresaríamos a la configuración del collector para definir que campos del logJson
+serán labels.
+
+java -javaagent:opentelemetry-javaagent.jar \
+-Dotel.service.name=mi-app \
+-Dotel.traces.exporter=otlp \
+-Dotel.metrics.exporter=none \
+-Dotel.logs.exporter=otlp \
+-Dotel.exporter.otlp.endpoint=http://localhost:4317 \
+-Dotel.exporter.otlp.protocol=grpc \
+-Dotel.instrumentation.logback-appender.enabled=true \
+-Dotel.instrumentation.logback-mdc.enabled=true \
+-Dotel.instrumentation.logback-appender.experimental.capture-mdc-attributes=* \
+-jar ./target/app-1.0.0.jar -> Se ejecuta el mismo comando para levantar la app con openTelemetry 
+	solo que se debe considerar que ahora la app manda logs. Ademas se agrega una nueva
+	opción mas.
+	- -Dotel.instrumentation.logback-appender.enabled=true -> Para hacer que los logs tengan 
+		traceId y span_id automáticamente. 
+	- -Dotel.instrumentation.logback-appender.experimental.capture-mdc-attributes=* -> Para
+		que los campos personalizados (los que se agregan con MDC.put) se envíen 
+		correctamente.
+
+Volver a grafana para hacer unas configuraciones.
+
+Hacer que aparezca el botón "View Trace" en los logs: *En grafana* -> apartado izq. connections
+	-> data sources -> loki -> buscar en esa pagina donde diga algo como: 'Derived fields'
+	-> add -> name: TraceID; type: regex in log line; regex: "traceid":"([a-f0-9]+)"; 
+	query: ${__value.raw} -> internal link: tempo.
+
+Visualizar la traza de determinado log: En el apartado explore -> data source: loki -> click 
+	dentro del cuerpo de determinado log -> scrollear hasta llegar al apartado links ->
+	click sobre tempo.
+
+Hacer que aparezca el botón "View log" en las trazas: *En grafana* -> apartado izq. connections
+	-> data sources -> tempo -> En apartado trace to logs -> data source: loki -> start time
+	shift: -1m; end time shift: 1m; use custom query: on -> query: {job=~".+"} | json | 
+	traceid="${__trace.traceId}" (significa busca en todos los Jobs y dentro del json el 
+	traceId correspondiente al traceId seleccionado).
+
+Visualizar el log de determinada traza: En el apartado explore -> data source: tempo -> click 
+	sobre el traceId determinad traza -> a lado de determinado span id esta el button de 
+	log.
