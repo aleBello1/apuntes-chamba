@@ -1,4 +1,76 @@
 
+//////////////////////////////////////////CONFIGURACION/////////////////////////////////////////
+
+
+CONFIGURACION Y LEVANTAMIENTO DE GRAFANA
+
+docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  --network red \
+  -v grafana_data:/var/lib/grafana \
+  -e GF_SERVER_ROOT_URL=http://TU_IP_O_DOMINIO:3000 \
+  grafana/grafana -> Crear y ejecutar un contenedor con base a la imagen grafana/grafana.
+	- /var/lib/grafana -> Los dashboards, usuarios y configuraciones se guardan en esta 
+		ruta.
+	- -e GF_SERVER_ROOT_URL="http://TU_IP_O_DOMINIO:3000" -> Para explícitamente a Grafana 
+		cuál es su URL pública.
+		Esto funciona para que cuando grafana mande alertas y en las alertas mande 
+		links, la url sea la de prod y no la de localhost.
+		Esta configuración solo se ocupa cuando grafana esta en producción, porque si
+		no se configura esto el valor por defecto será localhost. ***
+
+docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  --network red \
+  -e GF_SERVER_ROOT_URL="http://TU_IP_O_DOMINIO:3000" \
+  -e GF_SMTP_ENABLED=true \
+  -e GF_SMTP_HOST=smtp.gmail.com:587 \
+  -e GF_SMTP_USER=correo_personal_empresa \
+  -e GF_SMTP_PASSWORD=mi_contraseña \
+  -e GF_SMTP_FROM_ADDRESS=correo_personal_empresa \
+  -e GF_SMTP_FROM_NAME="Grafana Alerts" \
+  -e GF_SMTP_SKIP_VERIFY=false \
+  -v grafana_data:/var/lib/grafana \
+  grafana/grafana -> Manera en el que se debe crear el contendor si es que se usara para pruebas
+	locales el correo personal de Gmail.
+	- GF_SMTP_ENABLED=true -> Habilita SMTP (puede enviar emails).
+	- GF_SMTP_USER=correo_personal_empresa -> Es el correo electrónico que Grafana usará 
+		para enviar emails. 
+	- GF_SMTP_PASSWORD=mi_contraseña -> Es la contraseña que nos da Gmail especial para 
+		aplicaciones.
+	- GF_SMTP_HOST=smtp.gmail.com:587 -> Este es el especifico valor para Gmail, al usar
+		otro aplicación de correo este valor podría variar.
+	- GF_SMTP_FROM_NAME="Grafana Alerts" -> Define el nombre visible del remitente del 
+		correo.
+	- -e GF_SMTP_FROM_ADDRESS=alerts@empresa.com -> Define el nombre visible del correo 
+		remitente del correo.
+		De tal modo que esta configuración en combinación con la anterior, al usuario
+		le llegara el correo asi: Grafana Alerts <alerts@empresa.com>.
+	- GF_SMTP_SKIP_VERIFY=false -> Verifica el certificado SSL del servidor (modo seguro).
+
+Al ingresar el usuario y contraseña será admin, posteriormente nos pedirá cambiar la contraseña.
+
+Conectar grafana con prometheus: *Ingresar a prometheus y grafana antes para asegurarse que
+	funciona bien* -> menú izq. connections -> data sources -> add data source -> prometheus
+	-> Ingresar en la url el valor http://prometheus:9090, se usa el nombre del contenedor
+	que alamcena a prometheus y su puerto -> save and test.
+
+Para visualizar el tiempo en el que promethues ha estado consumiendo actuator: Apartado izq. 
+	explore -> seleccionar prometheus -> en metric buscar y seleccionar up -> run query.
+	Es una métrica interna de Prometheus.
+	- 1 = el target está activo
+	- 0 = no puede conectarse
+
+
+ADMINISTRACION DE USUARIOS
+
+Crear un usuario: Apartado izq. administration -> users and Access -> users -> new user -> 	
+	asignar el nombre, email, username, password -> créate.
+	Opcionalmente después en la misma pagina se le puede otorgar permiso de admin, editor o 
+	viewer al usuario.
+
 
 
 /////////////////////////////////ADMINISTRACION DE DASHBOARDS////////////////////////////////
@@ -196,19 +268,6 @@ for: 5m (balanceado). Usado para evitar falsos positivos.
 	Por ejemplo para cpu, ram y latencia.
 	Se usa para alertas warning pe cuando se supera un 80% de ram o cpu. ****
 for: 10m+ (lento): Se usa para monitorear el espacio en disco.
-
-
-
-
-//////////////////////////////////////////OTROS////////////////////////////////////////////
-
-
-ADMINISTRACION DE USUARIOS
-
-Crear un usuario: Apartado izq. administration -> users and Access -> users -> new user -> 	
-	asignar el nombre, email, username, password -> créate.
-	Opcionalmente después en la misma pagina se le puede otorgar permiso de admin, editor o 
-	viewer al usuario.
 
 
 
