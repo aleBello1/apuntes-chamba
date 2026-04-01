@@ -185,7 +185,7 @@ silece: Es Ignorar temporalmente alertas que cumplan ciertas etiquetas.
 	no notificar.
 
 
-VALORES PARA PENDING PERIOD
+VALORES RECOMENDADOS PARA PENDING PERIOD
 
 for: 1m (rápido). Usado cuando el problema no puede esperar.
 	Se usa para detectar servicios caídos (up == 0).
@@ -280,11 +280,18 @@ Para la cpu de la ram.
 
 Para el corto circuito (solo si aplica).
 
-Porcentaje de errores 5xx por cada endpoint.
+Porcentaje de errores 5xx por cada endpoint en ventanas de 5m.
 
-Porcentaje de errores 4xx por cada endpoint
+Porcentaje de errores 4xx por cada endpoint en ventanas de 5m.
 
-
+Mostrar la cantidad de request por minuto y por cada endpoint (ignorando endpoints que 
+no son de interés).
+sum by (uri) (
+  rate(http_server_requests_seconds_count{
+    job="nombre-app",
+    uri!~"/actuator.*|/health.*|/metrics.*|/swagger-ui.*|/v3.*|/webjars.*"
+  }[5m])
+) * 60
 
 
 ALERTAS QUE SE AGREGAN EN PRODUCCION
@@ -323,8 +330,39 @@ Avisar cuando la cpu supera el 90% por mas de 2 min y agregar avg_over_time(up{j
 
 La condición avg_over_time(up{job="nombreApp"}[2m]) > 0.9 sirve para condicionar a que La app 
 estuvo UP el 90% del tiempo durante los últimos 2 minutos. Esto se hace porque si cuando la app se 
-reinicia la ram y la capu suelve subir de golpe y esto provoca falsos positivos, entonces 
-condiciona a que si la app esta viva y sube la ram o cpu no es un falso negativo.
+reinicia la RAM y la CPU vuelve subir de golpe y esto provoca falsos positivos, entonces 
+condiciona a que si la app esta viva y sube la RAM o CPU no es un falso negativo.
+
+Avisar cuando el porcentaje de errores 5xx por cada endpoint en ventanas de 5m haya superado cierto valor y
+para que no haya falsos positivos se agrega la condición de que hay un numero mínimo de request (por ejemplo
+lanzar la alerta solo si hubo un 70% de errores y al menos unas n request).
+
+
+
+
+
+
+
+( sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", status=~"5..", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) / sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*" }[5m]) ) ) > m -> Un endpoint tiene más de m% de errores 5xx en los últimos 5 minutos
+
+
+sum by (uri) ( increase(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) -> Z # Solo si hay al menos z request en los últimos 5 min.
+
+ 
+
+
+
+
+sum by (uri) (
+    increase(http_server_requests_seconds_count{
+      job="ws-mapfre-prod",
+      uri="nombreEndpoint"
+    }[5m])
+  ) -> Z # Solo si hay al menos z request en los últimos 5 min.
+	Se debe de aplicar por endpoint, porque si se intenta aplicar la misma condición a todos los enpoints,
+	no seria lo correcto porque no todos los endpoints tienen el mismo trafico. ****
+	Para determinar el valor de Z lo mejor seria usar el explorer y ahí meter esta consulta, visualizar
+	los datos de las ultimas 12 horas y usar un valor menor al promedio de request.
 
 
 

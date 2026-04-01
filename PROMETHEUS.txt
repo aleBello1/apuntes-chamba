@@ -122,3 +122,11 @@ increase(metrica[tiempo]) -> Calcula cuánto aumentó el contador dentro del ran
 	Ejemplo si increase(contador[5m]) y si el primer valor es a las 10.00am y hubo 30 	
 	mientras que a las 10.05am hubo 47 entonces se graficara a las 10.00am un 30 y a las 
 	10.05am se graficara un 17.
+
+
+CONFIGURACION Y LEVANTAMIENTO
+
+
+
+
+

@@ -298,17 +298,6 @@ scrape_configs: -> Lista de cosas que Prometheus debe monitorear.
 	- metrics_path: "ruta" -> Le dice a Prometheus la URL donde debe leer 
 		la métrica para este job.
 		- /actuator/prometheus -> Para leer métricas de la app.
-	- static_configs:
-		- - targets: ["host.docker.internal:puertoApp"] -> Indicarle a que servidor 
-			conectarse, es decir, indicarla donde esta la app, db o herramienta que 
-			debe consumir para recolectar las métricas.
-			Se hace la suposición que la app esta corriendo en local y proteus 
-			dentro de un contenedor, por eso se usa el 'host.docker.internal'.
-		- labels:
-  		    service: "nombreLabel" -> Agrega un label a todas las métricas provenientes
-			de este target (herramienta, db o app).
-			Esto ayuda en consultas por eso es importante agregarlo y que sea el 
-			nombre del target.
 	- metric_relabel_configs: -> Define reglas que permiten modificar o eliminar métricas antes 
 		de que Prometheus las almacene.
 	    - - source_labels: [__name__]
@@ -320,6 +309,29 @@ scrape_configs: -> Lista de cosas que Prometheus debe monitorear.
 		dashboards lo mejor es eliminarlas, asi se reduce la ram, disco y cardinalidad.
 		Esta configuración sirve para eliminar todas las métricas de go. Esta configuración se 
 		usa sobre collector, tempo y loki.
+	Opciones si se dará de alta un target por su ip ---------------------------------
+	- static_configs:
+		- - targets: ["ipApp:puertoApp"] -> Indicarle a que servidor conectarse, es decir, 
+			indicarla donde esta la app, db o herramienta que debe consumir para recolectar 
+			las métricas.
+			Si se se hace la suposición que la app esta corriendo en local y prometheus
+			dentro de un contenedor, evidentemente el locahost será: 'host.docker.internal'.
+		- labels:
+  		    service: "nombreLabel" -> Agrega un label a todas las métricas provenientes
+			de este target (herramienta, db o app).
+			Esto ayuda en consultas por eso es importante agregarlo y que sea el 
+			nombre del target.
+	Opciones si se dará de alta un target por su dominio ---------------------------------
+	- scheme: https -> Indica qué protocolo usar para hacer el scrape.
+		Otro posible valor seria http esto dependerá del dominio.
+	- static_configs:
+		- - targets: ["dominio"] -> Indicarle a que servidor conectarse, es decir, 
+			indicarla donde esta la app, db o herramienta que debe consumir para recolectar 
+			las métricas.
+			Se coloca el puro dominio sin el 'https' ni las diagonales y ni los dos 
+			puntos. ****
+		- labels:
+  		    service: "nombreLabel" -> Funciona igual, va el nombre de la app.
 
 Hacer que promethus consuma las métricas: 
 
@@ -367,6 +379,12 @@ GET /targets -> En esta ruta prometheus enlista todas los targets que esta scrap
 
 GET /query -> Muestra que métricas tenemos disponibles con base a los endpoints que esta 
 	consumiendo prometheus.
+
+POST /-/reload -> Para obligar a prometheus a volver a cargar su archivo de configuración. *******
+	Entonces cada que queramos monitorear un nuevo proyecto tendremos que agregar los datos del proyecto
+	al archivo de configuración, seguidamente usar este endpoint para que prometheus note los cambios
+	del archivo de configuración.
+	curl -X POST http://localhost:9090/-/reload
 
 
 ||||||||||| Levantar y configurar grafana ||||||||||||
@@ -588,4 +606,159 @@ logging en application.
 
 
 
+////////////////////////////////////////PRODUCCION/////////////////////////////////////////////
 
+mkdir nombreCarpeta -> Make Directory. Crea una carpeta con determinado nombre.
+	Se puede especificar una ruta parcial o completa de donde queremos que se cree
+	una carpeta nueva. 
+	E:
+		*suponiendo que se esta en el escritorio*
+		sudo mkdir abuelo/padre/hijo 
+		*NO fue necesario indicar la ruta que viene detras, en este caso 
+		home/nombreUsuario/Desktop*
+	Esta nueva carpeta se creara solo si en la ruta parcial o completa que se indica,
+	existen todos esos directororios.
+	- mkdir -p abuelo/padre/nombreCarpeta -> Crea una carpeta con determinado nombre.
+		Si el abuelo o padre no existen, estos seran creados. ***
+		Si las carpetas ya existen no falla el comando. *******
+	- mkdir -m noOctalXnoOctalYnoOctalZ nombreDirectorio -> Crea una nueva carpeta
+		con determinado nombre, especificando que permisos tendra la carpeta.
+	- mkdir -v nombreCarpeta -> Crea una carpeta con determinado nombre.
+		Adicionalmente la terminal mostrará un mensaje como: "se creo el directorio
+		nombreDirectorio".  
+
+
+CARPETAS DE LINUX
+
+/opt: se usa principalmente para instalar software adicional o de terceros que no forma parte del sistema base.
+Esa carpeta es como un lugar “aislado” donde cada aplicación puede vivir con todas sus 
+dependencias sin afectar al resto del sistema.
+Ejemplos típicos:
+/opt/google/chrome
+/opt/intellij-idea
+/opt/postman
+
+/usr: Se utiliza para instalar software del sistema (gestionado por el sistema).
+
+*debajo de control de flujo*
+	Logicos:
+	corchetes simples:
+	Strings ----------------------------------------
+	- -z cadena -> Pregunta si la cadena esta vacía.
+	- -n cadena -> Pregunta si la NO cadena esta vacía.
+	Archivos ---------------------------------------
+	- -f nombreArchivo.extension -> Pregunta de la existencia de un archivo.
+	- -d nombreCarpeta -> Pregunta de la existencia de una carpeta.
+	- -e nombreArchivo.extension ó nombreCarpeta -> Pregunta de la existencia de una carpeta o archivo.
+
+
+
+
+GESTION DE SERVICIOS EN LINUX CON SYSTEMD PARA LAS APPS
+
+La siguiente teoría sirve para explicar como convertir un jar en un servicio administrado por
+linux que le permita reiniciar la app cada que se cae y correrlo en segundo plano.
+
+sudo mkdir -p /opt/jar-service -> Crea el lugar donde vive el controlador, es decir, el script que controlara
+	al archivo .jar.
+
+sudo mkdir -p /home/ubuntu/app
+sudo chown -R ubuntu:ubuntu /home/ubuntu/app
+sudo chmod 755 /home/ubuntu/app -> Para Asegurar que el directorio de la app existe y pertenece al usuario.
+
+sudo chown ubuntu:ubuntu /opt/jar-service
+sudo chmod 755 /opt/jar-service -> Darle permisos para el directorio del script.
+
+sudo nano /opt/jar-service/jar-ws.sh -> Creación y edición del script.
+
+sudo chmod +x /opt/jar-service/jar-ws.sh -> Darle permisos de ejecución al script.
+
+
+Instrucciones dentro del archivo ----------------------------------------------------------
+
+#!/bin/bash
+
+APP_DIR="/home/ubuntu/app" -> Define las rutas donde viven los jars.
+
+JAVA_BIN=$(which java || echo "/usr/bin/java") -> Intenta encontrar Java en el sistema.
+	- which java → Busca en el PATH el comando llamado java.
+	- si falla → usa /usr/bin/java (Evita errores si PATH no está bien configurado).
+
+JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC" -> Configuración la memoria de la app.
+	- -Xms256m → Define la memoria mínima que usara la app.
+	- -Xmx512m → Define la memoria maxima que usara la app.
+	- -XX:+UseG1GC → Para usar el garbage collector moderno.
+
+JAR_FILE=$(ls -t "$APP_DIR"/*.jar 2>/dev/null | head -n 1) -> Para buscar y tomar el jar mas 
+	reciente.
+	- ls -t /home/ubuntu/app/*.jar -> Lista los .jar ordenados por fecha de modificación: El 
+		más reciente → arriba y El más viejo → abajo.
+	- 2>/dev/null -> Oculta errores (por ejemplo si no hay .jar).
+	- | head -n 1 -> Toma solo el primer elemento.
+
+if [ -z "$JAR_FILE" ]; then
+    echo "ERROR: No se encontró ningún archivo .jar en $APP_DIR"
+    exit 1
+fi -> Si no se encontró ningún jar imprime un mensaje y termina el script (systemd lo verá como 
+	fallo).
+
+cd "$APP_DIR" || exit -> Nos movemos a donde esta la app pero si falla termina el script.
+
+echo "Iniciando Spring Boot..."
+echo "JAR: $JAR_FILE"
+exec "$JAVA_BIN" $JAVA_OPTS \
+    -jar "$JAR_FILE" \
+    --server.port=5000 \
+    --spring.profiles.active=nombreAmbiente -> Para levantar el jar utilizando ciertas opciones.
+
+
+Configuración del servicio -------------------------------------------------------------
+
+systemd: Es el sistema que controla TODO lo que corre en Linux. 
+	Rutas:
+	- /etc/systemd/system -> 
+
+sudo nano /etc/systemd/system/jar-ws.service
+	El servicio se crea dentro de esta ruta porque en esta ruta van todos los serivicos personalizados
+	del usuario y admin.
+
+Secciones del archivo de configuración:
+[Unit]     → qué es y cuándo iniciar
+[Service]  → cómo se ejecuta
+[Install]  → cuándo se activa automáticamente
+
+°°°°°°°°° Instrucciones dentro de unit °°°°°°°°
+
+Description=texto -> Agrega una description meramente para humanos
+	Esta se visualizara al hacer systemctl status nombreServicio.
+
+After=network.target -> Para que Linux arranque el servicio después de que otro servicio este listo.
+	Ejemplos:
+	- After=network.target -> Para que Linux arranque el servicio después de que la red esté 
+		lista.
+
+
+
+
+
+Restart=always -> Si la app se cae se levanta sola.
+
+User=Ubuntu -> Lo corre con determinado usuario.
+
+MemoryMax=800M -> Limita consumo de RAM.
+
+Ahora systemd captura los logs de la app y podemos utilizar el siguiente comando.
+
+journalctl -u jar-ws -> Para mostrar los logs de determinado servicio.
+	journald es el sistema de logs de Linux.
+	Los logs normalmente se guardan en disco en /var/log/journal/.
+	Journalctl usa RAM como buffer temporal: Para escribir rápido y para no saturar el disco con cada 
+	log después los pasa al disco.
+	Al hacerlo asi, no importa donde este el archivo, siempre podremos pedir los logs.
+	- journalctl -u jar-ws -f -> Para ver los logs den tiempo real.
+
+
+
+
+dividir teoría de prometheus
+terminar de autoexplicarse lo de los servicios y nginx

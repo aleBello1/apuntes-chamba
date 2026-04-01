@@ -1,0 +1,63 @@
+Crea un pipeline: Basicamente esto sirve para integrar un proyecto nuevo a Jenkins.
+    *En sl servidor de jenkins* -> Ingresar a la carpeta donde se almacenan los pipelines
+    -> en apartado izq buscar y darle click en new item (Si no nos aparece es porque no 
+    tenemos permisos de admin en jenkins) -> asignar nombre (el nombre del proyecto) -> 
+    multibranch (porque queremos el despliegue en dev y prod) -> ok.
+	Asignar nombre (igualmente el nombre del proyecto) -> indicar donde vive el repositorio (si
+	git hub, bitBucket, etc).
+		Bitbucket:
+		- Se debe crear un server para bitbucket.
+		- Después de crearlo, en este selector se deberá elegir el ultimo. ***
+	seleccionar las credenciales -> asginar el nombre del owner (tal cual el dueño del repo) -> 
+    asignar el nombre del repositorio. En un apartado mas abajo buscar: 'Build Configuration' 
+    -> mode: by JenkisFile -> apply and save.
+
+
+
+Crear un webhook para un repositorio en bitbucket: *En bitbucket* Ir a determinado repositorio -> 
+    apartado izq reposiroty settings (si no tenemos este apartado, seguramente no tenemos los 
+    sufientes permisos sobre el repositorio) -> click sobre workflows -> webhooks -> add webhook 
+    -> en title: nombre del repositorio, url: conformado por [url donde vive la instania de 
+    jenkins][evento a ejecutar] -> Status: active -> El el apartdo de triggers, en la columna de 
+    repository: palomear push, en la columna issue se queda vacio, en la columna de pull request 
+    palomear create, update, comment created, comment updated -> save.
+
+
+*esto reemplaza a: Crear credenciales en jenkins:*
+Crear credenciales para los ambientes del proyecto en jenkins: parte sup der 'engrane' -> apartado 
+    security -> credentials -> Scrollear en la pagina y en el apartado: 'Stores scoped to Jenkins' 
+    De la columna domains, dar click sobre su valor ('global') -> add credentials.
+    En kind: secret text; scope: global (jenkins, ...); secret: es la ip de la instancia; en id es 
+    una especie de nombre de variable que se crea y se 	usa en nuestro jenkinsfile, esta conformado 
+    por un nombre asi: ssh-[nombreNube]-[tipoInstancia]-[nombreProyecto]-[envirenment]-ip y en 
+    description es la que sea pero se usa el mimso valor que el valor de id concatenado con la ip
+    de la instancia.
+    Esto se hace dos veces, uno vez por ambiente. ***
+
+*Esto reemplaza a Agregar credencial de tipo PEM:*
+Crear credencial de tipo PEM: parte sup der 'engrane' -> apartado security -> credentials -> 
+    Scrollear en la pagina y en el apartado: 'Stores scoped to Jenkins' -> De la columna domains, 
+    dar click sobre su valor ('global') -> add credentials.
+	En kind: SSH Username with private key; en id es una especie de nombre de variable que se crea y 
+    se 	usa en nuestro jenkinsfile, esta conformado por un nombre asi: 
+	ssh-[nombreNube]-[tipoInstancia]-[nombreProyecto]-pem por ejemplo: ssh-aws-arm-ws-clupp-pem; en 
+	username se agrega el nombre del usuario root en la instancia por ejemplo Ubuntu; palomeamos la 
+    opción: Enter directly e ingresamos la pem.
+    El pem es el que se usa para conectarse con la instancia de aws. ***
+
+Agregar y configurar el JenkinsFile en nuestro proyecto: *En el proyecto de interes* -> Crear una 
+    rama feature llamada jenkinsfile -> si el proyecto tiene los archivos: bitbucket-pipeline.yml,
+    Procfile, buildspect.yml y/o la carpeta .ebextensions en la raíz, entonces los eliminamos -> 
+    En la raíz del proyecto cremos el archivo 'Jenkinsfile' (la primera letra en mayuscula, las 
+    deman en minúsculas y no tiene extensión el archivo). -> Despues agregarmos el contenido del 
+    archivo.
+    Hay aprox 5 variables que se les debe cambiar el valor: 	
+	- BITBUCKET_REPO: Repositorio a donde está alojado el proyecto.
+	- BITBUCKET_CREDENTIALS_ID: Credencial principal del administrador.
+	- credentialsId A1: Nombre de la credencial en Jenkins que apunta a Desarrollo. 
+		En pocas palabras es para poder subir el .jar a cierta instancia de aws en dev.
+	- credentialsId A2: Nombre de la credencial en Jenkins que apunta a producción.
+		En pocas palabras es para poder subir el .jar a cierta instancia de aws en prod.
+	- credentialsId A3: Nombre de la credencial en Jenkins que apunta al pem.
+    Cerramos la rama -> ya podremos hacer push y ver el estado del despliegue en el repositorio.
+	

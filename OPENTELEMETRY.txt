@@ -517,3 +517,4 @@ nc -zv IP_INSTANCIA_OBSERVABILIDAD 4317 -> Verifica que la regla de salida en la
 Para debuggear *Dentro de la instancia de observabilidad*: docker ps y docker logs colllector
 
 ss -tulnp | grep 4317 -> Verifica si hay un proceso escuchando en el puerto 4317 dentro de la instancia.
+
