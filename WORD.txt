@@ -1,0 +1,37 @@
+//////////////////////////////////////////GOOGLE DOCS/////////////////////////////////////////
+
+CREACION DE HIPERVINCULOS
+
+También es llamado crear enlaces internos dentro del documento.
+Supuestamente hay varios métodos.
+
+Método encabezados ----------------------------
+
+Definir el destino del hipervinculo: Es para indicar el texto al que quieres llevar al usuario.
+	Para ello seleccionar el texto y debajo de los menus (a la altura del menú formato) darle 
+	click sobre estilos.
+	Los estilos que aparecerán serán algo como: Título 1, Título 2 o similares. 
+
+Crear el hipervínculo: Selecciona el texto desde donde quieres que al hacer clic nos lleve el 
+	destino -> hacer ctrl + k -> seleccionar títulos, favoritos y pestañas -> seleccionar +
+	determinado titulo.
+
+Método marcadores ------------------------------
+
+
+
+PAGINAR DOCUMENTO
+
+menú insertar -> elementos de pagina -> números de pagina y seleccionar la posición donde se 
+	desea que se muestre la numeración.
+
+
+OTROS
+
+Crear una Caja de texto copiable ó Bloque de código (code block): Hay varias manera pero la
+	mejor es con la técnica de la tabla.
+	menú insertar -> tabla -> 1x1 y ahí pegar el código.
+
+
+
+	
