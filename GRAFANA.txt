@@ -397,9 +397,57 @@ para que no haya falsos positivos se agrega la condición de que hay un numero m
 lanzar la alerta solo si hubo un 70% de errores y al menos unas n request).
 
 
+CONSUMO DE LA API DE GRAFANA
 
+Esto se utiliza para apagar ciertas aletas usando los endpoints de grafana.
+Lo que sucede es que, al hacer un despliegue automático, una de las acciones es tirar el anterior jar y
+grafana piensa que la app se cayo cuando en realidad esto es parte del despliegue automático, entonces 
+para evitar que lance alertas, dentro del despliegue automático se consume la api de grafana para que 
+nos permita desactivar ciertas alertas mientras se hace el despliegue.
 
+Crear un token (API Keys o tokens de servicio): *en grafana* -> Apartado izq administration -> 
+	users and Access -> service accounts -> add service account -> asignar un nombre -> 
+	role: editor -> créate.
+	Volver a Apartado izq administration -> users and Access -> service accounts -> sobre
+	cierto service account dar click en add token -> darle nombre al token (pe api-key) -> 
+	generate.
+	El token se muestra una sola vez asi que se debe guardar. ****
 
+Usar el token: *En postman* -> click en apartado authorization -> auth type: bearer token ->
+	meter el token y ya podremos lanzar soliticutes a la api de grafana.
+	El servicio mas sencillo para hacer pruebas es: GET /api/org ó GET /api/user
+
+Mutear una alerta: Si se mutea la alerta no notificara por el contacto point que se este usando.
+	
+{
+  "matchers": [...],
+  "startsAt": "...",
+  "endsAt": "...",
+  "createdBy": "...",
+  "comment": "..."
+} -> Cuerpo de la solicitud para mutear alertas.
+	Básicamente define qué alertas, cuándo, y por qué las quieres silenciar.
+	- "matchers" -> Sirve para filtrar, es decir, para buscar determinas alertas.
+		Se pueden crear varios filtros, por cada filtro se debe crear un elmeneto dentro
+		de matchers. ****
+		- "name": "nombreLabel" -> Indica el label por el cual se desea filtrar, valores
+			comunes: alertname, job, instance, severity, namespace.
+		- "value": "valor" -> El valor que debe tener el label.
+		- "isRegex": boolean -> Indica si el valor es una expresión regular o no.
+	- "startsAt": "2026-04-01T19:54:00Z" -> Indica el momento en el que iniciar el silencio.
+	- "endsAt": "2026-04-01T19:59:00Z" -> Momento en el que termina el silencio.
+	- "createdBy": "dev ops" -> Solo es informativo para indicar quien lo creo.
+	- "comment": "Despliegue automatico" -> Description del silencio.
+
+START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+END=$(date -u -d "+5 minutes" +"%Y-%m-%dT%H:%M:%SZ") -> Esto se usa para volver dinámica la 
+	fecha actual de inicio y termino.
+	Tiene el formato de hora que ocupa grafana ***
+	Se puede probar en git bash.
+
+Comprobacion de silenciar determinada alerta o alertas: en grafana, apartado izq Alerting -> 
+	silences se mostrara la o las alertas muteadas.
+	En el apartado alert rules no cambia nada visual. *****
 
 
 ( sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", status=~"5..", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) / sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*" }[5m]) ) ) > m -> Un endpoint tiene más de m% de errores 5xx en los últimos 5 minutos

@@ -126,6 +126,15 @@ df -h -> Muestra de manera desglosada la memoria en disco usada. Muestra: Espaci
 
 
 
+timedatectl -> Muestra la zona horaria que tiene la instancia.
+	Lo ideal es cambiarla a la misma zona horaria de nuestro país.
+	
+sudo timedatectl set-timezone America/Mexico_City -> Cambia la zona horaria a la de mexoco.
+	
+
+
+
+
 
 
 

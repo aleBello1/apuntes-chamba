@@ -449,7 +449,8 @@ mkdir nombreCarpeta -> Make Directory. Crea una carpeta con determinado nombre.
 
 CARPETAS DE LINUX
 
-/opt: se usa principalmente para instalar software adicional o de terceros que no forma parte del sistema base.
+/opt: se usa principalmente para instalar software adicional o de terceros que no forma parte 
+del sistema base.
 Esa carpeta es como un lugar “aislado” donde cada aplicación puede vivir con todas sus 
 dependencias sin afectar al resto del sistema.
 Ejemplos típicos:
@@ -468,7 +469,8 @@ Ejemplos típicos:
 	Archivos ---------------------------------------
 	- -f nombreArchivo.extension -> Pregunta de la existencia de un archivo.
 	- -d nombreCarpeta -> Pregunta de la existencia de una carpeta.
-	- -e nombreArchivo.extension ó nombreCarpeta -> Pregunta de la existencia de una carpeta o archivo.
+	- -e nombreArchivo.extension ó nombreCarpeta -> Pregunta de la existencia de una 
+		carpeta o archivo.
 
 
 
@@ -478,12 +480,13 @@ GESTION DE SERVICIOS EN LINUX CON SYSTEMD PARA LAS APPS
 La siguiente teoría sirve para explicar como convertir un jar en un servicio administrado por
 linux que le permita reiniciar la app cada que se cae y correrlo en segundo plano.
 
-sudo mkdir -p /opt/jar-service -> Crea el lugar donde vive el controlador, es decir, el script que controlara
-	al archivo .jar.
+sudo mkdir -p /opt/jar-service -> Crea el lugar donde vive el controlador, es decir, el script
+	que controlara al archivo .jar.
 
 sudo mkdir -p /home/ubuntu/app
 sudo chown -R ubuntu:ubuntu /home/ubuntu/app
-sudo chmod 755 /home/ubuntu/app -> Para Asegurar que el directorio de la app existe y pertenece al usuario.
+sudo chmod 755 /home/ubuntu/app -> Para Asegurar que el directorio de la app existe y pertenece 
+	al usuario.
 
 sudo chown ubuntu:ubuntu /opt/jar-service
 sudo chmod 755 /opt/jar-service -> Darle permisos para el directorio del script.
@@ -510,8 +513,8 @@ JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC" -> Configuración la memoria de la ap
 
 JAR_FILE=$(ls -t "$APP_DIR"/*.jar 2>/dev/null | head -n 1) -> Para buscar y tomar el jar mas 
 	reciente.
-	- ls -t /home/ubuntu/app/*.jar -> Lista los .jar ordenados por fecha de modificación: El 
-		más reciente → arriba y El más viejo → abajo.
+	- ls -t /home/ubuntu/app/*.jar -> Lista los .jar ordenados por fecha de modificación: 
+		El más reciente → arriba y El más viejo → abajo.
 	- 2>/dev/null -> Oculta errores (por ejemplo si no hay .jar).
 	- | head -n 1 -> Toma solo el primer elemento.
 
@@ -538,47 +541,108 @@ systemd: Es el sistema que controla TODO lo que corre en Linux.
 	- /etc/systemd/system -> 
 
 sudo nano /etc/systemd/system/jar-ws.service
-	El servicio se crea dentro de esta ruta porque en esta ruta van todos los serivicos personalizados
-	del usuario y admin.
+	El servicio se crea dentro de esta ruta porque en esta ruta van todos los serivicos 
+	personalizados del usuario y admin.
 
 Secciones del archivo de configuración:
-[Unit]     → qué es y cuándo iniciar
+[Unit]     → qué es y cuándo iniciar el serivicio
 [Service]  → cómo se ejecuta
 [Install]  → cuándo se activa automáticamente
+
 
 °°°°°°°°° Instrucciones dentro de unit °°°°°°°°
 
 Description=texto -> Agrega una description meramente para humanos
-	Esta se visualizara al hacer systemctl status nombreServicio.
+	Esta se visualizara al hacer 'systemctl status nombreServicio'.
 
-After=network.target -> Para que Linux arranque el servicio después de que otro servicio este listo.
-	Ejemplos:
-	- After=network.target -> Para que Linux arranque el servicio después de que la red esté 
-		lista.
+After=servicioZ -> Para que Linux arranque el servicio después de que otro servicio este listo.
+	Posibles valores:
+	- After=network.target -> Para que Linux arranque el servicio después de que la red 
+		esté lista.
+		No garantiza internet o ip lista.
+		Esto se aplica comúnmente a los backend, porque el backend necesita la red
+		disponible para exponer puertos y conectarse a la db. ****
+	- basic.target -> Para que Linux arranque el servicio después de que el sistema mínimo 
+		este listo (sin red garantizada)
+	- network-online.target -> Red completamente operativa, IP asignada y listo para 
+		conexiones reales.
+	- After=mysql.service -> Espera a que MySQL arranque. 
+		Obviamente solo si la db esta en localhost.
 
 
+°°°°°°°°° Instrucciones dentro de service °°°°°°°°
 
+Type=valor -> Define cómo systemd interpreta el proceso.
+	valores:
+	- simple -> Para indicar que el proceso que lanzas (el script) es directamente el servicio, 
+		y systemd lo considera “activo” desde que arranca, sin esperar señales extra.
+		Este valor se usa comúnmente sobre scripts que levantan apps.
+	- oneshot -> Para scripts que terminan. Ejemplo: migraciones.
 
+User=Ubuntu -> Para que el servicio corra con determinado usuario.
+	Si hackean el servicio o la instancia entonces no tendrán acceso total al sistema.
 
-Restart=always -> Si la app se cae se levanta sola.
+WorkingDirectory=/home/ubuntu/app -> Es el directorio base donde se ejecuta el proceso.
+	Es equivalen a cd ruta.
 
-User=Ubuntu -> Lo corre con determinado usuario.
+ExecStart=/opt/jar-service/jar-ws.sh -> Defines qué se ejecuta.
+
+Restart=always -> Si el servicio se cae se levanta solo.
+
+RestartSec=n[s] -> Espera n segundos antes de reiniciar.
+
+NoNewPrivileges=true -> Evita que el proceso use sudo.
+
+PrivateTmp=true -> Le da un /tmp aislado.
+	Así el servicio no comparte /tmp con el sistema y evita ataques tipo: race conditions
+	y manipulación de archivos temporales.
+
+ProtectHome=read-only -> Convierte a /home solo lectura.
+
+ProtectSystem=full -> Hace el sistema casi solo de lectura.
+	Las rutas: /usr, /etc y /bin están protegidos.
+	El servicio no puede modificar sistema y solo puede usar lo mínimo necesario
+
+LimitNOFILE=65535 -> Define el Máximo número de archivos abiertos.
 
 MemoryMax=800M -> Limita consumo de RAM.
+	systemd mata el servicio antes de tumbar al servidor.
 
-Ahora systemd captura los logs de la app y podemos utilizar el siguiente comando.
+TimeoutStopSec=30 -> Tiempo máximo para detener el servicio.
+	Cuando se hace: 'systemctl stop jar-ws', si el servicio tarda mas de 30s entonces
+	systemd mata el servicio.
+
+StandardOutput=journal 
+StandardError=journal -> Para que todo tipo de log o impresión se vaya a journalctl por
+	todo se refiere a stout, stderr, logs del proceso y logs del script.
+
+
+°°°°°°°°° Instrucciones dentro de install °°°°°°°°
+
+WantedBy=multi-user.target -> Define CUÁNDO se activa el servicio al arrancar el sistema.
+	- multi-user.target -> Para que arranque cuando el sistema este listo, red disponible
+		y sin gui.
+
+
+Activar el servicio ------------------------------------------
+
+sudo systemctl daemon-reload -> Recargar systemd para que reconozca el nuevo servicio.
+
+sudo systemctl enable jar-ws -> Habilitar que el servicio inicie con el sistema.
+
+sudo systemctl start jar-ws -> Para iniciar el servicio.
+
+sudo systemctl status jar-ws -> Verificar el estado del servicio.
+
+Con base a estas configuraciones, ahora systemd captura los logs de la app y podemos 
+utilizar el siguiente comando.
 
 journalctl -u jar-ws -> Para mostrar los logs de determinado servicio.
 	journald es el sistema de logs de Linux.
 	Los logs normalmente se guardan en disco en /var/log/journal/.
-	Journalctl usa RAM como buffer temporal: Para escribir rápido y para no saturar el disco con cada 
-	log después los pasa al disco.
+	Journalctl usa RAM como buffer temporal: Para escribir rápido y para no saturar el disco
+	con cada log después los pasa al disco.
 	Al hacerlo asi, no importa donde este el archivo, siempre podremos pedir los logs.
 	- journalctl -u jar-ws -f -> Para ver los logs den tiempo real.
 
 
-
-
-dividir teoría de prometheus
-terminar de autoexplicarse lo de el Daemon y nginx
-conocer como consumir la api de grafana

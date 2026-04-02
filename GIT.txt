@@ -1,4 +1,26 @@
 
+git reset -> Mueve el puntero HEAD a otro commit y dependiendo de como se usa también afecta 
+	staggin area y WORKDIR.
+	Se usa cuando NO has hecho push de uno o varios commits, y se quieren eliminar uno o 
+	varios de esos commits. 
+	Para que un commit se elimine para siempre, deben pasar 2 cosas: Que NO esté 
+	referenciado
+	- git reset nombreArchivo.extension -> Saca determinado archivo del staggin area.
+	- git reset [opciones] idCommit -> Hacer que determinado commit sea el ultimo en una 
+			rama, todos los commits mas recientes a este, serán eliminados del 
+			repositorio local.
+		- --soft -> Los cambios del ultimo commit se quedan en el staggin área y en 
+			el disco local.
+		- --mixed -> Los cambios del ultimo commit NO se quedan en el staggin área 
+			pero si en el disco local.
+			Si no se coloca una opción, este es la opción por defecto. ****
+		- --hard -> Los cambios del ultimo commit NO se quedan en el staggin área 
+			ni en el disco local.
+	- git reset [opciones] HEAD~n -> Indica cuantos commits atrás será el ultimo. 
+		- HEAD~1 = commit anterior.
+		- HEAD~2 = dos commits atrás
+		- etc.
+
 
 GIT FLOW
 
@@ -27,7 +49,8 @@ ramas feature ---------------------------------------------
 git flow feature start nombreRama -> Crea una rama local con el prefijo utilizado (feature en este caso)
 	a partir de la rama develop.
 	Internamente ejecuta varios comando de git: ejecuta el comando para que nos cambiemos a la rama
-	develop (checkout/switch), bajemos lo relacionado a esa rama para tenerla actualizada (pull), crea 	la rama de feature y nos cambia a esta nueva rama (switch).
+	develop (checkout/switch), bajemos lo relacionado a esa rama para tenerla actualizada (pull), crea
+ 	la rama de feature y nos cambia a esta nueva rama (switch).
 	El nombre de la rama será un nombre que describa la funcionalidad que se implementara.
 
 git flow feature finish nombreRama -> Fusiona (merge) la rama feature/nombreRama en develop, despues
@@ -36,7 +59,9 @@ git flow feature finish nombreRama -> Fusiona (merge) la rama feature/nombreRama
 	Si hay conflictos Git Flow detendrá el proceso y te pedirá resolverlos manualmente (como en un
 	merge clásico).
 	Se nos manda a vim y debemos escribir el mensaje del commit (sin las comillas dobles envolviendo 
-	al string), para eso presionar i (insert) para que nos deje escribir después presionar esc para 	indicar que terminamos de escribir, y escribimos :wq! -> Para guardar y salir de vim. Nos pide el 	commit en vim 2 veces pero solo lo escribimos una vez (el otro nos lo saltamos).
+	al string), para eso presionar i (insert) para que nos deje escribir después presionar esc para 
+	indicar que terminamos de escribir, y escribimos :wq! -> Para guardar y salir de vim. Nos pide el
+ 	commit en vim 2 veces pero solo lo escribimos una vez (el otro nos lo saltamos).
 	
 En este momento deberemos hacer el git push.
 
@@ -64,7 +89,8 @@ ramas realese ---------------------------------------------
 
 git pull origin master
 git checkout develop
-git pull origin develop -> Antes de iniciar un release, siempre se ejecutan estas instrucciones para tener 	la versión más reciente.
+git pull origin develop -> Antes de iniciar un release, siempre se ejecutan estas instrucciones para tener 
+	la versión más reciente.
 
 git flow release start vx.y.z -> Crea una rama de release llamada release/vx.y.z, Prepara una nueva 
 	versión para producción, Permite realizar últimas pruebas y ajustes antes del lanzamiento, 
@@ -86,7 +112,9 @@ application.yaml pero implicaría hacer otro commit.
 git flow release finish vx.y.z -> Fusiona la rama de release en main (master), Crea un tag con el nombre 
 	de la versión, Borra la rama release/vx.y.z localmente.
 	Se nos manda a vim y debemos escribir el mensaje del commit (sin las comillas dobles envolviendo 
-	al string), para eso presionar i (insert) para que nos deje escribir después presionar esc para 	indicar que terminamos de escribir, y escribimos :wq! -> Para guardar y salir de vim. Nos pide 2 	mensajes: el primero es para el tag (puedes aceptar el predeterminado o personalizarlo) y el 
+	al string), para eso presionar i (insert) para que nos deje escribir después presionar esc para 
+	indicar que terminamos de escribir, y escribimos :wq! -> Para guardar y salir de vim. Nos pide 2
+ 	mensajes: el primero es para el tag (puedes aceptar el predeterminado o personalizarlo) y el 
 	segundo es para el tag (este se puede quedar con el valor por default, que seria el que 
 	utilizamos al crear el realese (vx.y.z)).
 
