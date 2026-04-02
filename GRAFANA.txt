@@ -395,6 +395,22 @@ condiciona a que si la app esta viva y sube la RAM o CPU no es un falso negativo
 Avisar cuando el porcentaje de errores 5xx por cada endpoint en ventanas de 5m haya superado cierto valor y
 para que no haya falsos positivos se agrega la condición de que hay un numero mínimo de request (por ejemplo
 lanzar la alerta solo si hubo un 70% de errores y al menos unas n request).
+	- Primera condición: ( sum( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", 
+		status=~"5..", uri="nombreRutaX" }[5m]) ) / sum( rate(http_server_requests_seconds_count{ 
+		job="ws-mapfre-prod", uri="nombreRutaX" }[5m]) ) ) -> Si determinado endpoint tiene más de
+			m% de errores 5xx en los últimos 5 minutos
+			Esta condición si lanza la alerta.
+	- Segunda consulta: sum by (uri) (
+    		increase(http_server_requests_seconds_count{
+      		job="ws-mapfre-prod",
+      		uri="nombreEndpoint"}[5m])) > Z -> # Solo si hay al menos z request en los últimos 5 min.
+			Se debe de aplicar por endpoint, porque si se intenta aplicar la misma condición 
+			a todos los enpoints, no seria lo correcto porque no todos los endpoints tienen 
+			el mismo trafico. ****
+			Para determinar el valor de Z lo mejor seria usar el explorer y ahí meter esta 
+			consulta, visualizar los datos de las ultimas 12 horas y usar un valor un poco 
+			menor al promedio de request (para cubrir mayor cantidad de request).
+			Esta condicion solo sirve para que no haya falsos positivos.
 
 
 CONSUMO DE LA API DE GRAFANA
@@ -455,23 +471,10 @@ Comprobacion de silenciar determinada alerta o alertas: en grafana, apartado izq
 
 
 
-( sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", status=~"5..", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) / sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*" }[5m]) ) ) > m -> Un endpoint tiene más de m% de errores 5xx en los últimos 5 minutos
-
-
-sum by (uri) ( increase(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) -> Z # Solo si hay al menos z request en los últimos 5 min.
 
  
 
-sum by (uri) (
-    increase(http_server_requests_seconds_count{
-      job="ws-mapfre-prod",
-      uri="nombreEndpoint"
-    }[5m])
-  ) -> Z # Solo si hay al menos z request en los últimos 5 min.
-	Se debe de aplicar por endpoint, porque si se intenta aplicar la misma condición a todos los enpoints,
-	no seria lo correcto porque no todos los endpoints tienen el mismo trafico. ****
-	Para determinar el valor de Z lo mejor seria usar el explorer y ahí meter esta consulta, visualizar
-	los datos de las ultimas 12 horas y usar un valor menor al promedio de request.
+
 
 
 
