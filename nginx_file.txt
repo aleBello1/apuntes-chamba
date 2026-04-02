@@ -1,0 +1,150 @@
+#!/bin/bash
+# ==========================================
+# 
+# 1. Configurar Sitio /etc/nginx/sites-available (dominio)
+#    -->>   linea 48 -&&- linea 51
+# 2. Configurar Sitio /etc/nginx/sites-Enabled (default) 
+#    -->>   linea 86
+# ==========================================
+
+# 3. Configurar
+#    -->>   linea 103
+
+# ==========================================
+
+# ==========================================
+# AUTOMATIZACIÓN DE CONFIGURACIÓN NGINX
+# 
+# ==========================================
+
+# Colores para salida
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+
+echo -e "${BLUE}[INFO] Iniciando proceso de configuración automática...${NC}"
+
+# 1. Actualizar el sistema
+echo -e "${GREEN}[1/8] Actualizando repositorios y sistema...${NC}"ls
+
+sudo apt update -qq && sudo apt upgrade -y -qq
+
+# 2. Instalar Nginx
+echo -e "${GREEN}[2/8] Instalando Nginx...${NC}"
+sudo apt install nginx -y -qq
+
+# 3. Verificar instalación e iniciar servicio
+echo -e "${GREEN}[3/8] Habilitando servicio Nginx...${NC}"
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
+# 4. Configurar Sitio Específico (dominio)
+# Nota: Escribimos en sites-available y luego linkeamos.
+# Usamos 'EOF' con comillas simples para que Bash no interprete las variables $ de Nginx.
+
+echo -e "${GREEN}[4/8] Escribiendo configuración para instancia && dominio...${NC}"
+cat << 'EOF' | sudo tee /etc/nginx/sites-enabled/arm.ws-zurich.com
+server {
+    listen 80;
+    server_name arm.ws-zurich.com www.arm.ws-zurich.com;
+    
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        # Opcional: tiempo de espera
+        proxy_read_timeout 90;
+    }
+    
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}
+EOF
+
+# 5. Configurar Sitio Default
+echo -e "${GREEN}[5/8] Sobrescribiendo configuración default...${NC}"
+# Backup del default original por seguridad
+if [ -f /etc/nginx/sites-available/default ]; then
+    sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+fi
+
+cat << 'EOF' | sudo tee /etc/nginx/sites-available/default
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name ws-zurich;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 3600;
+    }
+}
+EOF
+
+# 6. Activar sitios (Symlinks)
+echo -e "${GREEN}[6/8] Activando sitios (Symlinks)...${NC}"
+# Activamos arm
+# sudo ln -sfn /etc/nginx/sites-available/arm.ws-aguila.com /etc/nginx/sites-enabled/
+# Aseguramos que default esté activo
+# sudo ln -sfn /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+# 7. Verificación de sintaxis y Reinicio
+echo -e "${GREEN}[7/8] Verificando sintaxis de Nginx...${NC}"
+sudo nginx -t
+
+if [ $? -eq 0 ]; then
+    echo -e "${BLUE}[INFO] Sintaxis correcta. Reiniciando Nginx...${NC}"
+    sudo systemctl restart nginx
+else
+    echo -e "${RED}[ERROR] La configuración tiene errores. No se reiniciará Nginx.${NC}"
+    exit 1
+fi
+
+#Revisa firewall y puertos
+sudo ufw status
+sudo ufw allow 80
+sudo ufw allow 443
+
+# 8. Reporte Final de Estado
+echo -e "\n${BLUE}==============================================${NC}"
+echo -e "${BLUE}          REPORTE DE ESTADO DEL SERVICIO       ${NC}"
+echo -e "${BLUE}==============================================${NC}"
+
+# Estado del servicio
+STATUS=$(systemctl is-active nginx)
+echo -e "Estado Nginx    : ${GREEN}$STATUS${NC}"
+
+# IPs
+PRIVATE_IP=$(hostname -I | awk '{print $1}')
+PUBLIC_IP=$(curl -s --connect-timeout 5 ifconfig.me || echo "No disponible")
+echo -e "IP Privada      : $PRIVATE_IP"
+echo -e "IP Pública      : $PUBLIC_IP"
+
+# Memoria RAM (Usada / Total)
+MEM_USED=$(free -h | grep Mem | awk '{print $3 "/" $2}')
+echo -e "Memoria RAM     : $MEM_USED"
+
+# Verificación de puertos escuchando
+echo -e "\nPuertos Nginx:"
+sudo ss -tulpn | grep nginx
+
+sudo systemctl restart nginx
+
+echo -e "${BLUE}==============================================${NC}"
+echo -e "${GREEN}Configuración completada exitosamente.${NC}"

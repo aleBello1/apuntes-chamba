@@ -440,7 +440,7 @@ Mutear una alerta: Si se mutea la alerta no notificara por el contacto point que
 	- "comment": "Despliegue automatico" -> Description del silencio.
 
 START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-END=$(date -u -d "+5 minutes" +"%Y-%m-%dT%H:%M:%SZ") -> Esto se usa para volver dinámica la 
+END=$(date -u -d "+3 minutes" +"%Y-%m-%dT%H:%M:%SZ") -> Esto se usa para volver dinámica la 
 	fecha actual de inicio y termino.
 	Tiene el formato de hora que ocupa grafana ***
 	Se puede probar en git bash.
@@ -450,15 +450,17 @@ Comprobacion de silenciar determinada alerta o alertas: en grafana, apartado izq
 	En el apartado alert rules no cambia nada visual. *****
 
 
+
+
+
+
+
 ( sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", status=~"5..", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) / sum by (uri) ( rate(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*" }[5m]) ) ) > m -> Un endpoint tiene más de m% de errores 5xx en los últimos 5 minutos
 
 
 sum by (uri) ( increase(http_server_requests_seconds_count{ job="ws-mapfre-prod", uri!~"/health|/metrics|/actuator.*|/webjars.*|/swagger-ui.*|/v3.*" }[5m]) ) -> Z # Solo si hay al menos z request en los últimos 5 min.
 
  
-
-
-
 
 sum by (uri) (
     increase(http_server_requests_seconds_count{
